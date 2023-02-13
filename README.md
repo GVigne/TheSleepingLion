@@ -16,9 +16,9 @@ Before creating your cards, make sure to check the tutorial to use this software
 # Installing The Sleeping Lion
 ## Windows users
 
-For Windows, you can simply use this binary (you do not need to have Python installed).
+For Windows, you can simply use [this binary](https://github.com/GVigne/TheSleepingLion/raw/main/TheSleepingLion.exe) (you do not need to have Python installed).
 
-Of course, you can also install The Sleeping Lion in a Python environment by following the below instructions.
+Of course, you can also install The Sleeping Lion in a Python environment by following the instructions below.
 
 ## Windows 11 users
 Windows 11 users also need to install the two fonts used in The Sleeping Lion. If those fonts aren't installed, The Sleeping Lion will not work properly.
