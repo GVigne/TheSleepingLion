@@ -1,0 +1,1132 @@
+
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[english]{babel}
+\usepackage{fancyvrb}
+\usepackage{indentfirst}
+\usepackage{tabularx}
+\usepackage{spverbatim}
+\usepackage{multicol}
+\usepackage{dirtree}
+
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\title{Available functions}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Overview}
+This document lists in details every available command, alias and macro. You will also find in the alias section an explanation as to how to define your own aliases.
+
+\section{Commands}
+% Use the command_doc.py script to generate the part of the following latex instructions, as well as associated images.
+\subsection{image}
+\subsubsection{Description}
+
+\textbf{\underline{Arguments:}} Takes one mandatory argument, which is the name or the path to an image with its extension.
+
+Can take an optional argument which is a scaling ratio: for example, 0.5 corresponds to a scaling ratio of 50\%, so the image will be twice as small. You do not need to scale the images already loaded in The Sleeping Lion, they are already at the correct size.
+
+\textbf{\underline{Description:}} Displays the image on the card. 
+
+\textbf{\underline{Example:}}
+
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+Attack \image{attack.svg} 1
+  Range \image{range.svg} 3
+  Stun \image{stun.svg}
+
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Commands_images/image.pdf}
+\end{minipage} 
+
+\subsubsection{Available images}
+The following images are already loaded into The Sleeping Lion, and can be used as they are.
+\begin{multicols}{2}
+\begin{itemize}
+\item \verb`attack.svg`
+\item \verb`move.svg`
+\item \verb`range.svg`
+\item \verb`target.svg`
+\item \verb`heal.svg`
+\item \verb`shield.svg`
+\item \verb`retaliate.svg`
+\item \verb`loot.svg`
+\item \verb`jump.svg`
+\item \verb`fly.svg`
+\item \verb`muddle.svg`
+\item \verb`wound.svg`
+\item \verb`poison.svg`
+\item \verb`immobilize.svg`
+\item \verb`disarm.svg`
+\item \verb`stun.svg`
+\item \verb`curse.svg`
+\item \verb`bless.svg`
+\item \verb`strengthen.svg`
+\item \verb`invisible.svg`
+\item \verb`fire.svg`
+\item \verb`ice.svg`
+\item \verb`earth.svg`
+\item \verb`wind.svg`
+\item \verb`dark.svg`
+\item \verb`light.svg`
+\item \verb`any_element.svg`
+\item \verb`add_target.svg`
+\item \verb`consume.svg`
+\item \verb`definitive_loss.svg`
+\item \verb`experience.svg`
+\item \verb`infinity.svg`
+\item \verb`loss.svg`
+\item \verb`pierce.svg`
+\item \verb`recover_card.svg`
+\item \verb`round_bonus.svg`
+\end{itemize}
+\end{multicols}
+
+\subsubsection{Using your own images}
+The image can also be a custom image like a new status effect. In this case, you should give \verb`\image` a relative path from the .gml file to the custom image (a path starting from the folder in which the .gml file is stored). A nice and easy way to do this is to have the following architecture:
+
+\dirtree{%
+.1 my\_character.gml.
+.1 Images.
+.2 custom\_image1.svg.
+.2 custom\_image2.svg.
+}
+
+With this structure, displaying \verb`custom_image1.svg` can be done by writing \verb`\image{Images/custom_image1.svg}`.
+
+To help adjust you image at the correct height with regards to the text, see the \verb`template.svg` file in the `assets` folder. By default, an image is drawn with a size of 1.4 times the font size. Out of an image of height 110 (font size 100 on Inkscape):
+\begin{itemize}
+	\item the text baseline (bottom of letter A) is located at 31.3 from the bottom (73.7 from top) 
+	\item the top of A is at 78.3 from the bottom (21.7 from top)
+\end{itemize}
+You will find in the \verb`template.svg` file two Inkscape guides corresponding to those measures.
+
+\subsection{aoe}
+\subsubsection{Description}  
+\textbf{\underline{Arguments:}} Takes one mandatory argument, which it the name or the path to an area of effect with its extension. Only \verb`.aoe` files are accepted.
+
+\textbf{\underline{Description:}} Displays the corresponding area of effect. 
+
+\textbf{\underline{Example:}}
+
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\aoe{full_hexagon.aoe}
+
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Commands_images/aoe.pdf}
+\end{minipage} 
+
+\subsubsection{Available area of effects}
+The following area of effects are already loaded into The Sleeping Lion, and can be used as they are.
+\begin{multicols}{2}
+\begin{itemize}
+\item \verb`adjacent_two_hexes.aoe`
+\item \verb`adjacent_three_hexes.aoe`
+\item \verb`adjacent_triangle.aoe`
+\item \verb`skewer.aoe`
+\item \verb`long_skewer.aoe`
+\item \verb`triangle.aoe`
+\item \verb`full_hexagon.aoe`
+\item \verb`cataclysm.aoe`
+\end{itemize}
+\end{multicols}
+
+\subsubsection{Using your own area of effects}
+It is highly recommended you use The Sleeping Lion's inbuilt tool to create your custom area of effects. This tool allows you to easily build any shape, and give any color to the hexagons. This tool will also save your area of effects to a specific format using the \verb`.aoe` extension. Note that these files are separate from your \verb`.gml` file, and should be included like any custom image when sharing your class.
+
+\subsection{exp}
+\textbf{\underline{Arguments:}} Takes one argument, which will always be displayed as text.
+
+\textbf{\underline{Description:}} Displays an experience symbol with the given value.
+
+\textbf{\underline{Example:}}
+
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\exp{1}
+
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Commands_images/exp.pdf}
+\end{minipage} 
+
+\subsection{multiline}
+\textbf{\underline{Arguments:}} Takes an unlimited number of arguments, which should be GML instructions.
+
+\textbf{\underline{Description:}} Displays the GML instructions one under the other, but does not break the line layout.
+
+\textbf{\underline{Example:}}
+
+\begin{center}
+\begin{BVerbatim}
+\consume_fire \multiline{\retaliate{2}}{@small Self} \exp{1}
+\end{BVerbatim}
+\end{center}
+
+\begin{center}
+\includegraphics[scale=0.5]{Doc_generation/Commands_images/multiline.pdf}
+\end{center}
+
+\subsection{charges}
+\textbf{\underline{Arguments:}} Takes up to 6 arguments, each representing a charge. They may be empty (nothing will be displayed inside the charge) or they may hold GML instructions which will be displayed inside the charge.
+
+\textbf{\underline{Description:}} This command allows you to build actions such as the Tinkerer's Potent Potables, which reads "On your next four heal actions, add +2 Heal". Each argument represents one charge of the action, so the number of arguments you give to \verb`\charges` will be the number of charges displayed on the card. This command will also add the "infinity" symbol before the first charge and a "loss" symbol after the last one.
+
+\textbf{\underline{Example:}}
+
+\begin{center}
+\begin{BVerbatim}
+@small On your next four heal actions, add +2 Heal \image{heal.svg}
+\charges{}{\exp{1}}{}{\exp{1}}
+\end{BVerbatim}
+\end{center}
+
+\begin{center}
+\includegraphics[scale=0.5]{Doc_generation/Commands_images/charges.pdf}
+\end{center}
+
+\subsection{charges\_non\_loss}
+\textbf{\underline{Arguments:}} Same as the \verb`\charges` command.
+
+\textbf{\underline{Description:}} Same as the \verb`\charges` command, except the loss symbol will not be displayed.
+
+\textbf{\underline{Example:}}
+
+\begin{center}
+\begin{BVerbatim}
+@small On your next two attacks, add +2 Attack \image{attack.svg}
+\charges_non_loss{}{\exp{1}}
+\end{BVerbatim}
+\end{center}
+
+\begin{center}
+\includegraphics[scale=0.5]{Doc_generation/Commands_images/charges_non_loss.pdf}
+\end{center}
+
+\subsection{summon}
+\textbf{\underline{Arguments:}} Takes 6 or 7 arguments, which can be empty or GML instructions.
+
+\textbf{\underline{Description:}} Displays a summon action. The arguments correspond to the following (in order):
+\begin{itemize}
+	\item the name of the summon
+	\item its hit points value
+	\item its movement value
+	\item its attack value
+	\item its range value
+	\item the summon's special abilities
+	\item (optional) if this argument is given, the part with the summon's special abilities will be split into two.
+\end{itemize}
+
+
+
+This command does not display the "infinity" symbol underneath the summon. It is up to you to define on a seperate line all symbols which should appear under the summon (usually, this is experience, element generation, "loss" symbol...).
+
+\textbf{\underline{Example:}}
+
+\begin{center}
+\begin{BVerbatim}
+\summon{Summon Rat Swarm}{6}{1}{2}{}{\poison}
+\end{BVerbatim}
+\end{center}
+
+\begin{center}
+\includegraphics[scale=0.5]{Doc_generation/Commands_images/summon.pdf}
+\end{center}
+
+\begin{center}
+\begin{BVerbatim}
+\summon{Summon Mosquito Swarm}{4}{1 \image{fly.svg}}{1}{3}{\wound}{\retaliate{1}}
+\end{BVerbatim}
+\end{center}
+
+\begin{center}
+\includegraphics[scale=0.5]{Doc_generation/Commands_images/summon2.pdf}
+\end{center}
+
+\subsection{dot}
+\textbf{\underline{Arguments:}} This command doesn't take any arguments.
+
+\textbf{\underline{Description:}} Displays the enhancement dot icon.
+
+\textbf{\underline{Example:}}
+
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\attack{3} \dot \dot
+
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Commands_images/dot.pdf}
+\end{minipage} 
+
+\subsection{inside}
+\textbf{\underline{Arguments:}} Takes two arguments, which should be GML instructions.
+
+\textbf{\underline{Description:}} The first argument represents the outer instruction: the second argument represents the inner instruction which will be displayed centered inside the outer instruction.
+
+\textbf{\underline{Example:}}
+
+\begin{center}
+\begin{BVerbatim}
+\inside{\image{experience.svg}}{@color{255}{0}{0} 1}
+\end{BVerbatim}
+\end{center}
+\begin{center}
+\includegraphics[scale=0.5]{Doc_generation/Commands_images/inside.pdf}
+\end{center}
+
+
+
+
+
+\newpage
+\section{Aliases}
+The following sections list all available aliases. For each, you will find a small example, as well as the explicit definition of the alias.
+
+\subsection{Available aliases}
+% Use the aliases_doc.py script to generate the following latex instructions
+
+% INSTRUCTIONS GO HERE
+
+\subsubsection{attack}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\attack{3} 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/attack.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\attack{$x$} = Attack \image{attack.svg} $x$
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{target}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\target{3} 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/target.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\target{$x$} = Target \image{target.svg} $x$
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{move}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\move{3} 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/move.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\move{$x$} = Move \image{move.svg} $x$
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{range}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\range{3} 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/range.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\range{$x$} = Range \image{range.svg} $x$
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{heal}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\heal{3} 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/heal.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\heal{$x$} = Heal \image{heal.svg} $x$
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{shield}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\shield{3} 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/shield.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\shield{$x$} = Shield \image{shield.svg} $x$
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{retaliate}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\retaliate{3} 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/retaliate.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\retaliate{$x$} = Retaliate \image{retaliate.svg} $x$
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{loot}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\loot{3} 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/loot.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\loot{$x$} = Loot \image{loot.svg} $x$
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{jump}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\jump 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/jump.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\jump = Jump \image{jump.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{muddle}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\muddle 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/muddle.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\muddle = MUDDLE \image{muddle.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{poison}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\poison 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/poison.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\poison = POISON \image{poison.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{wound}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\wound 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/wound.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\wound = WOUND \image{wound.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{immobilize}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\immobilize 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/immobilize.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\immobilize = IMMOBILIZE \image{immobilize.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{disarm}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\disarm 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/disarm.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\disarm = DISARM \image{disarm.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{stun}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\stun 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/stun.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\stun = STUN \image{stun.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{curse}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\curse 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/curse.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\curse = CURSE \image{curse.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{bless}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\bless 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/bless.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\bless = BLESS \image{bless.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{strengthen}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\strengthen 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/strengthen.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\strengthen = STRENGTHEN \image{strengthen.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{pierce}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\pierce{3} 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/pierce.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\pierce{$x$} = PIERCE \image{pierce.svg} $x$
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{generate\_wind}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\generate_wind 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/generate_wind.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\generate_wind = \image{wind.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{generate\_fire}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\generate_fire 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/generate_fire.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\generate_fire = \image{fire.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{generate\_earth}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\generate_earth 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/generate_earth.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\generate_earth = \image{earth.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{generate\_ice}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\generate_ice 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/generate_ice.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\generate_ice = \image{ice.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{generate\_light}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\generate_light 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/generate_light.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\generate_light = \image{light.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{generate\_dark}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\generate_dark 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/generate_dark.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\generate_dark = \image{dark.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{generate\_any}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\generate_any 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/generate_any.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\generate_any = \image{any_element.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{consume\_wind}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\consume_wind 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/consume_wind.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\consume_wind = @big \inside{\image{wind.svg}}{\image{consume.svg}} : @endlast
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{consume\_fire}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\consume_fire 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/consume_fire.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\consume_fire = @big \inside{\image{fire.svg}}{\image{consume.svg}}  : @endlast
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{consume\_earth}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\consume_earth 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/consume_earth.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\consume_earth = @big \inside{\image{earth.svg}}{\image{consume.svg}} : @endlast
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{consume\_ice}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\consume_ice 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/consume_ice.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\consume_ice = @big \inside{\image{ice.svg}}{\image{consume.svg}} : @endlast
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{consume\_light}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\consume_light 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/consume_light.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\consume_light = @big \inside{\image{light.svg}}{\image{consume.svg}} : @endlast
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{consume\_dark}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\consume_dark 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/consume_dark.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\consume_dark = @big \inside{\image{dark.svg}}{\image{consume.svg}} : @endlast
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{consume\_any}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\consume_any 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/consume_any.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\consume_any = @big \inside{\image{any_element.svg}}{\image{consume.svg}} : @endlast
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{loss}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\loss 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/loss.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\loss = @bottomright \image{loss.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{definitive\_loss}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\definitive_loss 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/definitive_loss.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\definitive_loss = @bottomright \image{definitive_loss.svg} \image{loss.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{round\_bonus}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\round_bonus 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/round_bonus.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\round_bonus = \image{round_bonus.svg}
+\end{BVerbatim}
+\end{center}
+
+\subsubsection{permanent}
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\permanent 
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Aliases_images/permanent.pdf}
+\end{minipage}
+\begin{center}
+\begin{BVerbatim}
+\permanent = \image{infinity.svg}
+\end{BVerbatim}
+\end{center}
+
+
+% End of the aliases's automatic documentation
+
+
+\subsection{Writing down your own aliases}
+You can define new aliases in the dedicated section in the graphical interface.
+
+Let's say you have created a new action, \verb`Cleanse` which will be written down on a card as \verb`Cleanse \image{cleanse.svg} 3`. You can define the alias \verb`\cleanse{}` by writing down the following:
+
+\begin{center}
+\begin{BVerbatim}
+\cleanse{$x$} = Cleanse \image{cleanse.svg} $x$
+\end{BVerbatim}
+\end{center}
+
+The dollar signs here are used to mean "anything that the user will write down". This means that you can now use \verb`\cleanse{3}`, \verb`\cleanse{4}` but also (although it wouldn't make much sense) \verb`\cleanse{Attack}`. The name of the variable (here, \verb`x` is used) also doesn't matter, and you can put anything. You can also define aliases with more than one argument. This means that all the following aliases definitions are valid, although most don't really make sense:
+
+\begin{center}
+\begin{BVerbatim}
+\cleanse{$x$} = Cleanse \image{cleanse.svg} $x$
+\cleanse{$first$}{$second$} = Cleanse \image{cleanse.svg} $first$ $second$
+$x$ \cleanse{$y$} $z$ = $x$ Cleanse $y$ \image{cleanse.svg} $z$
+\cleanse{$x$} = Cleanse \image{cleanse.svg}
+\end{BVerbatim}
+\end{center}
+
+What is really happening when you are writing this down? Before parsing, The Sleeping Lion will look through the GML file to see if there is anything that looks like the left hand side of your new alias. If it finds something, it will replace it will the right hand side of your new alias, replacing the variable in dollar signs by their real value. This means that it is strictly equivalent to write down \verb`\cleanse{2}` and \verb`Cleanse \image{cleanse.svg} 2`.
+
+\pagebreak
+
+\section{Macros}
+
+\subsection{endlast}
+\textbf{\underline{Arguments:}} This macro doesn't take arguments.
+
+\textbf{\underline{Description:}} Ends the last macro used in this line, except for positional macros (\verb`@column2`, \verb`@topleft` and \verb`@bottomright`).
+
+\textbf{\underline{Example:}}
+
+\begin{BVerbatim}
+@small This is a small text, @endlast and this is a normal-sized text.
+\end{BVerbatim}
+
+\begin{center}
+\includegraphics[scale=0.5]{Doc_generation/Macros_images/endlast.pdf}
+\end{center}
+
+\subsection{end}
+\textbf{\underline{Arguments:}} This macro doesn't take arguments.
+
+\textbf{\underline{Description:}} Ends all previously used macros in this line, except for positional macros (\verb`@column2`, \verb`@topleft` and \verb`@bottomright`). 
+
+\textbf{\underline{Example:}}
+
+\begin{center}
+\begin{BVerbatim}
+@small @color{255}{0}{0} Small red text, @end and big white text.
+\end{BVerbatim}
+
+\includegraphics[scale=0.5]{Doc_generation/Macros_images/end.pdf}
+\end{center}
+
+
+\subsection{small}
+\textbf{\underline{Arguments:}} This macro doesn't take arguments.
+
+\textbf{\underline{Description:}} Forces this line to be written in small. This is slightly different from indenting the text: using indentation signals The Sleeping Lion that the default behaviour for this line is to write the text in small; not using indentation signals The Sleeping Lion that the default behaviour for this line is to write the text using the normal font size. 
+
+For clarity purpose, this macro should be used on lines where you want to make an exception, and not on lines which should be small by default (such as the line giving the range for a ranged attack).
+
+\textbf{\underline{Example:}}
+
+\begin{spverbatim}
+\attack{3}
+@small Add +2 \image{attack.svg} and gain \exp{1} if the target is adjacent to one of your allies.
+\end{spverbatim}
+
+\begin{center}
+\includegraphics[scale=0.5]{Doc_generation/Macros_images/small.pdf}
+\end{center}
+
+\subsection{big}
+\textbf{\underline{Arguments:}} This macro doesn't take arguments.
+
+\textbf{\underline{Description:}} Forces this line to be written using the normal font size.
+
+\textbf{\underline{Example:}}
+
+\begin{center}
+\begin{BVerbatim}
+@small A small text, @big and a big text.
+\end{BVerbatim}
+
+\includegraphics[scale=0.5]{Doc_generation/Macros_images/big.pdf}
+\end{center}
+
+
+\subsection{title\_font}
+\textbf{\underline{Arguments:}} This macro doesn't take arguments.
+
+\textbf{\underline{Description:}} Allows you to write a text with the same font used for the card's name (Pirata One).
+
+\textbf{\underline{Example:}}
+
+\begin{center}
+\begin{BVerbatim}
+@title_font This is a text using the title font.
+\end{BVerbatim}
+
+\includegraphics[scale=0.5]{Doc_generation/Macros_images/title_font.pdf}
+\end{center}
+
+\subsection{color}
+\textbf{\underline{Arguments:}} This macro takes three arguments, which must be integers between 0 and 255.
+
+\textbf{\underline{Description:}} Allows you to writte text using a specific color. The first argument corresponds to the red value, the second to the green value, the third to the blue value.
+
+\textbf{\underline{Example:}}
+
+\begin{center}
+\begin{BVerbatim}
+@color{0}{0}{0} This is a text written in black.
+@color{255}{0}{0} This is a text written in red.
+\end{BVerbatim}
+
+\includegraphics[scale=0.5]{Doc_generation/Macros_images/color.pdf}
+\end{center}
+
+
+\subsection{column2}
+\textbf{\underline{Arguments:}} This macro doesn't take arguments.
+
+\textbf{\underline{Description:}} This is an indication that the card should be splitted into two columns, and that this line should be placed in the second column.
+
+This is a positional macro, like \verb`@topleft` and \verb`@bottomright`. Positional macros are unaffected by \verb`@end` and \verb`@endlast`. Furthermore, only the first positional macro of each line is taken into account: if there are more than one positional macro on a given line, all but the first one will be ignored.
+
+\textbf{\underline{Example:}}
+
+\begin{center}
+\begin{BVerbatim}
+\attack{3}
+  \range{3}
+  \immobilize
+  Gain \exp{1} for every enemy targeted
+@column2 \aoe{triangle.aoe}
+\end{BVerbatim}
+
+\includegraphics[scale=0.5]{Doc_generation/Macros_images/column2.pdf}
+\end{center} 
+
+\subsection{topleft}
+\textbf{\underline{Arguments:}} This macro doesn't take arguments.
+
+\textbf{\underline{Description:}} This is an indication that this line should be placed at the top of the card and centered left, instead of being centered in the middle of the card.
+
+This is a positional macro, like \verb`@column2` and \verb`@bottomright`. Positional macros are unaffected by \verb`@end` and \verb`@endlast`. Furthermore, only the first positional macro of each line is taken into account: if there are more than one positional macro on a given line, all but the first one will be ignored.
+
+\textbf{\underline{Example:}}
+
+\begin{center}
+\begin{BVerbatim}
+@topleft Augment
+@small On melee attack: Add +2 \image{attack.svg}
+\end{BVerbatim}
+
+\includegraphics[scale=0.5]{Doc_generation/Macros_images/topleft.pdf}
+\end{center}
+
+
+\subsection{bottomright}
+\textbf{\underline{Arguments:}} This macro doesn't take arguments.
+
+\textbf{\underline{Description:}} This is an indication that this line should be placed at the bottom of the card and centered right, instead of being centered in the middle of the card.
+
+This is a positional macro, like \verb`@column2` and \verb`@topleft`. Positional macros are unaffected by \verb`@end` and \verb`@endlast`. Furthermore, only the first positional macro of each line is taken into account: if there are more than one positional macro on a given line, all but the first one will be ignored.
+
+\textbf{\underline{Example:}}
+
+\begin{minipage}{0.45\linewidth}
+\raggedright
+\begin{spverbatim}
+\attack{6}
+@bottomright \image{loss.svg}
+\end{spverbatim}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\raggedleft
+\includegraphics[scale=0.5]{Doc_generation/Macros_images/bottomright.pdf}
+\end{minipage} 
+
+
+\end{document}
+

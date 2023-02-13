@@ -1,0 +1,45 @@
+# The list of all aliases available in the standard library.
+
+base_aliases = [
+"\\attack{$x$} = Attack \\image{attack.svg} $x$",
+"\\target{$x$} = Target \\image{target.svg} $x$",
+"\\move{$x$} = Move \\image{move.svg} $x$",
+"\\range{$x$} = Range \\image{range.svg} $x$",
+"\\heal{$x$} = Heal \\image{heal.svg} $x$",
+"\\shield{$x$} = Shield \\image{shield.svg} $x$",
+"\\retaliate{$x$} = Retaliate \\image{retaliate.svg} $x$",
+"\\loot{$x$} = Loot \\image{loot.svg} $x$",
+"\\jump = Jump \\image{jump.svg}",
+"\\muddle = MUDDLE \\image{muddle.svg}",
+"\\poison = POISON \\image{poison.svg}",
+"\\wound = WOUND \\image{wound.svg}",
+"\\immobilize = IMMOBILIZE \\image{immobilize.svg}",
+"\\disarm = DISARM \\image{disarm.svg}",
+"\\stun = STUN \\image{stun.svg}",
+"\\curse = CURSE \\image{curse.svg}",
+"\\bless = BLESS \\image{bless.svg}",
+"\\strengthen = STRENGTHEN \\image{strengthen.svg}",
+"\\pierce{$x$} = PIERCE \\image{pierce.svg} $x$",
+"\\generate_wind = \\image{wind.svg}",
+"\\generate_fire = \\image{fire.svg}",
+"\\generate_earth = \\image{earth.svg}",
+"\\generate_ice = \\image{ice.svg}",
+"\\generate_light = \\image{light.svg}",
+"\\generate_dark = \\image{dark.svg}",
+"\\generate_any = \\image{any_element.svg}",
+"\\consume_wind = @big \\inside{\\image{wind.svg}}{\\image{consume.svg}} : @endlast",
+"\\consume_fire = @big \\inside{\\image{fire.svg}}{\\image{consume.svg}}  : @endlast",
+"\\consume_earth = @big \\inside{\\image{earth.svg}}{\\image{consume.svg}} : @endlast",
+"\\consume_ice = @big \\inside{\\image{ice.svg}}{\\image{consume.svg}} : @endlast",
+"\\consume_light = @big \\inside{\\image{light.svg}}{\\image{consume.svg}} : @endlast",
+"\\consume_dark = @big \\inside{\\image{dark.svg}}{\\image{consume.svg}} : @endlast",
+"\\consume_any = @big \\inside{\\image{any_element.svg}}{\\image{consume.svg}} : @endlast",
+"\\loss = @bottomright \\image{loss.svg}",
+"\\definitive_loss = @bottomright \\image{definitive_loss.svg} \\image{loss.svg}",
+"\\round_bonus = \\image{round_bonus.svg}",
+"\\permanent = \\image{infinity.svg}",
+]
+# \generate_ice = \image{ice.svg}
+# \consume_ice = \inside{\image{ice.svg}}{\image{red_cross.svg}} @title : @end @small
+# (by default, after element consumption, things are written in small.)
+# do a plus_attack, plus_move for +1 Attack \image{attack.svg}?

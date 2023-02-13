@@ -1,0 +1,15 @@
+__pycache__/
+eggs/
+*.egg-info/
+*.egg
+*.glade~
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.fls
+*.fdb_latexmk
+
+
+
