@@ -47,7 +47,7 @@ You can also install it from source by downloading this repository and running:
 
 `pip install .`
 
-Once installed, just run `thesleepinlion` to launch the graphical interface.
+Once installed, just run `thesleepinglion` to launch the graphical interface.
 
 # Documentation
 - You will find [here](src/thesleepinglion/docs/tutorial.pdf) a short tutorial explaining how to get started with The Sleeping Lion.
