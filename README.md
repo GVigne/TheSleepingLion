@@ -20,15 +20,6 @@ For Windows, you can simply use [this binary](https://github.com/GVigne/TheSleep
 
 Of course, you can also install The Sleeping Lion in a Python environment by following the instructions below.
 
-## Windows 11 users
-Windows 11 users also need to install the two fonts used in The Sleeping Lion. If those fonts aren't installed, The Sleeping Lion will not work properly.
-
-To install the fonts:
-- download the **Sakkal Majalla Bold** font. You can also find the .ttf file [here](src/thesleepinglion/assets/fonts/majallab.ttf).
-- download the **Pirata One** font. You can also find the .ttf file [here](src/thesleepinglion/assets/fonts/PirataOne-Regular.ttf).
-- open each font, then click the Install button.
-You are now set to use The Sleeping Lion!
-
 ## Linux users
 ### Dependencies
 The Sleeping Lion depends on PyGObject and manimpango, which require non-python dependencies. You can install those dependencies by running
