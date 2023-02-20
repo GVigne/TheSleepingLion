@@ -50,11 +50,11 @@ You can also install it from source by downloading this repository and running:
 Once installed, just run `thesleepinglion` to launch the graphical interface.
 
 # Documentation
-- You will find [here](src/thesleepinglion/docs/tutorial.pdf) a short tutorial explaining how to get started with The Sleeping Lion.
-- A list of available functions can be found [here](src/thesleepinglion/docs/available_functions.pdf).
-- You can find the .gml file corresponding to the Spellweaver's cards [here](src/thesleepinglion/docs/Spellweaver.gml).
-- The FAQ for The Sleeping Lion can be found [here](src/thesleepinglion/docs/FAQ.md).
-- If you want to help develop The Sleeping Lion, or want to know what is happening behind the scenes, check out [this document](src/thesleepinglion/docs/advanced_topics.pdf) about some advanced topics!
+- You will find [here](https://github.com/GVigne/TheSleepingLion/raw/main/src/thesleepinglion/docs/tutorial.pdf) a short tutorial explaining how to get started with The Sleeping Lion.
+- A list of available functions can be found [here](https://github.com/GVigne/TheSleepingLion/raw/main/src/thesleepinglion/docs/available_functions.pdf).
+- You can find the .gml file corresponding to the Spellweaver's cards [here](https://github.com/GVigne/TheSleepingLion/raw/main/src/thesleepinglion/docs/Spellweaver.gml).
+- The FAQ for The Sleeping Lion can be found [here](https://github.com/GVigne/TheSleepingLion/raw/main/src/thesleepinglion/docs/FAQ.md).
+- If you want to help develop The Sleeping Lion, or want to know what is happening behind the scenes, check out [this document](https://github.com/GVigne/TheSleepingLion/raw/main/src/thesleepinglion/docs/advanced_topics.pdf) about some advanced topics!
 
 # Acknowledgements
 I would like to thank Isaac Childres for releasing the assets, and for his interest in developping an active community around Gloomhaven. This project, and in general the creation of custom Gloomhaven classes would not have been possible without his cooperation.
