@@ -2,7 +2,7 @@ from setuptools import setup, find_namespace_packages
 from pathlib import Path
 
 setup(name='thesleepinglion',
-    version='0.1.0',
+    version='0.1.1',
     description='Automatic card layout creation for Gloomhaven custom classes',
     long_description=Path("README.md").read_text("utf8"),
     long_description_content_type='text/markdown',
