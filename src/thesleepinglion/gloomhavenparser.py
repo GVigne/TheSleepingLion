@@ -26,7 +26,8 @@ class GloomhavenParser:
                        "\\multiline": MultilineCommand,
                        "\\charges": ChargesLossCommand,
                        "\\charges_non_loss": ChargesNonLossCommand,
-                       "\\summon": SummonCommand
+                       "\\summon": SummonCommand,
+                       "\\divider_line": DividerLine
                     }
 
         self.macro_tokens = {"@end": EndMacro,

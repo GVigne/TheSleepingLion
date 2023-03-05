@@ -603,6 +603,41 @@ class AoECommand(AbstractCommand):
     def draw(self, cr: cairo.Context):
         self.hex_grid.draw(cr, self.hexagons)
 
+class DividerLine(AbstractCommand):
+    """
+    In Jaws of the Lion, a divider line is a line of 9 white points. However, they aren't as high as normal
+    text, so that's why we create a dedicated command and not just an alias.
+    """
+    def __init__(self, arguments: list[str],
+                    gml_context: GMLLineContext,
+                    path_to_gml: Path | None = None,
+                    image_color: dict = {}):
+        super().__init__(arguments, gml_context, path_to_gml, image_color)
+        if len(arguments) !=0:
+            raise MismatchNoArguments(f"The '\\divider_line' command takes 1 argument {len(arguments)} were given.")
+
+        divider_message = (". "*9).strip() # Add strip to remove last blank
+        self.dotted_line = TextItem(divider_message, GMLLineContext(font_size=small_font_size),self.path_to_gml)
+
+        self.height_percentage = 0.5 # Factor reducing the apparent width of this item (ie width as seen by the parser)
+        # Reducing the apparent width isn't enough since text is written at the bottom of its bounding box,
+        # and can therefore overlap text underneath.
+        self.offset_percentage = 0.45 # Factor to reposition vertically the divider line
+
+    def get_width(self):
+        return self.dotted_line.get_width()
+
+    def get_height(self):
+        return self.height_percentage*self.dotted_line.get_height()
+
+    def draw(self, cr: cairo.Context):
+        cr.save()
+        cr.translate(0, -self.offset_percentage*self.dotted_line.get_height())
+        cr.move_to(0,0)
+        self.dotted_line.draw(cr)
+        cr.restore()
+
+
 # Circular import required to allow commands to parse their arguments.
 # What we really are doing in making parser.create_command a recursive function split over two files
 # create_command -> Abstractcommand(args) -> create_command(args[0]) -> ...
