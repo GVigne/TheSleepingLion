@@ -45,3 +45,9 @@ dot:
 inside:
   top: |2
     \inside{\image{experience.svg}}{@color{255}{0}{0} 1}
+
+divider_line:
+  top: |2
+    \attack{1}
+    \divider_line
+    \attack{1}
