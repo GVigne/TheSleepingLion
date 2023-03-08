@@ -614,7 +614,7 @@ class DividerLine(AbstractCommand):
                     image_color: dict = {}):
         super().__init__(arguments, gml_context, path_to_gml, image_color)
         if len(arguments) !=0:
-            raise MismatchNoArguments(f"The '\\divider_line' command takes 1 argument {len(arguments)} were given.")
+            raise MismatchNoArguments(f"The '\\divider_line' takes no arguments but {len(arguments)} were given.")
 
         divider_message = (". "*9).strip() # Add strip to remove last blank
         self.dotted_line = TextItem(divider_message, GMLLineContext(font_size=small_font_size),self.path_to_gml)
