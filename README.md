@@ -13,6 +13,9 @@ The Gloomhaven Markdown Language (GML) is a laconic way to easily describe cards
 
 Before creating your cards, make sure to check the tutorial to use this software at its best.
 
+Here are a few examples of what the cards look like when they are created using The Sleeping Lion:
+- [Spellweaver's cards](https://github.com/GVigne/TheSleepingLion/raw/main/src/thesleepinglion/docs/Spellweaver.pdf)
+
 # Installing The Sleeping Lion
 ## Windows users
 
@@ -43,7 +46,7 @@ Once installed, just run `thesleepinglion` to launch the graphical interface.
 # Documentation
 - You will find [here](https://github.com/GVigne/TheSleepingLion/raw/main/src/thesleepinglion/docs/tutorial.pdf) a short tutorial explaining how to get started with The Sleeping Lion.
 - A list of available functions can be found [here](https://github.com/GVigne/TheSleepingLion/raw/main/src/thesleepinglion/docs/available_functions.pdf).
-- You can find the .gml file corresponding to the Spellweaver's cards [here](https://github.com/GVigne/TheSleepingLion/raw/main/src/thesleepinglion/docs/Spellweaver.gml).
+- You can find the .gml file corresponding to the Spellweaver's cards [here](https://github.com/GVigne/TheSleepingLion/raw/main/src/thesleepinglion/docs/Spellweaver.gml). The corresponding output PDF can be found [here](https://github.com/GVigne/TheSleepingLion/raw/main/src/thesleepinglion/docs/Spellweaver.pdf).
 - The FAQ for The Sleeping Lion can be found [here](https://github.com/GVigne/TheSleepingLion/raw/main/src/thesleepinglion/docs/FAQ.md).
 - If you want to help develop The Sleeping Lion, or want to know what is happening behind the scenes, check out [this document](https://github.com/GVigne/TheSleepingLion/raw/main/src/thesleepinglion/docs/advanced_topics.pdf) about some advanced topics!
 
