@@ -56,7 +56,7 @@ target_directory.mkdir(exist_ok=True)
 aliases_infos = {}
 for alias in base_aliases:
     splitted = alias.split("=")
-    example = splitted[0].replace("$x$", "3")
+    example = splitted[0].replace("$x$", "3").strip()
 
     name = splitted[0][1:]
     i = 0
