@@ -148,8 +148,13 @@ class InsideCommand(AbstractCommand):
             # worse case scenario, you would have one big fat line as an argument of a command
             # To keep to this philosophy, we call gml_line_to_items with a width of -1, which fits everything on one line
             parser = GloomhavenParser(self.path_to_gml)
-            self.outside = parser.gml_line_to_items(arguments[0], gml_context, width = -1)[0]
-            self.inside = parser.gml_line_to_items(arguments[1], gml_context, width = -1)[0]
+            out_gml = parser.gml_line_to_items(arguments[0], gml_context, width = -1)
+            in_gml = parser.gml_line_to_items(arguments[1], gml_context, width = -1)
+            if len(out_gml) == 0 or len(in_gml) == 0:
+                # outside or inside has only macros, so there is no element/item to collect
+                raise EmptyArgument("Arguments for the '\\inside' command must be valid gml commands and not only macros.")
+            self.outside = out_gml[0]
+            self.inside = in_gml[0]
 
     def get_width(self):
         return self.outside.get_width()
@@ -234,7 +239,11 @@ class MultilineCommand(AbstractCommand):
         parser = GloomhavenParser(self.path_to_gml)
         self.parsed_arguments = []
         for arg in arguments:
-            self.parsed_arguments.append(parser.gml_line_to_items(arg, gml_context)[0])
+            parsed_arg = parser.gml_line_to_items(arg, gml_context)
+            if len(parsed_arg) == 0 :
+                # one of the argument has only macros, so there is no element/item to collect
+                raise EmptyArgument("Arguments for the '\\multiline' command must be valid gml commands and not only macros.")
+            self.parsed_arguments.append(parsed_arg[0])
         self.column = ColumnItem(self.parsed_arguments, self.path_to_gml)
 
     def get_width(self):
@@ -263,18 +272,21 @@ class OneChargeItem(AbstractCommand):
                                         height = one_charge_size_factor*gml_context.font_size,
                                         old_color={"red":0, "green":0, "blue":0},
                                         new_color=image_color) # Replace the black arrow with an arrow of same color as the class
+
+        self.charge_effect = None # By default, a charge is empty
         if len(arguments) > 0:
             parser = GloomhavenParser(self.path_to_gml)
-            charge_effect = parser.gml_line_to_items(arguments[0], gml_context)[0] # charge_effect is a LineItem
-            if isinstance(charge_effect.items[0], ExpCommand):
-                # Hack the ExpCommand's image so that it is of the correct color.
-                # Also slightly increase it's size.
-                charge_effect.items[0].new_image(SVGImage(get_image(self.path_to_gml, "experience.svg"),
-                                                            height = 1.1*charge_effect.items[0].get_height(),
-                                                            new_color=image_color))
-            self.charge_effect = charge_effect
-        else:
-            self.charge_effect = None
+            charge_effect_lst = parser.gml_line_to_items(arguments[0], gml_context) # List of LineItems
+            # charge_effect_lst may be an empty list if the user only gave macros as arguments
+            if len(charge_effect_lst) > 0:
+                charge_effect = charge_effect_lst[0]
+                if isinstance(charge_effect.items[0], ExpCommand):
+                    # Hack the ExpCommand's image so that it is of the correct color.
+                    # Also slightly increase it's size.
+                    charge_effect.items[0].new_image(SVGImage(get_image(self.path_to_gml, "experience.svg"),
+                                                                height = 1.1*charge_effect.items[0].get_height(),
+                                                                new_color=image_color))
+                self.charge_effect = charge_effect
 
     def get_width(self):
         # Add a white blank after the charge.
@@ -483,14 +495,22 @@ class SummonCommand(AbstractCommand):
                     self.parsed_arguments.append(TextItem("-", GMLLineContext(font_size=small_font_size), path_to_gml=self.path_to_gml))
             else:
                 if i == 0:
-                    self.parsed_arguments.append(parser.gml_line_to_items(arg, gml_context)[0])
+                    parsed_arg = parser.gml_line_to_items(arg, gml_context)
+                    if len(parsed_arg) > 0: # This can happen if the user only gave macros and not gml commands
+                        self.parsed_arguments.append(parsed_arg[0])
+                    else:
+                        self.parsed_arguments.append(TextItem("", GMLLineContext(font_size=small_font_size), path_to_gml=self.path_to_gml))
                 elif i == 5 or i == 6:
                     # Parse in small the summon's characteristics
                     all_lines = parser.gml_line_to_items(arg, GMLLineContext(font_size=small_font_size),
                                                         width = 0.35*self.image.get_width())
                     self.parsed_arguments.append(ColumnItem(all_lines))
                 else:
-                    self.parsed_arguments.append(parser.gml_line_to_items(arg, GMLLineContext(font_size=small_font_size))[0])
+                    parsed_arg = parser.gml_line_to_items(arg, GMLLineContext(font_size=small_font_size))
+                    if len(parsed_arg) > 0: # This can happen if the user only gave macros and not gml commands
+                        self.parsed_arguments.append(parsed_arg[0])
+                    else:
+                        self.parsed_arguments.append(TextItem("-", GMLLineContext(font_size=small_font_size), path_to_gml=self.path_to_gml))
 
         self.hp_line = LineItem(hp_image + [self.parsed_arguments[1]])
         self.move_line = LineItem(move_image + [self.parsed_arguments[2]])
