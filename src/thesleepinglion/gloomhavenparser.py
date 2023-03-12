@@ -44,7 +44,7 @@ class GloomhavenParser:
               action : str,
               background_color: dict = {},
               additional_aliases: str = "",
-              action_box_size = 0.78*card_width):
+              action_box_size = 0.775*card_width):
         """
         Given the text representing the a top or bottom action, return a dictionnary with keys being position and
         values being ColumnItems which should be drawn. Also return a list of warnings, ie non-breaking errors.
