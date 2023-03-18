@@ -112,6 +112,7 @@
       <object class="GtkEntry" id="card_ID">
         <property name="visible">True</property>
         <property name="can-focus">True</property>
+        <property name="hexpand">True</property>
       </object>
       <packing>
         <property name="left-attach">1</property>
@@ -130,6 +131,7 @@
             <property name="can-focus">True</property>
             <property name="margin-top">10</property>
             <property name="margin-bottom">10</property>
+            <property name="hexpand">True</property>
           </object>
         </child>
       </object>
@@ -150,6 +152,7 @@
             <property name="can-focus">True</property>
             <property name="margin-top">10</property>
             <property name="margin-bottom">10</property>
+            <property name="hexpand">True</property>
           </object>
         </child>
       </object>

@@ -32,6 +32,7 @@ class CharacterTab(AbstractTab, GObject.Object):
         color_box = builder.get_object("color_box")
         self.color_chooser = Gtk.ColorChooserWidget()
         self.color_chooser.connect("notify", self.rgba_modified)
+        self.color_chooser.set_hexpand(True)
 
         color_box.add(self.color_chooser)
         self.color_chooser.show()
