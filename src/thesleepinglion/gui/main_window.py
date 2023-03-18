@@ -381,6 +381,19 @@ class MainWindow(GObject.Object):
         self.current_class = self.backup_handler.open_new_file(get_doc_asset("Spellweaver.gml"), read_only=True)
         self.loading_routine()
 
+    def demolitionist_cards(self, button):
+        """
+        Load the Demolitionist's cards (in the docs/ folder) as a read only file.
+        """
+        save_as_message = "The current file isn't saved. Do you want to save it before opening the Demolitionist's cards?"
+        cancel_action = self.safe_to_close_class(save_as_message)
+        if cancel_action:
+            # At some point, the user said he wanted to cancel this action. Cancel everything.
+            return
+
+        self.current_class = self.backup_handler.open_new_file(get_doc_asset("Demolitionist.gml"), read_only=True)
+        self.loading_routine()
+
     def safe_to_close_class(self, save_as_message: str):
         """
         Check if the class is safe to close. If it isn't the case, create a popup asking the user if he wishes to save or
