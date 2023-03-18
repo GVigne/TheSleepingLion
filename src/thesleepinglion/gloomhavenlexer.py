@@ -112,15 +112,20 @@ class GloomhavenLexer:
                 else:
                     i+=1
 
-            to_replace = raw_replacement
+            to_replace = ""
+            last_dollar_position = 0
             i = 0
             while i < len(raw_replacement):
                 if raw_replacement[i] == "$":
                     j = self.find_next_dollar(raw_replacement[i+1:])
-                    to_replace = to_replace[:i] + variable_values[raw_replacement[i+1:i+j+1]]+ to_replace[i+j+2:]
+                    to_replace += raw_replacement[last_dollar_position:i] + variable_values[raw_replacement[i+1:i+j+1]]
+                    last_dollar_position = i+j+2
                     i = i+j+2
                 else:
                     i +=1
+            # Add the remaining letters from raw_pattern. Note: if there are no arguments, then last_dollar_position is still 0
+            # so the following line copies raw_replacement in its entirety, which is what we cant
+            to_replace += raw_replacement[last_dollar_position:i]
 
             start, end = match.span()
             result = result + text[last:start] + to_replace
