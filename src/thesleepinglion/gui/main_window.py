@@ -168,27 +168,11 @@ class MainWindow(GObject.Object):
         self.window.close() # This will emit the window destroy signal which will get caught by self.window_destroy
 
     def window_destroy(self, window, event):
-        canceled = False
-        if not self.backup_handler.safe_to_close():
-            dlg = Gtk.MessageDialog()
-            dlg.add_buttons(Gtk.STOCK_NO, Gtk.ResponseType.NO,
-                        Gtk.STOCK_YES, Gtk.ResponseType.YES,
-                        Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
-            dlg.set_markup("The current file isn't saved. Do you want to save it?")
-            dlg.set_modal(True)
-            response = dlg.run()
-
-            if response == Gtk.ResponseType.CANCEL:
-                canceled = True
-            elif response == Gtk.ResponseType.YES:
-                canceled = self.save(None)
-            # If answer is NO, don't do anything. The backup handler knows how to handle this.
-            dlg.destroy()
-
-        # If at some point the user pressed cancel, (in the confirmation dialog or in the "Save as" popup),
-        # don't close the app
-        if canceled:
+        save_as_message = "The current file isn't saved. Do you want to save it?"
+        cancel_action = self.safe_to_close_class(save_as_message)
+        if cancel_action: # Don't quit the app
             return True # Yes, the signal has been dealt with. No need to propagate it!
+
         self.backup_handler.close()
         Gtk.main_quit()
 
@@ -302,28 +286,11 @@ class MainWindow(GObject.Object):
         """
         Close the current class and open a new one.
         """
-        if not self.backup_handler.safe_to_close():
-            dlg = Gtk.MessageDialog()
-            dlg.add_buttons(Gtk.STOCK_NO, Gtk.ResponseType.NO,
-                        Gtk.STOCK_YES, Gtk.ResponseType.YES,
-                        Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
-            dlg.set_markup("The current file isn't saved. Do you want to save it before opening a new file?")
-            dlg.set_modal(True)
-            response = dlg.run()
-            canceled = False
-
-            if response == Gtk.ResponseType.CANCEL:
-                canceled = True
-            elif response == Gtk.ResponseType.YES:
-                canceled = self.save(None)
-            else:
-                pass
-
-            dlg.destroy()
-            if canceled:
-                # At some point, the user has pressed the cancel button (confirmation dialog or the "Save as" popup").
-                # Abort the open action.
-                return
+        save_as_message = "The current file isn't saved. Do you want to save it before opening a new file?"
+        cancel_action = self.safe_to_close_class(save_as_message)
+        if cancel_action:
+            # At some point, the user said he wanted to cancel the action. Abort everything.
+            return
 
         # Now open a dialog so the user may select a file.
         dlg = Gtk.FileChooserDialog(title = "Open", parent = None,
@@ -404,13 +371,31 @@ class MainWindow(GObject.Object):
         """
         Load the Spellweaver's cards (in the docs/ folder) as a read only file.
         """
-        # Close the current file. Warning: this is yet another code duplication...
+        save_as_message = "The current file isn't saved. Do you want to save it before opening the Spellweaver's cards?"
+        cancel_action = self.safe_to_close_class(save_as_message)
+        if cancel_action:
+            # At some point, the user said he wanted to cancel the action. Cancel everything.
+            return
+
+        # Open as read-only.
+        self.current_class = self.backup_handler.open_new_file(get_doc_asset("Spellweaver.gml"), read_only=True)
+        self.loading_routine()
+
+    def safe_to_close_class(self, save_as_message: str):
+        """
+        Check if the class is safe to close. If it isn't the case, create a popup asking the user if he wishes to save or
+        not the current class.
+        Return a boolean: if it is True, the function calling this one MUST immediately stop (ie must immediately "return").
+        This is because the users has pressed "Cancel", so the entire action must be canceled, not just the "save as" part.
+
+        This mechanism is really starting to look like a state machine...
+        """
         if not self.backup_handler.safe_to_close():
             dlg = Gtk.MessageDialog()
             dlg.add_buttons(Gtk.STOCK_NO, Gtk.ResponseType.NO,
                         Gtk.STOCK_YES, Gtk.ResponseType.YES,
                         Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
-            dlg.set_markup("The current file isn't saved. Do you want to save it before opening the Spellweaver's cards?")
+            dlg.set_markup(save_as_message)
             dlg.set_modal(True)
             response = dlg.run()
             canceled = False
@@ -418,18 +403,15 @@ class MainWindow(GObject.Object):
                 canceled = True
             elif response == Gtk.ResponseType.YES:
                 canceled = self.save(None)
-            else:
-                pass
+            # If answer is NO, don't do anything. The backup handler knows how to handle this.
 
             dlg.destroy()
-            if canceled:
-                # At some point, the user has pressed the cancel button (confirmation dialog or in the "Save as" popup").
-                # Abort the "open spellweaver cards" action.
-                return
 
-        # Open as read-only.
-        self.current_class = self.backup_handler.open_new_file(get_doc_asset("Spellweaver.gml"), read_only=True)
-        self.loading_routine()
+            # At some point, the user has pressed the cancel button (confirmation dialog or in the "Save as" popup").
+            # The function calling this one should cancel everything.
+            return canceled
+        return False # Safe to close, calling function may procede.
+
 
     def open_aoe_editor(self, button):
         """
