@@ -14,6 +14,9 @@ class MismatchNoArguments(ValueError):
 class EmptyArgument(ValueError):
     pass
 
+class InvalidCustomAlias(ValueError):
+    pass
+
 class InvalidArgumentType(ValueError):
     pass
 

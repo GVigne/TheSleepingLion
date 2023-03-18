@@ -1,6 +1,7 @@
 import regex as re
 from .aliases import base_aliases
 from .utils import find_opened_bracket, find_end_bracket, find_end_macro, alias_text_to_alias_list
+from .errors import InvalidCustomAlias
 
 class GloomhavenLexer:
     """
@@ -118,7 +119,16 @@ class GloomhavenLexer:
             while i < len(raw_replacement):
                 if raw_replacement[i] == "$":
                     j = self.find_next_dollar(raw_replacement[i+1:])
-                    to_replace += raw_replacement[last_dollar_position:i] + variable_values[raw_replacement[i+1:i+j+1]]
+                    # Get the variable value
+                    try:
+                        replaced_value = variable_values[raw_replacement[i+1:i+j+1]]
+                    except KeyError:
+                        # The following lines simply format the error message
+                        pretty_pattern = raw_pattern.replace("\\\\", "\\") # Undo what's be done in split_alias
+                        raise InvalidCustomAlias(f"The custom alias {pretty_pattern} is invalid. The variable '{raw_replacement[i+1:i+j+1]}' found " \
+                                                 "in the right hand side of the alias isn't defined in the left hand side.")
+                    # Build the result string
+                    to_replace += raw_replacement[last_dollar_position:i] + replaced_value
                     last_dollar_position = i+j+2
                     i = i+j+2
                 else:
