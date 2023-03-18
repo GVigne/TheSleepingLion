@@ -16,11 +16,12 @@ class GloomhavenLexer:
 
     def input(self, text : str):
         """
-        Given a text, split it into a list of high level objects in GML.
-        This function stops at the first hierarchical level.
+        Given a GML line, split it into a list of high level objects. This function stops at the first hierarchical level.
         Ex: "Attack \image{attack.svg} 2" -> ["Attack ", "\image{attack.svg}", " 2"]
         Ex: "\command1{\command2{...}} 2" -> ["\command1{\command2{...}}",  " 2"]
         Ex: "\inside{...}{...}" -> ["\inside{...}{...}"]
+        Note: this function does not replace aliases with their values. It should only be used on a single line from the
+        output of separate_lines.
         """
         if len(text) ==0:
             return []
@@ -40,11 +41,12 @@ class GloomhavenLexer:
 
     def separate_lines(self, text : str, additional_aliases: str = ""):
         """
-        Given a raw GML text, split it into different lines. Also replace any aliases defined in base_aliase and in
-        additional_aliases (user-defined aliases).
+        Given a raw GML text representing a top or bottom action, split it into different lines. Also replace
+        any aliases defined in base_aliase and in additional_aliases (user-defined aliases).
         Return a list of tuple. For each tuple:
             -the first element is a string representing the line
             -the second is False if there wasn't any indentation, True if there was one
+        This function should always be the first one called on a text extracted from a .gml file.
         """
         res = []
         splitted = text.split("\n")
@@ -73,7 +75,7 @@ class GloomhavenLexer:
 
     def split_alias(self, alias : str):
         """
-        Roughly split the alias into the model pattern and the string it should be replaced by.
+        Roughly split the alias into a model pattern and the string it should be replaced by.
         Also make the alias regex-compatible, by inserting escape characters if needed.
         """
         splitted = alias.split("=")
@@ -85,7 +87,10 @@ class GloomhavenLexer:
 
     def replace_alias(self, raw_pattern : str, raw_replacement : str, text : str):
         """
-        raw_pattern and raw_replacement are direcly extracted from the GML file (see aliases.py)
+        Check if raw_pattern is a pattern found in the given text; if it is, replace it with raw_replacement.
+        raw_pattern and raw_replacement should already be regex-compatible (see split_alias).
+        Ex: replace_alias("\\\\p{$x$}", "MOVE $x$", "Before \p{4} After") returns "Before MOVE 4 After"
+
         Step 1 : create a regexp for the general pattern. Also create regexp to extract the user-defined
             variables between dollar signs.
         Step 2 : find the parts of the text matching the general pattern. Iterate through them, applying

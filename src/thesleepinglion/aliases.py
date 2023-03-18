@@ -41,7 +41,3 @@ base_aliases = [
 "\\round_bonus = \\image{round_bonus.svg}",
 "\\permanent = \\image{infinity.svg}",
 ]
-# \generate_ice = \image{ice.svg}
-# \consume_ice = \inside{\image{ice.svg}}{\image{red_cross.svg}} @title : @end @small
-# (by default, after element consumption, things are written in small.)
-# do a plus_attack, plus_move for +1 Attack \image{attack.svg}?
