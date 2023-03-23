@@ -423,7 +423,8 @@ class ChargesCommand(AbstractCommand):
                 # Inf  O  O  O  and not  Inf  O  O  O
                 #       O   O                O  O
                 # ie the middle of the first charge on the second line should align with the arrow of the first charge.
-                cr.translate(self.infinity.get_width() + self.parsed_arguments[0].get_width() - self.parsed_arguments[0].get_circle_center(),
+                # Also note that the first line consists in "Inf, blank, O" and not just "Inf, O".
+                cr.translate(self.infinity.get_width() + self.blank.get_width() + self.parsed_arguments[0].get_width() - self.parsed_arguments[0].get_circle_center(),
                         self.vertical_offset_factor*self.parsed_arguments[0].get_height())
             else:
                 # For 4 or 6 charges, the  center of the first charge on the second line should be just under
