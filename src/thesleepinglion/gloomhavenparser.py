@@ -260,12 +260,19 @@ class GloomhavenParser:
                                                       width = width,
                                                       ongoing_x = x,
                                                       image_color = image_color)
-            else:
-                # current_str is a text
+            else: # current_str is a text
+                # Compute the maximum space allowed for this text
                 if width == -1:
                     allowed_width = -1
                 else:
                     allowed_width = width - x
+                # If a macro was used to change part of text, then the lexer will have removed blanks. To prevent text from
+                # being immediately next to each other, we re-add it here.
+                # For example: ["BIG", "@small", "small", "@endlast", "BIG"] => "BIG small BIG" and not "BIGsmallBIG"
+                if len(current_line) > 0 and isinstance(current_line[-1],TextItem):
+                    # Text was somehow splitted: it should have a blank inbetween the last text and this one.
+                    current_str = " " + current_str
+
                 item, remain_str = self.create_text(current_str, allowed_width, gml_context)
                 if remain_str != "":
                     current_line.append(item)
