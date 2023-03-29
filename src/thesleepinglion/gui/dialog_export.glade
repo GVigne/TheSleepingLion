@@ -97,7 +97,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkRadioButton" id="card_per_page">
+              <object class="GtkRadioButton" id="one_card_per_page">
                 <property name="label" translatable="yes">Put each card on a separate page</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
@@ -118,7 +118,22 @@
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
                 <property name="draw-indicator">True</property>
-                <property name="group">card_per_page</property>
+                <property name="group">one_card_per_page</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkRadioButton" id="one_card_per_file">
+                <property name="label" translatable="yes">Generate one file per card</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="draw-indicator">True</property>
+                <property name="group">one_card_per_page</property>
               </object>
               <packing>
                 <property name="expand">False</property>
