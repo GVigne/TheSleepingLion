@@ -1,6 +1,6 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk
 import cairo
 from pathlib import Path
 from math import pi
@@ -10,9 +10,8 @@ from ..utils import get_gui_asset
 from ..constants import card_height, card_width
 from .select_cards_widget import SelectCardsForExportWidget
 
-class ExportDialogPDF(GObject.Object):
+class ExportDialogPDF:
     def __init__(self, gloomhavenclass: GloomhavenClass):
-        GObject.GObject.__init__(self)
         self.gloomhavenclass = gloomhavenclass
 
         builder = Gtk.Builder()
@@ -44,45 +43,45 @@ class ExportDialogPDF(GObject.Object):
 
     def accept(self, event, id):
         if id == -3:
-            # The export button was clicked
+            if self.select_cards_widget.has_cards_to_save():
+                # The export button was clicked
 
-            # Ask the user for a path to save a file of a folder
-            default_name = None
-            if len(self.gloomhavenclass.name) > 0:
-                default_name = self.gloomhavenclass.name
+                # Ask the user for a path to save a file of a folder
+                default_name = None
+                if len(self.gloomhavenclass.name) > 0:
+                    default_name = self.gloomhavenclass.name
 
-            current_button_activated = self.get_activated_radio_button()
+                current_button_activated = self.get_activated_radio_button()
 
-            if self.buttons_create_folder[current_button_activated]:
-                # Create a new folder
-                if default_name is None:
-                    default_name = "New folder"
-                dlg = Gtk.FileChooserDialog(title = "Save folder as", parent = None,
-                                            action = Gtk.FileChooserAction.CREATE_FOLDER)
+                if self.buttons_create_folder[current_button_activated]:
+                    # Create a new folder
+                    if default_name is None:
+                        default_name = "New folder"
+                    dlg = Gtk.FileChooserDialog(title = "Save folder as", parent = None,
+                                                action = Gtk.FileChooserAction.CREATE_FOLDER)
+                else:
+                    # Create a new file
+                    if default_name is None:
+                        default_name = "Untitled"
+                    default_name = f"{default_name}.pdf"
+                    dlg = Gtk.FileChooserDialog(title = "Save as", parent = None,
+                                                action = Gtk.FileChooserAction.SAVE)
+
                 dlg.set_current_name(default_name)
-            else:
-                # Create a new file
-                if default_name is None:
-                    default_name = "Untitled"
-                default_name = f"{default_name}.pdf"
-                dlg = Gtk.FileChooserDialog(title = "Save as", parent = None,
-                                            action = Gtk.FileChooserAction.SAVE)
-
-            dlg.set_current_name(default_name)
-            dlg.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                        Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
-            dlg.set_modal(True)
-            dlg.set_do_overwrite_confirmation(True)
-            response = dlg.run()
-            if response == Gtk.ResponseType.OK:
-                # Call the dedicated function corresponding to the active radio button
-                save_func = self.buttons_save_func[current_button_activated]
-                save_func(dlg.get_filename())
-                dlg.destroy()
-            else:
-                # Don't close the main window
-                dlg.destroy()
-                return
+                dlg.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                            Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
+                dlg.set_modal(True)
+                dlg.set_do_overwrite_confirmation(True)
+                response = dlg.run()
+                if response == Gtk.ResponseType.OK:
+                    # Call the dedicated function corresponding to the active radio button
+                    save_func = self.buttons_save_func[current_button_activated]
+                    save_func(dlg.get_filename())
+                    dlg.destroy()
+                else:
+                    # Don't close the main window
+                    dlg.destroy()
+                    return
         # At this point, the user hasn't canceled anything, so the dialog should be closed.
         self.dialog.destroy()
 

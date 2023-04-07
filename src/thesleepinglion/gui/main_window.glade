@@ -94,7 +94,16 @@
                         <property name="can-focus">False</property>
                         <property name="label" translatable="yes">Export as pdf</property>
                         <property name="use-underline">True</property>
-                        <signal name="activate" handler="export_pdf" swapped="no"/>
+                        <signal name="activate" handler="export_as_pdf" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Export as png</property>
+                        <property name="use-underline">True</property>
+                        <signal name="activate" handler="export_as_png" swapped="no"/>
                       </object>
                     </child>
                   </object>

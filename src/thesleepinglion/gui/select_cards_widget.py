@@ -59,3 +59,12 @@ class SelectCardsForExportWidget:
             if checkbutton.get_active():
                 active.append(checkbutton.get_label())
         return [card for card in self.gloomhavenclass.cards if card.name in active]
+
+    def has_cards_to_save(self):
+        """
+        Return True if at least one card is selected, False otherwise
+        """
+        for checkbutton in self.card_box.get_children():
+            if checkbutton.get_active():
+                return True
+        return False
