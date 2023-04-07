@@ -8,14 +8,17 @@ from math import pi
 from ..gloomhavenclass import GloomhavenClass
 from ..utils import get_gui_asset
 from ..constants import card_height, card_width
+from .select_cards_widget import SelectCardsForExportWidget
 
 class ExportDialog(GObject.Object):
     def __init__(self, gloomhavenclass: GloomhavenClass):
         GObject.GObject.__init__(self)
+        self.gloomhavenclass = gloomhavenclass
+
         builder = Gtk.Builder()
         builder.add_from_file(get_gui_asset("dialog_export.glade"))
         self.dialog = builder.get_object("dialog")
-        self.card_box = builder.get_object("card_box")
+        self.main_box = builder.get_object("main_box")
         self.one_card_per_page = builder.get_object("one_card_per_page")
         self.a4_page = builder.get_object("a4_page")
         self.one_card_per_file = builder.get_object("one_card_per_file")
@@ -29,12 +32,12 @@ class ExportDialog(GObject.Object):
         self.buttons_save_func  = {self.one_card_per_page: self.save_one_card_per_page,
                                    self.a4_page: self.save_cards_for_printing,
                                    self.one_card_per_file: self.save_one_card_per_file}
-
-        self.gloomhavenclass = gloomhavenclass
-        for card in self.gloomhavenclass.cards:
-            check_button = Gtk.CheckButton(card.name)
-            check_button.set_active(True)
-            self.card_box.add(check_button)
+        # Insert a widget dedicated to card selection at topmost position
+        self.select_cards_widget = SelectCardsForExportWidget(self.gloomhavenclass)
+        self.main_box.add(self.select_cards_widget.widget)
+        self.main_box.reorder_child(self.select_cards_widget.widget, 0)
+        # Set the widget to expand and fill the given space. The "0" corresponds to padding (number of pixels between children)
+        self.main_box.set_child_packing(self.select_cards_widget.widget, True, True, 0, Gtk.PackType.START)
 
         self.dialog.show_all()
 
@@ -93,22 +96,11 @@ class ExportDialog(GObject.Object):
         elif self.one_card_per_file:
             return self.one_card_per_file
 
-    def get_cards_to_save(self):
-        """
-        This is common to all "save" functions. Return a list of Card items representing all the cards the user whishes to export.
-        """
-        active = []
-        for checkbutton in self.card_box.get_children():
-            if checkbutton.get_active():
-                active.append(checkbutton.get_label())
-        to_draw  = [card for card in self.gloomhavenclass.cards if card.name in active]
-        return to_draw
-
     def save_one_card_per_page(self, export_path):
         save_path = Path(export_path).with_suffix(".pdf")
         surface = cairo.PDFSurface(save_path, card_width, card_height)
         cr = cairo.Context(surface)
-        for card in self.get_cards_to_save():
+        for card in self.select_cards_widget.get_cards_to_save():
             cr.save()
             self.gloomhavenclass.draw_card(card, cr)
             cr.restore()
@@ -128,7 +120,7 @@ class ExportDialog(GObject.Object):
         cr.scale(8.5/7.5 * 252.28/card_height, 8.5/7.5 * 252.28/card_height)
         cr.rotate(-pi/2)
         pos = 0
-        for card in self.get_cards_to_save():
+        for card in self.select_cards_widget.get_cards_to_save():
             if pos == 4 :
                 # Go back to the top of the page
                 cr.translate(4*card_width, card_height)
@@ -148,7 +140,7 @@ class ExportDialog(GObject.Object):
         surface.finish()
 
     def save_one_card_per_file(self, export_path):
-        for card in self.get_cards_to_save():
+        for card in self.select_cards_widget.get_cards_to_save():
             file_name = (Path(export_path) / card.name).with_suffix(".pdf")
             surface = cairo.PDFSurface(file_name, card_width, card_height)
             cr = cairo.Context(surface)
