@@ -94,7 +94,7 @@
                         <property name="can-focus">False</property>
                         <property name="label" translatable="yes">Export as pdf</property>
                         <property name="use-underline">True</property>
-                        <signal name="activate" handler="export" swapped="no"/>
+                        <signal name="activate" handler="export_pdf" swapped="no"/>
                       </object>
                     </child>
                   </object>

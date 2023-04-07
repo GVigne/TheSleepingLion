@@ -9,7 +9,7 @@ from gi.repository import Gtk, Gdk, GObject, GdkPixbuf, PangoCairo
 
 from .character_tab import CharacterTab
 from .card_tab import CardTab
-from .dialog_export import ExportDialog
+from .dialog_exportPDF import ExportDialogPDF
 from .aoe_creator import AoECreator
 from ..utils import get_gui_asset, get_doc_asset, show_parsing_errors, show_warning_errors, freeze_event, unfreeze_event, gtk_error_message, get_gui_images
 from ..constants import card_height, card_width
@@ -278,9 +278,9 @@ class MainWindow(GObject.Object):
         dlg.destroy()
         return canceled
 
-    def export(self, button):
+    def export_pdf(self, button):
         self.refresh(None) # Make sure everything is up to date.
-        dialog = ExportDialog(self.current_class)
+        dialog = ExportDialogPDF(self.current_class)
 
     def open(self, widget):
         """

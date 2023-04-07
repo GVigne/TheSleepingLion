@@ -10,13 +10,13 @@ from ..utils import get_gui_asset
 from ..constants import card_height, card_width
 from .select_cards_widget import SelectCardsForExportWidget
 
-class ExportDialog(GObject.Object):
+class ExportDialogPDF(GObject.Object):
     def __init__(self, gloomhavenclass: GloomhavenClass):
         GObject.GObject.__init__(self)
         self.gloomhavenclass = gloomhavenclass
 
         builder = Gtk.Builder()
-        builder.add_from_file(get_gui_asset("dialog_export.glade"))
+        builder.add_from_file(get_gui_asset("dialog_exportPDF.glade"))
         self.dialog = builder.get_object("dialog")
         self.main_box = builder.get_object("main_box")
         self.one_card_per_page = builder.get_object("one_card_per_page")
@@ -39,6 +39,7 @@ class ExportDialog(GObject.Object):
         # Set the widget to expand and fill the given space. The "0" corresponds to padding (number of pixels between children)
         self.main_box.set_child_packing(self.select_cards_widget.widget, True, True, 0, Gtk.PackType.START)
 
+        self.dialog.set_title("Export as PDF")
         self.dialog.show_all()
 
     def accept(self, event, id):
