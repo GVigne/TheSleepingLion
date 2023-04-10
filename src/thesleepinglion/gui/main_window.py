@@ -61,9 +61,16 @@ class MainWindow(GObject.Object):
         """
         Update the current class, if it was modified parse it and draw it.
         """
-        needs_parsing = self.update_current_class()
-        if needs_parsing:
+        needs_parsing, errors = self.update_current_class()
+
+        # Clear error message box if something is going to change
+        if len(errors) > 0 or needs_parsing:
             self.error_display.get_buffer().set_text("")
+        if len(errors) > 0:
+            self.error_display.get_buffer().set_text(errors)
+
+        # Parse and redraw the current class
+        if needs_parsing:
             self.parse_current_class()
         self.drawing_area.queue_draw()
 
@@ -114,6 +121,7 @@ class MainWindow(GObject.Object):
         are automatically emitted not to force the whole parsing and drawing procedure if nothing changed. For example,
         when setting the color in a ColorChooserWidget, the signal "notify" is emitted, then caught by the main window
         and calls refresh. However, nothing really changed in the class, so it shouldn't be redrawn.
+        Also returns errors as a string: this string is empty if no error occurred.
         """
         current_tab = None
         tab_widget = self.notebook.get_nth_page(self.notebook.get_current_page())
@@ -124,18 +132,16 @@ class MainWindow(GObject.Object):
         if self.character_tab.tab_widget == tab_widget:
             current_tab = self.character_tab
         # Now current_tab is either a CardTab or the CharacterTab
-        errors = None
+        errors = ""
         was_modified = True # By default, assume something has changed.
         try:
             was_modified = current_tab.update_custom_character(self.current_class, self.backup_handler)
         except CardNameAlreadyExists as e:
             errors = str(e)
-        if errors is not None:
-            self.error_display.get_buffer().set_text(errors)
 
         if was_modified:
             self.emit("custom_character_changed") # Notify the backup file handler that the custom classed has been modified.
-        return was_modified
+        return was_modified, errors
 
     def parse_current_class(self):
         """
