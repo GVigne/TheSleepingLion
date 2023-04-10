@@ -215,7 +215,8 @@ class GloomhavenClass:
         - If existing_card is None, return card_name if no card has this name, else pick another one.
         - If existing_card is not None, return card_name if no other card has this name, else pick another one.
         If we should pick another name, it will be something like "Card 42".
-        Note: some card names are also blacklisted (already used for fields in GML)
+        Note: some card names are also blacklisted (already used for fields in GML). Furthermore, a name may not have
+        an empty name.
         """
         matching_card = None
         for card in self.cards:
@@ -226,8 +227,9 @@ class GloomhavenClass:
                     break
 
         blacklisted = ["class", "aliases", "special rules"]
+        empty_name =  not card_name.strip() # An empty string evaluates to False
 
-        if matching_card is not None or card_name in blacklisted:
+        if matching_card is not None or card_name in blacklisted or empty_name:
             # Replace card_name with something like "Card 1", "Card 2"...
             existing_indices = []
             for card in self.cards:

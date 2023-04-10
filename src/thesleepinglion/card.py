@@ -70,7 +70,7 @@ class Card:
         """
         Save this card to the GML file at location self.path_to_gml. Only appends text, doesn't overwrite.
         """
-        if len(self.name) !=0: # Name is not empty: save it.
+        if len(self.name) !=0: # Sanity check to make sure we don't break the GML file and make it unreadable
 
             parameters = {}
             if len(self.level) > 0:
@@ -245,7 +245,7 @@ class Card:
         Try to replace the current top (or bottom) text with the given one.
         Returns True if the text was indeed different (ie if text is different from self.top_text), and False if nothing
         was changed.
-        This function is the interface between the user's raw input and what will be serialised lated on in the GML file.
+        This function is the interface between the user's raw input and what will be serialised later on in the GML file.
         Currently, it:
         - removes leading empty lines and trailing white blanks. It does not remove the indentation (if it exists) of the first line.
         - replace tabs by two spaces

@@ -69,7 +69,7 @@ class CardTab(AbstractTab):
             self.tab_name_label.set_text(valid_name)
             if valid_name != ui_name:
                 # Something went wrong and name isn't valid. Instead, the gloomhaven class gave a valid one.
-                raise CardNameAlreadyExists(f"{ui_name} is already the name of an existing card. A card was renamed into {valid_name} instead.")
+                raise CardNameAlreadyExists(f"{ui_name} is not a valid name: perhaps it is already the name of an existing card. A card was renamed into {valid_name} instead.")
         return was_modified
 
 
