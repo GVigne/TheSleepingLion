@@ -198,8 +198,11 @@ class HexagonalGrid:
     def draw(self, cr: cairo.Context, hexagons_to_draw: HexagonDict):
         """
         Draw the given hexagons at coordinates (0,0).
-        Note: a small translation will be made as the origin for the HexagonalGrid is the top left vertex but the
-        hexagon at position (0,1) is bit to the left. Furthermore, the hexagon at position (0,0) has a pointy top.
+        Note: a translation is first made as the origin for the HexagonalGrid is the top left vertex but the hexagons
+        at positions (0, 2n+1) (example: hexagon (0,1)) are a bit to the left.
+        - On x: translate if a hexagon (0, 2n+1) has to be drawn. If there are no such hexagons, don't translate on the x component
+        - On y: translate (always) since hexagons on the first line have a pointy top
+
         This translation enables the following:
         - W = Hexagonalgrid.get_width(hexagons), H = Hexagonalgrid.get_height(hexagons)
         - Draw a rectangle of size W x H with top left vertex at (0,0)
@@ -207,7 +210,15 @@ class HexagonalGrid:
         => The hexagons fit in the box and don't overflow.
         """
         cr.save()
-        cr.translate(0.5*self.hexagon_width, self.small_height)
+        cr.translate(0, self.small_height)
+        has_odd_hex_first_col = False
+        for (x,y), _ in hexagons_to_draw.items():
+            if x == 0 and y % 2 == 1:
+                has_odd_hex_first_col = True
+                break
+        if has_odd_hex_first_col:
+            cr.translate(0.5*self.hexagon_width, 0)
+
         cr.move_to(0,0)
         for _, ((hex_x, hex_y), color) in enumerate(hexagons_to_draw.items()):
             cr.save()
