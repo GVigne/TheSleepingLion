@@ -176,10 +176,13 @@ class GloomhavenParser:
     def create_text(self,
                     text : str,
                     allowed_size : int,
-                    gml_context: GMLLineContext):
+                    gml_context: GMLLineContext,
+                    minimum_one_word: bool = True):
         """
         Try to create a text item with the given size. If the text doesn't fit in the given space, try to
         fill it as much as possible, then return the part of the text which doesn't fit.
+        Can return None instead of a text item if there wasn't enough space and minimum_one_word is False, so as
+        to prevent empty items being placed in the line.
         If allowed_size = -1, ignore all size restrictions.
         """
         if allowed_size == -1:
@@ -199,9 +202,17 @@ class GloomhavenParser:
                     break
                 else:
                     a = a + (b - a) //2
+
+        # The default behavior is to put at least one word per line to prevent infinite loop if a single word is too big to fit in a card
+        # However, in some rare cases (for example when an image is at the end of a line), we can tolerate an empty word,
+        # so that there is no overflow.
         if a == 0:
-            # Always put at least 1 word per line. This prevents infinite loop is a single word is too big to fit in a card
-            a = 1
+            if minimum_one_word:
+                a = 1
+            else:
+                # There is no item to place, so return None. Note that " ".join(words[a:] should be equal to text.
+                return None, " ".join(words[a:])
+
         item = TextItem(" ".join(words[:a]), gml_context, path_to_gml = self.path_to_gml)
         return item, " ".join(words[a:])  # Joining on a empty list returns an empty string.
 
@@ -273,9 +284,11 @@ class GloomhavenParser:
                     # Text was somehow splitted: it should have a blank inbetween the last text and this one.
                     current_str = " " + current_str
 
-                item, remain_str = self.create_text(current_str, allowed_width, gml_context)
+                minimum_one_word = (len(current_line)==0) # If at least one word should be placed in the line or if 0 words can be placed
+                item, remain_str = self.create_text(current_str, allowed_width, gml_context, minimum_one_word)
                 if remain_str != "":
-                    current_line.append(item)
+                    if item is not None:
+                        current_line.append(item)
                     lines.append(LineItem(current_line, self.path_to_gml))
                     current_line = []
                     x = 0
