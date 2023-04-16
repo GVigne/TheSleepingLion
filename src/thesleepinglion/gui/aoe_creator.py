@@ -47,8 +47,8 @@ class AoECreator(GObject.Object):
                 self.drawn_hexagons[(x,y)] = {"red": 255, "green": 255, "blue": 255}
         # The origin for the cairo context is a the top left of the screen. For the hexagonal grid, its the
         # coordinates of the top left hexagon. self.drawing_origin is the vector allowing the conversion between both.
-        self.drawing_origin = (self.drawing_grid.get_width(self.drawn_hexagons)//2 - 0.5*self.drawing_grid.hexagon_width,
-                                self.drawing_grid.get_height(self.drawn_hexagons)//2 - self.drawing_grid.small_height)
+        self.drawing_origin = (self.drawing_grid.get_width(self.drawn_hexagons)/2,
+                                self.drawing_grid.get_height(self.drawn_hexagons)/2)
 
         # Make tempfile an attribute of this class so it can be deleted when the AoE creator is closed.
         tmpdir = mkdtemp()
@@ -63,7 +63,7 @@ class AoECreator(GObject.Object):
         self.window.maximize()
 
     def aoe_area_clicked(self, window, event):
-        x, y = self.drawing_grid.pos_to_coord(event.x-self.drawing_origin[0], event.y-self.drawing_origin[1])
+        x, y = self.drawing_grid.pos_to_coord(event.x-self.drawing_origin[0], event.y-self.drawing_origin[1], self.drawn_hexagons)
         if x < self.background_x_range[0] or x >= self.background_x_range[1] or y < self.background_y_range[0] or y >= self.background_y_range[1]:
             # Out of bounds, do nothing
             return

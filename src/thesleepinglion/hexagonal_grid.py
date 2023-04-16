@@ -140,20 +140,49 @@ class HexagonalGrid:
 
         return x_pos, y_pos
 
-    def pos_to_coord(self, x_pos: int, y_pos: int):
+    def pos_to_coord(self, x_pos: int, y_pos: int, hexagons_to_draw: HexagonDict):
         """
-        Given the x and y position of point, return the coordinates of the hexagon encompassing this point.
-        Assumes that the origin (0,0) is the top left edge of the top left hexagon.
+        See technical docs for the documentation.
+        It's dark magic.
         """
-        # These transformations assume that the origin it at the center of a hexagon, not its top left edge.
-        x_pos_center = x_pos - 0.5*self.hexagon_width
-        y_pos_center = y_pos - 0.5*self.edge_size
+        # Translation to bring (0,0) to the top left vertex of the hexagon at hexagonal coordinates (0,0)
+        internal_x, internal_y, = self.get_origin_pixel_coordinates(hexagons_to_draw)
+        x_pos -= internal_x
+        y_pos -= internal_y
 
-        x_coord = (sqrt(3)/3 * x_pos_center - 1/3 * y_pos_center) / self.edge_size
-        y_coord = 2/3 * y_pos_center / self.edge_size
-        x_axial, y_axial = round(x_coord), round(y_coord)
-        # Now we have the axial coordinates. Transform them into offset coordinates.
-        return x_axial + (y_axial + 1) //2, y_axial
+        q_x = x_pos //round(sqrt(3) * self.edge_size)
+        r_x = x_pos - q_x*round(sqrt(3) * self.edge_size)
+        q_y = y_pos // round(1.5*self.edge_size)
+        r_y = y_pos - q_y*round(1.5*self.edge_size)
+
+        x_res = q_x
+        if r_x  > round(sqrt(3) * self.edge_size)/2:
+            if q_y % 2 == 0:
+                if r_y > self.edge_size and (r_y - self.edge_size) >= -(1/sqrt(3)) * (r_x - self.hexagon_width):
+                    x_res += 1
+            else:
+                if r_y < self.edge_size or (r_y - self.edge_size) <= (1/sqrt(3))*(r_x - self.hexagon_width/2):
+                    x_res += 1
+
+        y_res = q_y
+        if r_y > self.edge_size:
+            if q_y % 2 ==0:
+                if r_x <= self.hexagon_width/2:
+                    if (r_y - self.edge_size) >= (1/(sqrt(3))) * r_x:
+                        y_res +=1
+                else:
+                    if (r_y - self.edge_size) >= -(1/(sqrt(3)))*(r_x - self.hexagon_width):
+                        y_res +=1
+            else:
+                if r_x <= self.hexagon_width/2:
+                    if (r_y - self.edge_size) >= -(1/(sqrt(3)))*(r_x - self.hexagon_width/2):
+                        y_res +=1
+
+                else:
+                    if (r_y - self.edge_size) >= (1/(sqrt(3)))*(r_x - self.hexagon_width/2):
+                        y_res +=1
+
+        return x_res, y_res
 
     def color_hexagon(self, cr: cairo.Context, rgb:dict = {"red": 0, "green": 0, "blue": 0}):
         """
@@ -195,6 +224,26 @@ class HexagonalGrid:
         cr.fill()
         cr.restore()
 
+    def get_origin_pixel_coordinates(self, hexagons_to_draw):
+        """
+        When the Hexagonal Grid draws something at pixel coordinates (0,0), it actually draws a box around the hexagons,
+        such that the top left corner of the box fits the pixel coordinate (0,0), ie where the cairo cursor currently is.
+        However, due to the even-r convention, a translation may be first made, so that the origin actually fits the
+        top left vertex of the hexagon at hexagonal coordinates (0,0).
+        This function returns the translation going FROM the reference where the origin has pixel coordinates (0,0) ie cairo's
+        cursor position TO the reference where the origin is the top left vertex of the hexagon at hexagonal coordinates (0,0).
+        """
+        trans_y = self.small_height
+        trans_x = 0
+        has_odd_hex_first_col = False
+        for (x,y), _ in hexagons_to_draw.items():
+            if x == 0 and y % 2 == 1:
+                has_odd_hex_first_col = True
+                break
+        if has_odd_hex_first_col:
+            trans_x = 0.5*self.hexagon_width
+        return trans_x, trans_y
+
     def draw(self, cr: cairo.Context, hexagons_to_draw: HexagonDict):
         """
         Draw the given hexagons at coordinates (0,0).
@@ -210,15 +259,8 @@ class HexagonalGrid:
         => The hexagons fit in the box and don't overflow.
         """
         cr.save()
-        cr.translate(0, self.small_height)
-        has_odd_hex_first_col = False
-        for (x,y), _ in hexagons_to_draw.items():
-            if x == 0 and y % 2 == 1:
-                has_odd_hex_first_col = True
-                break
-        if has_odd_hex_first_col:
-            cr.translate(0.5*self.hexagon_width, 0)
-
+        trans_x, trans_y = self.get_origin_pixel_coordinates(hexagons_to_draw)
+        cr.translate(trans_x, trans_y)
         cr.move_to(0,0)
         for _, ((hex_x, hex_y), color) in enumerate(hexagons_to_draw.items()):
             cr.save()
