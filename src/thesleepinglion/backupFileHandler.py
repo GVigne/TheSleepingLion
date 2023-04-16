@@ -210,7 +210,7 @@ class AoEFileHandler(BackupFileHandler):
     def automatic_save(self, aoe_window):
         if not self.read_only:
             path_to_save = self.path_to_file.with_suffix(".aoe~")
-            aoe_window.clicked_hexagons.serialize_aoe(path_to_save)
+            aoe_window.drawn_hexagons.serialize_aoe(path_to_save)
 
         super().automatic_save()
 

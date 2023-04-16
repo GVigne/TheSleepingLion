@@ -38,19 +38,17 @@ class AoECreator(GObject.Object):
         self.drawing_grid = HexagonalGrid(self.hexagon_side)
 
         # Fixed size hexagon grid used to draw the background. Has hexes with negative coordinates so (0,0) is
-        # at the center of the cairo context.
-        self.background_hexagons = HexagonDict()
+        # at the center of the cairo context. It will modified according to user's input.
+        self.drawn_hexagons = HexagonDict()
         self.background_x_range = (-3,5)
         self.background_y_range = (-3,5)
         for x in range(self.background_x_range[0], self.background_x_range[1]):
             for y in range(self.background_y_range[0], self.background_y_range[1]):
-                self.background_hexagons[(x,y)] = {"red": 255, "green": 255, "blue": 255}
-        # The hexagons the user has clicked on ie those which should be serialised.
-        self.clicked_hexagons = HexagonDict()
+                self.drawn_hexagons[(x,y)] = {"red": 255, "green": 255, "blue": 255}
         # The origin for the cairo context is a the top left of the screen. For the hexagonal grid, its the
         # coordinates of the top left hexagon. self.drawing_origin is the vector allowing the conversion between both.
-        self.drawing_origin = (self.drawing_grid.get_width(self.background_hexagons)//2 - 0.5*self.drawing_grid.hexagon_width,
-                                self.drawing_grid.get_height(self.background_hexagons)//2 - self.drawing_grid.small_height)
+        self.drawing_origin = (self.drawing_grid.get_width(self.drawn_hexagons)//2 - 0.5*self.drawing_grid.hexagon_width,
+                                self.drawing_grid.get_height(self.drawn_hexagons)//2 - self.drawing_grid.small_height)
 
         # Make tempfile an attribute of this class so it can be deleted when the AoE creator is closed.
         tmpdir = mkdtemp()
@@ -62,6 +60,7 @@ class AoECreator(GObject.Object):
         self.aoe_backup_handler.connect("change_window_title", self.change_window_title)
 
         self.window.show_all()
+        self.window.maximize()
 
     def aoe_area_clicked(self, window, event):
         x, y = self.drawing_grid.pos_to_coord(event.x-self.drawing_origin[0], event.y-self.drawing_origin[1])
@@ -83,12 +82,12 @@ class AoECreator(GObject.Object):
             blue = int(rgba_object.blue *255)
             color = {"red": red, "green": green, "blue": blue}
 
-        if (x,y) not in self.clicked_hexagons or self.clicked_hexagons[(x,y)] != color:
+        if (x,y) not in self.drawn_hexagons or self.drawn_hexagons[(x,y)] != color:
             # New hexagon, or hexagon with a different color than the one currently selected
-            self.clicked_hexagons[(x,y)] = color
+            self.drawn_hexagons[(x,y)] = color
         else:
             # The user is clicking on a hexagon which is already of the given color.
-            self.clicked_hexagons[(x,y)] = {"red": 255, "green": 255, "blue": 255}
+            self.drawn_hexagons[(x,y)] = {"red": 255, "green": 255, "blue": 255}
 
         self.emit("aoe_changed")
         self.aoe_drawing_area.queue_draw()
@@ -102,8 +101,7 @@ class AoECreator(GObject.Object):
     def draw(self, widget, cr):
         cr.translate(self.drawing_origin[0], self.drawing_origin[1])
         cr.move_to(0,0)
-        self.drawing_grid.draw(cr, self.background_hexagons)
-        self.drawing_grid.draw(cr, self.clicked_hexagons)
+        self.drawing_grid.draw(cr, self.drawn_hexagons)
 
     def change_window_title(self, event):
         """
@@ -120,7 +118,7 @@ class AoECreator(GObject.Object):
             # Ask the user where he wants to save his file as it is currently a temporary file.
             self.save_aoe_as(None)
         else:
-            self.aoe_backup_handler.save(self.clicked_hexagons)
+            self.aoe_backup_handler.save(self.drawn_hexagons)
 
     def save_aoe_as(self, widget):
         dlg = Gtk.FileChooserDialog(title = "Save as", parent = None,
@@ -182,7 +180,8 @@ class AoECreator(GObject.Object):
                 if response == Gtk.ResponseType.YES:
                     # Load the backup
                     try:
-                        self.clicked_hexagons = self.aoe_backup_handler.open_new_file(dlg.get_filename(), load_backup=True)
+                        self.drawn_hexagons = self.aoe_backup_handler.open_new_file(dlg.get_filename(), load_backup=True)
+                        self.check_hexagons_integrity()
                         self.aoe_drawing_area.queue_draw()
                     except InvalidAoEFile:
                         gtk_error_message(f"The backup for the file {dlg.get_filename()} couldn't be read. Try loading the file directly.")
@@ -190,7 +189,8 @@ class AoECreator(GObject.Object):
                     # This is simply the normal way to open a file. This also means that the backup file will be destroyed;
                     # the user has been warned and chose not to load it, we will assume it is irrelevant
                     try:
-                        self.clicked_hexagons = self.aoe_backup_handler.open_new_file(dlg.get_filename())
+                        self.drawn_hexagons = self.aoe_backup_handler.open_new_file(dlg.get_filename())
+                        self.check_hexagons_integrity()
                         self.aoe_drawing_area.queue_draw()
                     except InvalidAoEFile:
                         gtk_error_message(f"The file {dlg.get_filename()} couldn't be read. Make sure it is a .aoe file and try again.")
@@ -198,11 +198,24 @@ class AoECreator(GObject.Object):
             else:
                 # This is the normal case: load the given file.
                 try:
-                    self.clicked_hexagons = self.aoe_backup_handler.open_new_file(dlg.get_filename())
+                    self.drawn_hexagons = self.aoe_backup_handler.open_new_file(dlg.get_filename())
+                    self.check_hexagons_integrity()
                     self.aoe_drawing_area.queue_draw()
                 except InvalidAoEFile:
                     gtk_error_message(f"The file {dlg.get_filename()} couldn't be read. Make sure it is a .aoe file and try again.")
         dlg.destroy()
+
+    def check_hexagons_integrity(self):
+        """
+        self.drawn_hexagons should always be a hexagonal grid with hexagons in background_x_range and background_y_range:
+        unclicked hexagons should be in blank.
+        However, when a card is serialized, blank hexagons are removed. Here we add them back and make sure self.draw_hexagon
+        is consistent with this window.
+        """
+        for x in range(self.background_x_range[0], self.background_x_range[1]):
+            for y in range(self.background_y_range[0], self.background_y_range[1]):
+                if (x,y) not in self.drawn_hexagons:
+                    self.drawn_hexagons[(x,y)] = {"red": 255, "green": 255, "blue": 255}
 
     def aoe_key_pressed(self, window, event):
         # Check if the CONTROL key was pressed at the same time
