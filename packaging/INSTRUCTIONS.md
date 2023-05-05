@@ -1,4 +1,4 @@
-This short document is memo to produce The Sleeping Lion's executable for Windows. There are no prerequisites other than having a computer running on Windows 10 or Windows 11.
+This short document is a memo to create an installer for The Sleeping Lion on Windows. There are no prerequisites other than having a computer running on Windows 10 or Windows 11.
 
 ## Step 0: install MSYS2
 Download and install MSYS2: https://www.msys2.org/. From here on, we will be working with MINGW64.
@@ -18,8 +18,9 @@ Create a Python venv using system-wide packages, then activate it:
 - `python3 -m venv path_to_venv --system-site-packages`
 - `source path_to_venv/bin/activate`
 - Download or clone The Sleeping Lion.
-- Copy the `setup.py` file found in the `packaging` folder and paste it at the root of the folder `TheSleepingLion`, replacing the one at this location. When packaging, we use specific versions of the Python dependencies (such as `cairocffi`: we should be using version `1.4.0`) so that building is replicable and isn't influenced by newer versions of dependency packages.
-- `pip install .`
+- `pip install cairocffi==1.0.0`. cairocffi's latest versions don't seem to compile using MSYS, so we have to use an older version.
+- `pip install pyinstaller`
+- `pip install .`. Install The Sleeping Lion.
 
 ## Step 4: package The Sleeping Lion using Nsis
 Nsis is a tool which helps distribute apps through Windows. We will also be using ResourceHacker to set an icon on the resulting executable (this icon will be shown in the task bar to the user).
@@ -30,4 +31,4 @@ The `build.sh` script starts by using PyInstaller to create an executable, then 
 
  Note that the icon located in `packaging` and named `the_sleeping_lion_square.ico` is different from the ones in `gui_images`: Windows can't deal with rectangular icons, so we have to use a dedicated square icon.
 
-The `build.sh` script will create folders named `dist` and `build`, as well as other files in the `packaging` folder. You can ignore them: the interesting file should be named something like `the_sleeping_lion-1.0.0-x86_64.exe` and corresponds to The Sleeping Lion's installer.
+The `build.sh` script will create folders named `dist` and `build`, as well as other files in the `packaging` folder. You can ignore them: the interesting file should be named something like `the_sleeping_lion-1.0.0-x86_64.exe` and corresponds to The Sleeping Lion's Windows installer.
