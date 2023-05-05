@@ -19,3 +19,6 @@ eggs/
 src/thesleepinglion/docs/Doc_generation/Aliases_images/
 src/thesleepinglion/docs/Doc_generation/Commands_images/
 src/thesleepinglion/docs/Doc_generation/Macros_images/
+
+# Ignore packaging files
+packaging/ResourceHacker.exe
