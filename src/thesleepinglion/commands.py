@@ -64,7 +64,6 @@ class ImageCommand(AbstractCommand):
             user_scaling = float(arguments[1])
         default_height = 1.4 * gml_context.font_size  * user_scaling # Height to font height ratio.
 
-        self.x_offset = TextItem(" ", GMLLineContext(font_size=gml_context.font_size)).get_width()
         # Load SVG as vector graphic, other files as pixbuf
         if Path(image_path).suffix == ".svg":
             try:
@@ -80,15 +79,13 @@ class ImageCommand(AbstractCommand):
                 self.warnings.append(f"The file {image_path} isn't a readable image (.svg or .png).")
 
     def get_width(self):
-        return self.image.get_width() + 2 * self.x_offset # One blank after, one blank before.
+        return self.image.get_width()
 
     def get_height(self):
         return self.image.get_height()
 
     def draw(self, cr: cairo.Context):
         cr.save()
-        cr.translate(self.x_offset, 0)
-        cr.move_to(0,0)
         if isinstance(self.image, GdkPixbuf.Pixbuf):
             Gdk.cairo_set_source_pixbuf(cr, self.image, 0, 0)
             cr.paint()
@@ -409,13 +406,13 @@ class ChargesCommand(AbstractCommand):
                 snd_args.append(self.loss_image)
 
         # Note: this is the same x_offset as in OneChargeItem
-        first_line = LineItem([self.infinity, self.blank] + list_join(first_args, self.blank))
+        first_line = LineItem([self.infinity] + first_args, joining_item=self.blank)
         cr.save()
         first_line.draw(cr)
         cr.restore()
 
         if len(snd_args) > 0:
-            second_line = LineItem(list_join(snd_args, self.blank))
+            second_line = LineItem(snd_args, joining_item=self.blank)
             cr.save()
 
             if n == 3 or n == 5 :

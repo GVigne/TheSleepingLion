@@ -2,7 +2,7 @@ import gi
 gi.require_version('PangoCairo', '1.0')
 from gi.repository import Pango, PangoCairo
 import cairo
-from .utils import text_to_pango
+from .utils import text_to_pango, list_join
 from .constants import *
 from .gmllinecontext import GMLLineContext
 from pathlib import Path
@@ -11,6 +11,8 @@ class AbstractItem:
     """
     Reminder: after an Item has been created, it's size cannot be changed. Once an Item has been created, it
     knows its width/height: this can be accessed via the get_width and get_height functions.
+    Items should only take their height and width into account, and shouldn't worry about additional blanks before
+    or after them which should be displayed to have a pretty output.
     """
     def __init__(self, path_to_gml : Path | None = None):
         self.path_to_gml = path_to_gml # All items know which GML file they depend.
@@ -44,9 +46,13 @@ class LineItem(AbstractItem):
     by side.
     """
     def __init__(self, items : list[AbstractItem],
-                       path_to_gml : Path | None = None):
+                       path_to_gml : Path | None = None,
+                       joining_item: AbstractItem | None = None):
         super().__init__(path_to_gml)
-        self.items = items
+        if joining_item is None:
+            self.items = items
+        else:
+            self.items = list_join(items, joining_item)
 
     def get_width(self):
         return sum([item.get_width() for item in self.items])
@@ -161,4 +167,3 @@ class TextItem(AbstractItem):
         cr.set_source_rgba(self.red / 255, self.green / 255, self.blue / 255) # By default, draw in white
         PangoCairo.update_layout(cr, self.pango_text) # Since we changed the target surface, we need to update the layout
         PangoCairo.show_layout(cr, self.pango_text)
-

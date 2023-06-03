@@ -124,6 +124,7 @@ class GloomhavenParser:
         all_warnings = []
         for column in [first_column, second_column, bot_column, top_column]:
             all_warnings = all_warnings + column.get_warnings()
+
         return {"topleft": top_column, "center": first_column, "center2": second_column, "bottomright": bot_column}, all_warnings
 
     def find_line_position(self, line: list[str]):
@@ -238,11 +239,13 @@ class GloomhavenParser:
                           width : int = card_width*0.78,
                           ongoing_x: int = 0,
                           image_color: dict = {}, # The class's color: may change the color of some images
+                          ongoing_blank: TextItem | None = None,
                           ):
         """
         Return a list of LineItems corresponding to the given GML line. The input may either be a string (for example,
         an entire line to parse), or a list of string (which have already been splitted by the lexer).
         If width =-1, then fit everything on a single line.
+        This function also adds a blank inbetween every item to have a prettier output.
         """
         # TODO: rewrite by splitting all three cases
         if isinstance(gml_line, list):
@@ -256,6 +259,12 @@ class GloomhavenParser:
         if ongoing_line is not None:
             current_line = ongoing_line # Needed for recursion using macros.
 
+        ## This blank will be added inbetween every item in a line.
+        ## It's size can be changed if a macro changes the size policy for this GML line
+        blank = TextItem(" ", GMLLineContext(font_size=gml_context.font_size))
+        if ongoing_blank is not None:
+            blank = ongoing_blank
+
         while len(splitted_gml) > 0:
             current_str = splitted_gml[0]
             if self.is_command(current_str):
@@ -263,33 +272,33 @@ class GloomhavenParser:
             elif self.is_macro(current_str):
                 macro = self.create_macro(current_str)
                 macro.change_context(gml_context) # Influece the current context
+                if gml_context.font_size == small_font_size:
+                    blank = TextItem(" ", GMLLineContext(font_size=small_font_size))
 
                 splitted_gml.pop(0)
-                return lines + self.gml_line_to_items(splitted_gml,
+                result = []
+                for line in lines:
+                    result.append(LineItem(line, self.path_to_gml, joining_item=blank))
+                return result + self.gml_line_to_items(splitted_gml,
                                                       gml_context,
                                                       ongoing_line = current_line,
                                                       width = width,
                                                       ongoing_x = x,
-                                                      image_color = image_color)
+                                                      image_color = image_color,
+                                                      ongoing_blank = blank)
             else: # current_str is a text
                 # Compute the maximum space allowed for this text
                 if width == -1:
                     allowed_width = -1
                 else:
                     allowed_width = width - x
-                # If a macro was used to change part of text, then the lexer will have removed blanks. To prevent text from
-                # being immediately next to each other, we re-add it here.
-                # For example: ["BIG", "@small", "small", "@endlast", "BIG"] => "BIG small BIG" and not "BIGsmallBIG"
-                if len(current_line) > 0 and isinstance(current_line[-1],TextItem):
-                    # Text was somehow splitted: it should have a blank inbetween the last text and this one.
-                    current_str = " " + current_str
 
                 minimum_one_word = (len(current_line)==0) # If at least one word should be placed in the line or if 0 words can be placed
                 item, remain_str = self.create_text(current_str, allowed_width, gml_context, minimum_one_word)
                 if remain_str != "":
                     if item is not None:
                         current_line.append(item)
-                    lines.append(LineItem(current_line, self.path_to_gml))
+                    lines.append(current_line)
                     current_line = []
                     x = 0
                     splitted_gml[0] = remain_str # Reminder: splitted_gml[0] is the current item being parsed
@@ -298,13 +307,17 @@ class GloomhavenParser:
             if width == -1 or item.get_width() < width - x:
                 current_line.append(item)
             else:
-                lines.append(LineItem(current_line, self.path_to_gml))
+                lines.append(current_line)
                 current_line = [item]
                 x = 0
-            x += item.get_width()
+            x += item.get_width() + blank.get_width()
             splitted_gml.pop(0)
 
         if current_line != []:
-            lines.append(LineItem(current_line, self.path_to_gml))
+            lines.append(current_line)
 
-        return lines
+        # Now, we convert all lines into LineItems with blank inbetween every element
+        result = []
+        for line in lines:
+            result.append(LineItem(line, self.path_to_gml, joining_item=blank))
+        return result
