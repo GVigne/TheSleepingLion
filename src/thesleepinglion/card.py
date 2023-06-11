@@ -168,11 +168,12 @@ class Card:
         # Actions
         total_area_width = card_width*0.78
         total_area_height = card_height*0.3
+        blank_space_width = TextItem(" ", GMLLineContext()).get_width()
 
         ## Move on to the top part of the card
         # Draw the top left column
         cr.save()
-        cr.translate(0.11*card_width, 0.15*card_height)
+        cr.translate(0.11*card_width + blank_space_width, 0.15*card_height)
         cr.move_to(0,0)
         left_column = self.top_areas["topleft"]
         left_column.draw(cr)
@@ -199,7 +200,7 @@ class Card:
         cr.move_to(0,0)
         right_column = self.top_areas["bottomright"]
         cr.save()
-        cr.translate(total_area_width - right_column.get_width(), total_area_height - right_column.get_height())
+        cr.translate(total_area_width - right_column.get_width() - blank_space_width, total_area_height - right_column.get_height())
         cr.translate(0, 0.03*card_height)
         right_column.draw(cr)
         cr.restore()
@@ -211,6 +212,8 @@ class Card:
         cr.move_to(0,0)
         left_column = self.bot_areas["topleft"]
         cr.save()
+        cr.translate(blank_space_width, 0)
+        cr.move_to(0,0)
         left_column.draw(cr)
         cr.restore()
         cr.move_to(0,0)
@@ -234,7 +237,8 @@ class Card:
         cr.move_to(0,0)
         right_column = self.bot_areas["bottomright"]
         cr.save()
-        cr.translate(total_area_width - 0.06*card_width - right_column.get_width(),
+        # There is a border on the bottom part of the card which isn't there for the top actions, so we need to have an extra offset
+        cr.translate(total_area_width - 0.06*card_width - right_column.get_width() - blank_space_width,
                     total_area_height - right_column.get_height())
         right_column.draw(cr)
         cr.restore()
