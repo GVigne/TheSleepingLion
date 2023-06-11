@@ -193,6 +193,8 @@ class GloomhavenParser:
         a = len(words)
         b = len(words)
         while True:
+            if a == 0: # Not enough space to put even a single word, stop the loop
+                break
             pango_text = text_to_pango(" ".join(words[:a]), gml_context)
             pango_width = Pango.units_to_double(pango_text.get_size().width)
             if pango_width > allowed_size:
