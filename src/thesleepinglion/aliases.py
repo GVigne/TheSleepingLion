@@ -21,6 +21,7 @@ base_aliases = [
 "\\curse = CURSE \\image{curse.svg}",
 "\\bless = BLESS \\image{bless.svg}",
 "\\strengthen = STRENGTHEN \\image{strengthen.svg}",
+"\\invisible = INVISIBLE \\image{invisible.svg}",
 "\\pierce{$x$} = PIERCE \\image{pierce.svg} $x$",
 "\\generate_wind = @big \\image{wind.svg} @endlast",
 "\\generate_fire = @big \\image{fire.svg} @endlast",
