@@ -227,6 +227,7 @@ class MainWindow(GObject.Object):
         self.drawing_area.queue_draw()
 
     def delete_tab(self, button):
+        # Fetch the current tab
         index = self.notebook.get_current_page()
         current_tab = self.notebook.get_nth_page(index)
         current_card_tab = None
@@ -234,14 +235,23 @@ class MainWindow(GObject.Object):
             if ct.tab_widget == current_tab:
                 current_card_tab = ct
                 break
-        self.card_tabs = [ct for ct in self.card_tabs if ct != current_card_tab]
         if index != 0:
             # Check if it's not "Class attributes". This should be removed, and the button enabled only if not on class attributes
-            current_card_tab.delete(self.current_class)
-            self.notebook.remove_page(index)
-        self.emit("custom_character_changed") # Notify the backup file handler that the custom classed has been modified.
-        # Redraw
-        self.drawing_area.queue_draw()
+            dlg = Gtk.MessageDialog()
+            dlg.add_buttons(Gtk.STOCK_YES, Gtk.ResponseType.YES,
+                        Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+            dlg.set_markup(f"Are you sure you want to delete the card {current_card_tab.card.name}? This cannot be undone.")
+            dlg.set_modal(True)
+            response = dlg.run()
+            if response == Gtk.ResponseType.YES:
+                current_card_tab.delete(self.current_class)
+                self.notebook.remove_page(index)
+                self.card_tabs = [ct for ct in self.card_tabs if ct != current_card_tab]
+                self.emit("custom_character_changed") # Notify the backup file handler that the custom classed has been modified.
+                # Redraw
+                self.drawing_area.queue_draw()
+            dlg.destroy()
+
 
     def save(self, widget):
         """
