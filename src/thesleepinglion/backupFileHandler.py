@@ -46,7 +46,7 @@ class BackupFileHandler(GObject.Object):
         # The file was marked as saved internally but backup still exists.
         return Path(target_file).with_suffix(f".{self.extension}~").is_file()
 
-    def open_new_file(self, new_path: str, load_backup = False, read_only = False):
+    def open_new_file(self, new_path: str, load_backup = False, read_only = False, in_temporary_dir = False):
         """
         Called when the user wants to open a file or a backup file.
         Return a deserialized python object corresponding to the data at the given location.
@@ -67,7 +67,7 @@ class BackupFileHandler(GObject.Object):
         self.close()
         # Load the new one, backup or real file.
         self.path_to_file = Path(new_path)
-        self.in_temporary_dir = False
+        self.in_temporary_dir = in_temporary_dir
         self.read_only = read_only
         if load_backup:
             self.is_saved = False
@@ -83,7 +83,7 @@ class BackupFileHandler(GObject.Object):
         Should only be called by front-end users. Return True if the current object is saved and it is safe
         to close it.
         """
-        return self.is_saved
+        return self.is_saved or self.read_only # A read-only file can always be closed
 
     def automatic_save(self):
         """
@@ -189,7 +189,7 @@ class GMLFileHandler(BackupFileHandler):
 
         super().save()
 
-    def open_new_file(self, new_path: str, load_backup=False, read_only=False):
+    def open_new_file(self, new_path: str, load_backup=False, read_only=False, in_temporary_dir = False):
         """
         Try to open the GML file. Raise uncaught error if the file couldn't be read.
         """
@@ -197,7 +197,7 @@ class GMLFileHandler(BackupFileHandler):
         if load_backup:
             path_to_gml = Path(new_path).with_suffix(".gml~")
         gloomhaven_class = GloomhavenClass.CreateFromFile(path_to_gml) # May raise an error, so that the next line isn't executed
-        super().open_new_file(new_path, load_backup, read_only)
+        super().open_new_file(new_path, load_backup, read_only, in_temporary_dir)
         return gloomhaven_class
 
 class AoEFileHandler(BackupFileHandler):
@@ -223,7 +223,7 @@ class AoEFileHandler(BackupFileHandler):
 
         super().save()
 
-    def open_new_file(self, new_path: str, load_backup=False, read_only=False):
+    def open_new_file(self, new_path: str, load_backup=False, read_only=False, in_temporary_dir = False):
         """
         Try to open the AoE file. Raise uncaught error if the file couldn't be read.
         """
@@ -231,5 +231,5 @@ class AoEFileHandler(BackupFileHandler):
         if load_backup:
             path_to_aoe = Path(new_path).with_suffix(".aoe~")
         new_hexagon_dict = HexagonDict.CreateFromFile(path_to_aoe) # May raise error so that the next line isn't executed
-        super().open_new_file(new_path, load_backup, read_only)
+        super().open_new_file(new_path, load_backup, read_only, in_temporary_dir)
         return new_hexagon_dict

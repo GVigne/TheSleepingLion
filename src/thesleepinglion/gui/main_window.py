@@ -2,6 +2,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('PangoCairo', '1.0')
 from pathlib import Path
+from tempfile import TemporaryDirectory
 import subprocess
 import sys
 import os
@@ -33,6 +34,10 @@ class MainWindow(GObject.Object):
         self.card_tabs = []
         self.character_tab = None
         self.zoom_factor = 1
+
+        # A pointer to a temporary directory so that it doesn't go out of scope and gets deleted prematurely.
+        # This can and should be safely ignored.
+        self.new_file_tmpdir = None
 
         builder = Gtk.Builder()
         builder.add_from_file(get_gui_asset("main_window.glade"))
@@ -302,6 +307,22 @@ class MainWindow(GObject.Object):
     def export_as_png(self, button):
         self.refresh(None) # Make sure everything is up to date.
         dialog = ExportDialogPNG(self.current_class)
+
+    def new_file(self, widget):
+        """
+        Create a blank new gml file in a temporary directory.
+        """
+        save_as_message = "The current file isn't saved. Do you want to save it before creating a new file?"
+        cancel_action = self.safe_to_close_class(save_as_message)
+        if cancel_action:
+            # At some point, the user said he wanted to abort the "New file" action. Abort everything.
+            return
+
+        self.new_file_tmpdir = TemporaryDirectory()
+        tmpfile = Path(self.new_file_tmpdir.name) / "Untitled.gml"# A temporary file which will be deleted when the user quits TSL
+        tmpfile.with_suffix(".gml").touch() # Create the temporary file.
+        self.current_class = self.backup_handler.open_new_file(tmpfile, in_temporary_dir=True)
+        self.loading_routine()
 
     def open(self, widget):
         """
