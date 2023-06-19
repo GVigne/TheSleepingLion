@@ -47,12 +47,18 @@ class LineItem(AbstractItem):
     """
     def __init__(self, items : list[AbstractItem],
                        path_to_gml : Path | None = None,
-                       joining_item: AbstractItem | None = None):
+                       joining_item: AbstractItem | None = None,
+                       gml_context: GMLLineContext | None = None):
         super().__init__(path_to_gml)
         if joining_item is None:
             self.items = items
         else:
             self.items = list_join(items, joining_item)
+
+        # The following is used in TopmostLineItem
+        self.banner_background = None
+        if gml_context is not None:
+            self.banner_background = gml_context.banner_background
 
     def get_width(self):
         return sum([item.get_width() for item in self.items])
@@ -130,6 +136,57 @@ class ColumnItem(AbstractItem):
             cr.translate(0, current_y) # Go back to the left of the column
             cr.move_to(0,0)
         cr.restore() # Go back to the top left of the column
+
+class TopmostLineItem(LineItem):
+    """
+    Represents the line at the highest level. This is a way to distinguish between a LineItem whose only job
+    is to align objects and the topmost LineItem which will be placed on the card: it's a way to break up a bit
+    with the recursive nature of parsing, and allows to pass easily information between items and the GloomhavenCard
+    object.
+    Currently, this is only used for the @banner macro (black background).
+    """
+    @staticmethod
+    def promoteLineItem(line_item: LineItem):
+        promoted_item = TopmostLineItem(line_item.items,
+                               path_to_gml = line_item.path_to_gml,
+                               joining_item = None)
+        promoted_item.banner_background = line_item.banner_background
+        return promoted_item
+
+    def black_banner_height(self):
+        """
+        If a black banner should be drawn around this line, return the height of the banner.
+        If no banner should be drawn, return None.
+        """
+        if not self.banner_background: # None evaluates to False
+            return None
+        else:
+            return self.get_height()
+
+class TopmostColumnItem(ColumnItem):
+    """
+    Represents the column at the highest level, similarly to TopMostLineItem.
+    Note that a TopMostColumnItem must only hold TopmostLineItem, or some methods may fail.
+    """
+    @staticmethod
+    def promoteColumnItem(column_item: ColumnItem):
+        return TopmostColumnItem(column_item.items, column_item.path_to_gml)
+
+    def black_banner_coordinates(self):
+        """
+        Return a list of information enabling the card to draw a black banner at specific location.
+        Each information is a dictionnary holding the position on the y axis "y-position" of the top left
+        corner and the banner's height "height".
+        Coordinates are relative to this item: (0,0) corresponds to the top left corner.
+        """
+        banners = []
+        y = 0
+        for line in self.items:
+            banner_height = line.black_banner_height()
+            if banner_height is not None:
+                banners.append({"y-position": y, "height": banner_height})
+            y += line.get_height()
+        return banners
 
 class TextItem(AbstractItem):
     """

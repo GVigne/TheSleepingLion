@@ -1,7 +1,7 @@
 from gi.repository import Pango
 from copy import deepcopy
 
-from .items import LineItem, ColumnItem, TextItem
+from .items import LineItem, ColumnItem, TextItem, TopmostLineItem, TopmostColumnItem
 from .commands import *
 from .macros import *
 from .errors import CommandNotFound, MacroNotFound
@@ -36,6 +36,7 @@ class GloomhavenParser:
                        "@color": ColorMacro,
                        "@small": SmallSizeMacro,
                        "@big": BaseSizeMacro,
+                       "@banner": BannerMacro,
                        "@topleft": TopLeftMacro,
                        "@bottomright": BottomRightMacro,
                        "@column2": Column2Macro}
@@ -47,7 +48,7 @@ class GloomhavenParser:
               action_box_size = 0.775*card_width):
         """
         Given the text representing the a top or bottom action, return a dictionnary with keys being position and
-        values being ColumnItems which should be drawn. Also return a list of warnings, ie non-breaking errors.
+        values being TopmostColumnItems which should be drawn. Also return a list of warnings, ie non-breaking errors.
         This is the highest level function from this parser.
 
         Implementation-wise, here is how this parser works.
@@ -87,6 +88,8 @@ class GloomhavenParser:
                                                           GMLLineContext.CreateFromIndentation(had_tabulation),
                                                           width = 0.5*action_box_size,
                                                           image_color=background_color)
+        # Promote the LineItem objects
+        second_column_items = [TopmostLineItem.promoteLineItem(line) for line in second_column_items]
         second_column = ColumnItem(second_column_items, self.path_to_gml)
         first_column_items = []
         for lexemes, had_tabulation in all_lines["center"]:
@@ -94,6 +97,8 @@ class GloomhavenParser:
                                                         GMLLineContext.CreateFromIndentation(had_tabulation),
                                                         width = action_box_size - second_column.get_width(),
                                                         image_color = background_color)
+        # Promote the LineItem objects
+        first_column_items = [TopmostLineItem.promoteLineItem(line) for line in first_column_items]
         first_column = ColumnItem(first_column_items, self.path_to_gml)
 
         # Throw second and column and start again if the first is small
@@ -104,22 +109,33 @@ class GloomhavenParser:
                                                             GMLLineContext.CreateFromIndentation(had_tabulation),
                                                             width = action_box_size - first_column.get_width(),
                                                             image_color = background_color)
+            # Promote the LineItem objects
+            second_column_items = [TopmostLineItem.promoteLineItem(line) for line in second_column_items]
             second_column = ColumnItem(second_column_items, self.path_to_gml)
-        # Now parse top and bottom columns
+        # Now parse the top column ...
         items = []
         for lexemes, had_tabulation in all_lines["topleft"]:
             items += self.gml_line_to_items(lexemes,
                                             GMLLineContext.CreateFromIndentation(had_tabulation),
                                             width = action_box_size,
                                             image_color = background_color)
+        items = [TopmostLineItem.promoteLineItem(line) for line in items]
         top_column = ColumnItem(items, self.path_to_gml)
+        # ... and the bottom column
         items = []
         for lexemes, had_tabulation in all_lines["bottomright"]:
             items += self.gml_line_to_items(lexemes,
                                             GMLLineContext.CreateFromIndentation(had_tabulation),
                                             width = action_box_size,
                                             image_color = background_color)
+        items = [TopmostLineItem.promoteLineItem(line) for line in items]
         bot_column = ColumnItem(items, self.path_to_gml)
+
+        # Now promote the four columns
+        first_column = TopmostColumnItem.promoteColumnItem(first_column)
+        second_column = TopmostColumnItem.promoteColumnItem(second_column)
+        bot_column = TopmostColumnItem.promoteColumnItem(bot_column)
+        top_column = TopmostColumnItem.promoteColumnItem(top_column)
 
         all_warnings = []
         for column in [first_column, second_column, bot_column, top_column]:
@@ -280,7 +296,7 @@ class GloomhavenParser:
                 splitted_gml.pop(0)
                 result = []
                 for line in lines:
-                    result.append(LineItem(line, self.path_to_gml, joining_item=blank))
+                    result.append(LineItem(line, self.path_to_gml, joining_item=blank, gml_context=gml_context))
                 return result + self.gml_line_to_items(splitted_gml,
                                                       gml_context,
                                                       ongoing_line = current_line,
@@ -321,5 +337,5 @@ class GloomhavenParser:
         # Now, we convert all lines into LineItems with blank inbetween every element
         result = []
         for line in lines:
-            result.append(LineItem(line, self.path_to_gml, joining_item=blank))
+            result.append(LineItem(line, self.path_to_gml, joining_item=blank, gml_context=gml_context))
         return result

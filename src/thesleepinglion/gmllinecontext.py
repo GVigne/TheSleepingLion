@@ -25,7 +25,8 @@ class GMLLineContext:
                 font_size: int = base_font_size,
                 text_color: dict = {"red": 255, "green": 255, "blue": 255}, # By default, text is in white
                 bold: bool = False,
-                is_small_context: bool = False):  # is_small_context should never be changed by a macro
+                is_small_context: bool = False, # is_small_context should never be changed by a macro
+                banner_background: bool = False):
 
         self.font = font
         self.font_size = font_size
@@ -34,6 +35,7 @@ class GMLLineContext:
         self.is_small_context = is_small_context
         if self.is_small_context:
             self.font_size = small_font_size
+        self.banner_background = banner_background
 
         self.context_history = [] # A stack of GMLLineContext, representing the previous states of the context.
 
@@ -41,8 +43,9 @@ class GMLLineContext:
                             font: int = None,
                             font_size: int = None,
                             text_color: dict = None,
-                            bold: bool = None):
-        last_context = GMLLineContext(self.font, self.font_size, self.text_color, self.bold, self.is_small_context)
+                            bold: bool = None,
+                            banner_background: bool = None):
+        last_context = GMLLineContext(self.font, self.font_size, self.text_color, self.bold, self.is_small_context, self.banner_background)
         self.context_history.append(last_context)
         if font is not None:
             self.font = font
@@ -52,6 +55,8 @@ class GMLLineContext:
             self.text_color = text_color
         if bold is not None:
             self.bold = bold
+        if banner_background is not None:
+            self.banner_background = banner_background
 
     def clear_last_effect(self):
         """

@@ -89,6 +89,19 @@ class TitleFontMacro(AbstractMacro):
     def change_context(self, gmllinecontext: GMLLineContext):
         gmllinecontext.new_context_effects(font = title_font)
 
+class BannerMacro(AbstractMacro):
+    """
+    Create a dark banner like the Mindthief's Augments.
+    This macro is unaffected by @end or @endlast macros, as it is global to a LineItem.
+    """
+    def __init__(self, arguments: list[str] = []):
+        super().__init__(arguments)
+        if len(arguments) != 0:
+            raise MismatchNoArguments(f"The '@banner' macro doesn't take arguments, but {len(arguments)} were given.")
+
+    def change_context(self, gmllinecontext: GMLLineContext):
+        gmllinecontext.new_context_effects(banner_background = True)
+
 
 # Postional macros don't interact with the context, but they do interact with gml_line_to_items!
 
