@@ -128,13 +128,8 @@ class MainWindow(GObject.Object):
         and calls refresh. However, nothing really changed in the class, so it shouldn't be redrawn.
         Also returns errors as a string: this string is empty if no error occurred.
         """
-        current_tab = None
-        tab_widget = self.notebook.get_nth_page(self.notebook.get_current_page())
-        for tab in self.card_tabs:
-            if tab.tab_widget == tab_widget:
-                current_tab = tab
-                break
-        if self.character_tab.tab_widget == tab_widget:
+        current_tab = self.get_pointer_to_current_tab()
+        if current_tab is None:
             current_tab = self.character_tab
         # Now current_tab is either a CardTab or the CharacterTab
         errors = ""
@@ -165,11 +160,9 @@ class MainWindow(GObject.Object):
         Draw the custom class on the given cairo context.
         """
         focused_card = None
-        tab_widget = self.notebook.get_nth_page(self.notebook.get_current_page())
-        for tab in self.card_tabs:
-            if tab.tab_widget == tab_widget:
-                focused_card = tab.card
-                break
+        current_tab = self.get_pointer_to_current_tab()
+        if current_tab is not None:
+            focused_card = current_tab.card
         # If focused_card is None, then the current tab is the Character tab, and only the background should be displayed.
 
         # Zoom the cairo context according to the user's input.
@@ -233,14 +226,9 @@ class MainWindow(GObject.Object):
 
     def delete_tab(self, button):
         # Fetch the current tab
-        index = self.notebook.get_current_page()
-        current_tab = self.notebook.get_nth_page(index)
-        current_card_tab = None
-        for ct in self.card_tabs:
-            if ct.tab_widget == current_tab:
-                current_card_tab = ct
-                break
-        if index != 0:
+
+        current_card_tab = self.get_pointer_to_current_tab()
+        if current_card_tab is not None:
             # Check if it's not "Class attributes". This should be removed, and the button enabled only if not on class attributes
             dlg = Gtk.MessageDialog()
             dlg.add_buttons(Gtk.STOCK_YES, Gtk.ResponseType.YES,
@@ -250,7 +238,7 @@ class MainWindow(GObject.Object):
             response = dlg.run()
             if response == Gtk.ResponseType.YES:
                 current_card_tab.delete(self.current_class)
-                self.notebook.remove_page(index)
+                self.notebook.remove_page(self.notebook.get_current_page())
                 self.card_tabs = [ct for ct in self.card_tabs if ct != current_card_tab]
                 self.emit("custom_character_changed") # Notify the backup file handler that the custom classed has been modified.
                 # Redraw
@@ -486,6 +474,17 @@ class MainWindow(GObject.Object):
             subprocess.call(["xdg-open", get_doc_asset("available_functions.pdf")])
         else:
             os.startfile(get_doc_asset("available_functions.pdf"))
+
+    def get_pointer_to_current_tab(self):
+        """
+        Returns a pointer to the card tab being currently focused on.
+        If the tab being currently focused on is the "Character tab", instead return None.
+        """
+        tab_widget = self.notebook.get_nth_page(self.notebook.get_current_page())
+        for tab in self.card_tabs:
+            if tab.tab_widget == tab_widget:
+                return tab
+        return None
 
     def special_windows_actions(self):
         """
