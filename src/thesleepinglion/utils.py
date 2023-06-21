@@ -121,12 +121,14 @@ def get_aoe(gml_path : Path|None, filepath : str|None):
 def find_opened_bracket(text : str):
         """
         Given a string, return an int i such that text[i] = "{".
-        If no curly bracket was found, return an int i marking the end of the first word (ie text[i] is a whitespace
-        and text[:i] is the first word in text)
+        If no curly bracket was found, or if the first word ended prematurely, return an int i marking the end
+        of the first word (ie text[i] is a whitespace and text[:i] is the first word in text)
         """
         for i,v in enumerate(text):
             if v == "{":
                 return i
+            elif v == " ": # End of the first word -> act as if no curly bracket was found.
+                break
         # No bracket found
         first_word = text.split(" ")[0]
         return len(first_word)
