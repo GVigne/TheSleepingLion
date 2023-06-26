@@ -1,7 +1,7 @@
 import regex as re
 from .aliases import base_aliases
 from .utils import find_opened_bracket, find_end_bracket, find_end_macro, alias_text_to_alias_list
-from .errors import InvalidCustomAlias
+from .errors import InvalidCustomAlias, MaximumAliasReplacementDepthExceeded
 
 class GloomhavenLexer:
     """
@@ -12,6 +12,7 @@ class GloomhavenLexer:
     When separating the lines, the lexer should also substitute all aliases.
     """
     def __init__(self):
+        self.recursion_max_depth = 10
         pass
 
     def input(self, text : str):
@@ -65,13 +66,31 @@ class GloomhavenLexer:
     def include_aliases(self, text : str, additional_aliases: str = ""):
         """
         Include the aliases in the given text.
+        This is done iteratively so that custom aliases referencing each other are appropriately replaced. A maximum
+        number of self.recursion_max_depth iterations are allowed.
         """
         # Add first the user's aliases in case he wants to redefine an alias in the standard library
         all_aliases = alias_text_to_alias_list(additional_aliases) + base_aliases
-        for alias in all_aliases:
-            raw_pattern, raw_replacement = self.split_alias(alias)
-            text = self.replace_alias(raw_pattern, raw_replacement, text)
-        return text
+        process_aliases = [self.split_alias(alias) for alias in all_aliases]
+
+        iteration = 0
+        current_text = text
+        while iteration < self.recursion_max_depth:
+            iteration += 1
+            text_modified = False
+            for raw_pattern, raw_replacement in process_aliases:
+                text_output = self.replace_alias(raw_pattern, raw_replacement, current_text)
+                # Check if the current alias was in the text and has been replaced
+                text_modified = text_modified or (text_output != current_text)
+                current_text = text_output
+            # If the text wasn't modified, immediately return it
+            if not text_modified:
+                return current_text
+
+        # Too many iterations. The user probably defined two aliases referencing each other
+        raise MaximumAliasReplacementDepthExceeded(f"Maximum alias replacement depth exceeded after {self.recursion_max_depth} iterations. "\
+                                                   "You may have defined two aliases referencing each other.")
+
 
     def split_alias(self, alias : str):
         """
@@ -139,7 +158,7 @@ class GloomhavenLexer:
                 else:
                     i +=1
             # Add the remaining letters from raw_pattern. Note: if there are no arguments, then last_dollar_position is still 0
-            # so the following line copies raw_replacement in its entirety, which is what we cant
+            # so the following line copies raw_replacement in its entirety
             to_replace += raw_replacement[last_dollar_position:i]
 
             start, end = match.span()

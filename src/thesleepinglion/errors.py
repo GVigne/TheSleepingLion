@@ -17,6 +17,9 @@ class EmptyArgument(ValueError):
 class InvalidCustomAlias(ValueError):
     pass
 
+class MaximumAliasReplacementDepthExceeded(ValueError):
+    pass
+
 class InvalidArgumentType(ValueError):
     pass
 
