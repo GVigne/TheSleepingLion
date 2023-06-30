@@ -174,7 +174,6 @@ class GloomhavenLexer:
                             -> Return a list with two elements, one extracting x and one extracting y
         """
         res = ""
-        extract_variables = []
         i = 0
         while i < len(text):
             if text[i] =="$":
@@ -186,16 +185,23 @@ class GloomhavenLexer:
             else:
                 res += text[i]
                 i +=1
-        # Now, build the regexp extracting each variable
-        i = 0
-        while i < len(res):
-            if res[i:i + 5] == "[^}]*":# Everything but closing parenthesis.
-                # (?<=...) means the text has ... BEFORE, (?=...) means the text has ... AFTER.
-                one_variable = "(?<=" + res[:i] + ").*(?=" + res[i+5:]+ ")"
-                extract_variables.append(re.compile(one_variable))
-                i = i+5
-            else:
-                i+=1
+
+        extract_variables = []
+        if res == text:
+            # This alias has no variables. We need to be able to detect the end of the word so that aliases with
+            # similar name like \a and \ab don't get mistaken.
+            res += "\\M" # Means "end of the word"
+        else:
+            # Now, build the regexp extracting each variable
+            i = 0
+            while i < len(res):
+                if res[i:i + 5] == "[^}]*":# Everything but closing parenthesis.
+                    # (?<=...) means the text has ... BEFORE, (?=...) means the text has ... AFTER.
+                    one_variable = "(?<=" + res[:i] + ").*(?=" + res[i+5:]+ ")"
+                    extract_variables.append(re.compile(one_variable))
+                    i = i+5
+                else:
+                    i+=1
         return re.compile(res), extract_variables
 
     def find_next_dollar(self, text : str):
