@@ -29,6 +29,9 @@ class MainWindow(GObject.Object):
         The Sleeping Lion's main window.
         """
         GObject.GObject.__init__(self)
+        # Entries shouldn't highlight the text when they are being focused on, and instead the cursor should be place somewhere
+        Gtk.Settings.get_default().set_property("gtk-entry-select-on-focus", False)
+
         self.current_class = custom_character
         self.backup_handler = backup_handler
         self.card_tabs = []

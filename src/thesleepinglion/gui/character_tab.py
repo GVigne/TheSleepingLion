@@ -37,6 +37,9 @@ class CharacterTab(AbstractTab, GObject.Object):
         color_box.add(self.color_chooser)
         self.color_chooser.show()
 
+        self.class_name.grab_focus()
+        self.class_name.set_position(-1)
+
     def update_custom_character(self, custom_character: GloomhavenClass, backup: BackupFileHandler):
         """
         Modify the given Gloomhaven class based on the information contained in this tab.

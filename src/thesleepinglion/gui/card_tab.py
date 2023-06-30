@@ -38,6 +38,9 @@ class CardTab(AbstractTab):
 
         self.load_custom_character()
 
+        self.card_name.grab_focus()
+        self.card_name.set_position(-1)
+
     def update_custom_character(self, custom_character: GloomhavenClass, backup: BackupFileHandler):
         """
         Modify the given self.card based on the information contained in this tab. Return True is a field was indeed

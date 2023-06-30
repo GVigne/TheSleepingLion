@@ -5,8 +5,7 @@
   <!-- n-columns=2 n-rows=6 -->
   <object class="GtkGrid" id="grid">
     <property name="visible">True</property>
-    <property name="can-focus">True</property>
-    <property name="has-focus">True</property>
+    <property name="can-focus">False</property>
     <property name="column-spacing">10</property>
     <child>
       <object class="GtkLabel">
@@ -122,7 +121,7 @@
     <child>
       <object class="GtkScrolledWindow">
         <property name="visible">True</property>
-        <property name="can-focus">True</property>
+        <property name="can-focus">False</property>
         <property name="vexpand">True</property>
         <property name="shadow-type">in</property>
         <child>
@@ -143,7 +142,7 @@
     <child>
       <object class="GtkScrolledWindow">
         <property name="visible">True</property>
-        <property name="can-focus">True</property>
+        <property name="can-focus">False</property>
         <property name="vexpand">True</property>
         <property name="shadow-type">in</property>
         <child>
