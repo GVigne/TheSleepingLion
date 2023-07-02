@@ -185,6 +185,22 @@ class MainWindow(GObject.Object):
     def switched_page(self, notebook, page, page_num):
         self.refresh(None)
 
+    def shortcut_switched_page(self, forward = True):
+        """
+        Method called when the users uses the shortcut allowing to swap betwen pages.
+        If forward is false, go to the previous page
+        """
+        current_page_id = self.notebook.get_current_page()
+        if forward:
+            next_page_id = current_page_id + 1
+        else:
+            next_page_id = current_page_id - 1
+        if next_page_id == self.notebook.get_n_pages():
+            next_page_id = 0
+        freeze_event(self.notebook, self.switched_page)
+        self.notebook.set_current_page(next_page_id)
+        unfreeze_event(self.notebook, "switch-page", self.switched_page)
+
     def key_pressed(self, window, event):
         # Simple keystrokes
         if event.keyval == Gdk.KEY_Return:
@@ -211,8 +227,14 @@ class MainWindow(GObject.Object):
                     current_tab.tab_move_focus(False)
                     return True # Same as above: return True to make sure this function overrides the default behavior
 
-
-
+        # ALT + something
+        if event.get_state() & Gdk.ModifierType.MOD1_MASK:
+            if event.keyval == Gdk.KEY_Right:
+                # Right arrow
+                self.shortcut_switched_page()
+            elif event.keyval == Gdk.KEY_Left:
+                # Left arrow
+                self.shortcut_switched_page(False)
 
     def scroll_event(self, window, event):
         if event.get_state() & Gdk.ModifierType.CONTROL_MASK:
