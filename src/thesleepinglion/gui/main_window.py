@@ -63,8 +63,6 @@ class MainWindow(GObject.Object):
         self.connect("custom_character_changed", self.backup_handler.automatic_save)
         self.backup_handler.connect("change_window_title", self.change_window_title)
 
-        self.special_windows_actions()
-
     def refresh(self, signal):
         """
         Update the current class, if it was modified parse it and draw it.
@@ -527,41 +525,3 @@ class MainWindow(GObject.Object):
             if tab.tab_widget == tab_widget:
                 return tab
         return self.character_tab
-
-    def special_windows_actions(self):
-        """
-        Windows is a bit tricky to work with.
-        Currently, manimpango seems to be broken with Windows 11: I didn't manage to get it to install
-        fonts at run time. Instead, the user has to manually install system wide fonts, or pango will
-        complain and default to the standard font.
-
-        Notify the user that some fonts are missing.
-        """
-        if sys.platform != "linux":
-            if sys.getwindowsversion().major == 11 or sys.getwindowsversion().build > 20000:
-                # Apparently windows 11 versions are still registered as windows 10 versions,
-                # but with a build in 20000 and such. Windows dark magic!
-                has_majalla = False
-                has_pirata = False
-                font_map = PangoCairo.font_map_get_default()
-                for font_family in font_map.list_families():
-                    if font_family.do_get_name(font_family) =="Pirata One":
-                        has_pirata = True
-                    elif font_family.do_get_name(font_family) =="Sakkal Majalla":
-                        has_majalla = True
-
-                # Build error message
-                error_message = "It seems you are using Windows 11, but the font"
-                if not has_majalla and has_pirata:
-                    error_message +=" Sakkal Majalla Bold isn't installed."
-                elif not has_pirata and has_majalla:
-                    error_message +=" Pirata One isn't installed."
-                elif not has_majalla and not has_pirata:
-                    error_message +="s Pirata One and Sakkal Majalla Bold aren't installed."
-                error_message +="\nThe Sleeping Lion won't work correctly with Windows 11 if the required fonts " \
-                "haven't been installed. Check out The Sleeping Lion's github repository for a quick guide on how " \
-                "to install the necessary fonts."
-
-                # Display a popup before the main window
-                if not has_majalla or not has_pirata:
-                    gtk_error_message(error_message)
