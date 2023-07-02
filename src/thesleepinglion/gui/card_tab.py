@@ -40,6 +40,7 @@ class CardTab(AbstractTab):
 
         self.card_name.grab_focus()
         self.card_name.set_position(-1)
+        self.set_iteration_order([self.card_name, self.level, self.initiative, self.top_action, self.bottom_action, self.card_ID])
 
     def update_custom_character(self, custom_character: GloomhavenClass, backup: BackupFileHandler):
         """
@@ -74,7 +75,6 @@ class CardTab(AbstractTab):
                 # Something went wrong and name isn't valid. Instead, the gloomhaven class gave a valid one.
                 raise CardNameAlreadyExists(f"{ui_name} is not a valid name: perhaps it is already the name of an existing card. A card was renamed into {valid_name} instead.")
         return was_modified
-
 
     def load_custom_character(self, backup: BackupFileHandler = None):
         """

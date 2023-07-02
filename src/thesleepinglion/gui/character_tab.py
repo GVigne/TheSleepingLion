@@ -39,6 +39,7 @@ class CharacterTab(AbstractTab, GObject.Object):
 
         self.class_name.grab_focus()
         self.class_name.set_position(-1)
+        self.set_iteration_order([self.class_name, self.aliases_box])
 
     def update_custom_character(self, custom_character: GloomhavenClass, backup: BackupFileHandler):
         """

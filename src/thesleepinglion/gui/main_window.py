@@ -132,8 +132,6 @@ class MainWindow(GObject.Object):
         Also returns errors as a string: this string is empty if no error occurred.
         """
         current_tab = self.get_pointer_to_current_tab()
-        if current_tab is None:
-            current_tab = self.character_tab
         # Now current_tab is either a CardTab or the CharacterTab
         errors = ""
         was_modified = True # By default, assume something has changed.
@@ -164,7 +162,7 @@ class MainWindow(GObject.Object):
         """
         focused_card = None
         current_tab = self.get_pointer_to_current_tab()
-        if current_tab is not None:
+        if current_tab!= self.character_tab:
             focused_card = current_tab.card
         # If focused_card is None, then the current tab is the Character tab, and only the background should be displayed.
 
@@ -188,13 +186,33 @@ class MainWindow(GObject.Object):
         self.refresh(None)
 
     def key_pressed(self, window, event):
-        # Check if the CONTROL key was pressed at the same time
+        # Simple keystrokes
+        if event.keyval == Gdk.KEY_Return:
+            self.refresh(None)
+
+        # CONTROL + something
         if event.get_state() & Gdk.ModifierType.CONTROL_MASK:
             if event.keyval == Gdk.KEY_s:
                 # Control + S was pressed
                 self.save(None)
-        if event.keyval == Gdk.KEY_Return:
-            self.refresh(None)
+            elif event.keyval == Gdk.KEY_Tab:
+                # Control + SHIFT + TAB was pressed
+                current_tab = self.get_pointer_to_current_tab()
+                current_tab.tab_move_focus()
+                return True # We return True so the signal is not propagated: this makes sure that nothing else happens
+
+        # CONTROL + SHIFT + something
+        if event.get_state() & Gdk.ModifierType.CONTROL_MASK:
+            if event.get_state() & Gdk.ModifierType.SHIFT_MASK:
+                if event.keyval == Gdk.KEY_ISO_Left_Tab:
+                    # Control + Tab. Apparently, it's not the same tab as when pressing Ctrl + Tab: identifiers are differnt
+                    # This is a bit weird: it's probably not how we should be catching this signal.
+                    current_tab = self.get_pointer_to_current_tab()
+                    current_tab.tab_move_focus(False)
+                    return True # Same as above: return True to make sure this function overrides the default behavior
+
+
+
 
     def scroll_event(self, window, event):
         if event.get_state() & Gdk.ModifierType.CONTROL_MASK:
@@ -231,7 +249,7 @@ class MainWindow(GObject.Object):
         # Fetch the current tab
 
         current_card_tab = self.get_pointer_to_current_tab()
-        if current_card_tab is not None:
+        if current_card_tab != self.character_tab:
             # Check if it's not "Class attributes". This should be removed, and the button enabled only if not on class attributes
             dlg = Gtk.MessageDialog()
             dlg.add_buttons(Gtk.STOCK_YES, Gtk.ResponseType.YES,
@@ -480,14 +498,13 @@ class MainWindow(GObject.Object):
 
     def get_pointer_to_current_tab(self):
         """
-        Returns a pointer to the card tab being currently focused on.
-        If the tab being currently focused on is the "Character tab", instead return None.
+        Returns a pointer to the card tab being currently focused on, either a card tab or the "Character tab".
         """
         tab_widget = self.notebook.get_nth_page(self.notebook.get_current_page())
         for tab in self.card_tabs:
             if tab.tab_widget == tab_widget:
                 return tab
-        return None
+        return self.character_tab
 
     def special_windows_actions(self):
         """
