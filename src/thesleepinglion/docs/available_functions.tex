@@ -1138,6 +1138,24 @@ For clarity purpose, this macro should be used on lines where you want to make a
 \includegraphics[scale=0.5]{Doc_generation/Macros_images/color.pdf}
 \end{center}
 
+\pagebreak
+
+\subsection{banner}
+\textbf{\underline{Arguments:}} This macro doesn't take arguments.
+
+\textbf{\underline{Description:}} Adds a black banner similar to the one used for the Mindthief's Augments around the current line. If several adjacent lines use this macro, the banners are fused together into one block.
+
+Using \verb'@banner' with the positional macros \verb'@topleft' or \verb'@bottomright' may result in ugly outputs.
+
+\textbf{\underline{Example:}}
+\begin{center}
+\begin{BVerbatim}
+@banner @small On your melee attack: Add +2 Attack \image{attack.svg}
+\attack{1} \exp{1}
+\end{BVerbatim}
+
+\includegraphics[scale=0.5]{Doc_generation/Macros_images/banner.pdf}
+\end{center}
 
 \subsection{column2}
 \textbf{\underline{Arguments:}} This macro doesn't take arguments.

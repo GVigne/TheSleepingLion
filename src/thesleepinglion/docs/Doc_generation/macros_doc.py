@@ -59,7 +59,7 @@ for card in gloomy_class.cards:
         output = PdfWriter()
         page = input.pages[0]
 
-        if card.name == "column2" or card.name == "topleft" or card.name == "bottomright":
+        if card.name == "column2" or card.name == "topleft" or card.name == "bottomright" or card.name =="banner":
             # Positional macro -> show half of the card
             page.cropbox.lower_left = (0, 0.465*card_height)
             page.cropbox.lower_right = (card_width, 0.465*card_height)

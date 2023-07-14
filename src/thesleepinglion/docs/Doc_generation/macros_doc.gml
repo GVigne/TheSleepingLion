@@ -27,6 +27,11 @@ color:
     @color{0}{0}{0} This is a text written in black.
     @color{255}{0}{0} This is a text written in red.
 
+banner:
+  top: |2
+    @banner @small On your melee attack: Add +2 Attack \image{attack.svg}
+    \attack{1} \exp{1}
+
 column2:
   top: |2
     \attack{3}
