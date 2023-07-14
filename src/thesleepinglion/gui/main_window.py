@@ -198,6 +198,7 @@ class MainWindow(GObject.Object):
         freeze_event(self.notebook, self.switched_page)
         self.notebook.set_current_page(next_page_id)
         unfreeze_event(self.notebook, "switch-page", self.switched_page)
+        self.refresh(None) # Refresh the card preview
 
     def key_pressed(self, window, event):
         # Simple keystrokes
