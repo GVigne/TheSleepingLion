@@ -166,6 +166,15 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">User Manual</property>
+                        <property name="use-underline">True</property>
+                        <signal name="activate" handler="show_user_manual" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkImageMenuItem">
                         <property name="label">gtk-about</property>
                         <property name="visible">True</property>

@@ -517,6 +517,12 @@ class MainWindow(GObject.Object):
         else:
             os.startfile(get_doc_asset("available_functions.pdf"))
 
+    def show_user_manual(self, button):
+        if sys.platform == "linux":
+            subprocess.call(["xdg-open", get_doc_asset("user_manual.pdf")])
+        else:
+            os.startfile(get_doc_asset("user_manual.pdf"))
+
     def get_pointer_to_current_tab(self):
         """
         Returns a pointer to the card tab being currently focused on, either a card tab or the "Character tab".
