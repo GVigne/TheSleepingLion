@@ -610,7 +610,7 @@ class AoECommand(AbstractCommand):
             self.hexagons = HexagonDict.CreateFromFile(aoe_path)
         except Exception as e:
             raise InvalidAoEFile(f"The .aoe file {arguments[0]} couldn't be read. Please correct it and try again.")
-        self.hex_grid = HexagonalGrid(base_font_size)
+        self.hex_grid = HexagonalGrid(gml_context.font_size)
 
     def get_width(self):
         return self.hex_grid.get_width(self.hexagons)
