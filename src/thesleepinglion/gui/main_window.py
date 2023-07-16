@@ -107,6 +107,7 @@ class MainWindow(GObject.Object):
         for card in self.current_class.cards:
             new_tab = CardTab(get_gui_asset("card_tab.glade"), card)
             self.card_tabs.append(new_tab)
+
         if len(self.card_tabs) == 0:
             # Always have at least one tab, even if it is empty.
             card = self.current_class.create_blank_card()
@@ -117,6 +118,7 @@ class MainWindow(GObject.Object):
         self.notebook.append_page(self.character_tab.tab_widget, self.character_tab.tab_name_label)
         for card_tab in self.card_tabs:
             self.notebook.append_page(card_tab.tab_widget, card_tab.tab_name_label)
+            self.notebook.set_tab_reorderable(card_tab.tab_widget, True)
         self.notebook.set_current_page(0) # By default, focus on the character tab
         unfreeze_event(self.notebook, "switch-page", self.switched_page)
 
@@ -200,6 +202,16 @@ class MainWindow(GObject.Object):
         unfreeze_event(self.notebook, "switch-page", self.switched_page)
         self.refresh(None) # Refresh the card preview
 
+    def tab_reordered(self, notebook, page, page_num):
+        """
+        This function is called when the notebook's tabs are reordered.
+        """
+        if page_num == 0:
+            # If the user tries to move a tab into the first spot, instead move it to the second one and make
+            # sure the Character Tab remains the first tab in the notebook.
+            # Warning: this will cause the page_reordered signal to be re-emitted, calling this function once again
+            self.notebook.reorder_child(self.character_tab.tab_widget, 0)
+
     def key_pressed(self, window, event):
         # Simple keystrokes
         if event.keyval == Gdk.KEY_Return:
@@ -260,6 +272,7 @@ class MainWindow(GObject.Object):
 
         freeze_event(self.notebook, self.switched_page)
         self.notebook.append_page(new_tab.tab_widget, new_tab.tab_name_label)
+        self.notebook.set_tab_reorderable(new_tab.tab_widget, True)
         self.notebook.set_current_page(-1) # Focus on the newly created card
         unfreeze_event(self.notebook, "switch-page", self.switched_page)
 
