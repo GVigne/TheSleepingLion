@@ -8,7 +8,7 @@
 
 Unicode True
 
-!define  VERSION "1.0.0"
+!define /file VERSION "VERSION"
 !define /file INSTALLSIZE "INSTALLSIZE"
 !define /file ARCH "ARCH"
 
