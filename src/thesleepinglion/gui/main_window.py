@@ -13,7 +13,8 @@ from .card_tab import CardTab
 from .dialog_exportPDF import ExportDialogPDF
 from .dialog_exportPNG import ExportDialogPNG
 from .aoe_creator import AoECreator
-from ..utils import get_gui_asset, get_doc_asset, show_parsing_errors, show_warning_errors, freeze_event, unfreeze_event, gtk_error_message, get_gui_images
+from ..utils import get_gui_asset, get_doc_asset, show_parsing_errors, show_warning_errors, freeze_event, unfreeze_event, \
+                    gtk_error_message, get_gui_images, order_card_tabs_by_id, order_card_tabs_by_level, order_card_tabs_by_initiative
 from ..constants import card_height, card_width
 from ..gloomhavenclass import GloomhavenClass
 from ..backupFileHandler import GMLFileHandler, AoEFileHandler
@@ -59,6 +60,9 @@ class MainWindow(GObject.Object):
 
         self.notebook = builder.get_object("notebook")
         self.loading_routine()
+
+        self.sort_cards_combobox = builder.get_object("sort_cards_combobox")
+        self.change_tab_sorting_method(None)
 
         self.connect("custom_character_changed", self.backup_handler.automatic_save)
         self.backup_handler.connect("change_window_title", self.change_window_title)
@@ -300,6 +304,33 @@ class MainWindow(GObject.Object):
                 self.drawing_area.queue_draw()
             dlg.destroy()
 
+    def change_tab_sorting_method(self, combobox):
+        current_tab = self.get_pointer_to_current_tab()
+        sorting_method = self.sort_cards_combobox.get_active()
+
+        if sorting_method == 0: # Level
+            self.card_tabs = order_card_tabs_by_level(self.card_tabs)
+        elif sorting_method == 1: # Initiative
+            self.card_tabs = order_card_tabs_by_initiative(self.card_tabs)
+        else: # ID
+            self.card_tabs = order_card_tabs_by_id(self.card_tabs)
+
+        freeze_event(self.notebook, self.switched_page)
+        # First, remove all tabs
+        for _ in range(self.notebook.get_n_pages()):
+            self.notebook.remove_page(-1)
+        # Put them back in the new order
+        self.notebook.append_page(self.character_tab.tab_widget, self.character_tab.tab_name_label)
+        for card_tab in self.card_tabs:
+            self.notebook.append_page(card_tab.tab_widget, card_tab.tab_name_label)
+            self.notebook.set_tab_reorderable(card_tab.tab_widget, True)
+        # Focus on the tab previously being focused (so the user doesn't see any change)
+        for page_id in range(len(self.card_tabs)):
+            if  self.notebook.get_nth_page(page_id)== current_tab.tab_widget:
+                self.notebook.set_current_page(page_id)
+                break
+        unfreeze_event(self.notebook, "switch-page", self.switched_page)
+        self.refresh(None)
 
     def save(self, widget):
         """
