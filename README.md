@@ -18,7 +18,7 @@ Here are a few examples of what the cards look like when they are created using 
 # Installing The Sleeping Lion
 ## Windows users
 
-For Windows, you can simply use [this binary](https://github.com/GVigne/TheSleepingLion/raw/main/TheSleepingLion_WindowsInstaller.exe) (you do not need to have Python installed).
+For Windows, you can simply use [this binary](https://github.com/GVigne/TheSleepingLion/raw/main/download/the_sleeping_lion-1.2.0-x86_64.exe) (you do not need to have Python installed).
 
 Of course, you can also install The Sleeping Lion in a Python environment by following the instructions below.
 
