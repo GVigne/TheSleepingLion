@@ -1,0 +1,2 @@
+download/the_sleeping_lion-1.0.0-x86_64.exe filter=lfs diff=lfs merge=lfs -text
+download/the_sleeping_lion-1.1.0-x86_64.exe filter=lfs diff=lfs merge=lfs -text
