@@ -10,7 +10,6 @@ from cairosvg.helpers import node_format
 import cairo as cairo
 from pathlib import Path
 from pkg_resources import resource_filename
-from .constants import *
 from .errors import ImageNotFound, BracketError, AoeFileNotFound
 from .gmllinecontext import GMLLineContext
 
