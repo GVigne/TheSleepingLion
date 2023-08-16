@@ -5,8 +5,8 @@ from pkg_resources import resource_filename
 from pathlib import Path
 
 if sys.platform == "linux":
-    manimpango.register_font(resource_filename("thesleepinglion.assets", "fonts/majallab.ttf"))
-    manimpango.register_font(resource_filename("thesleepinglion.assets", "fonts/PirataOne-Regular.ttf"))
+    manimpango.register_font(resource_filename("thesleepinglion.assets.gloomhaven.fonts", "majallab.ttf"))
+    manimpango.register_font(resource_filename("thesleepinglion.assets.gloomhaven.fonts", "PirataOne-Regular.ttf"))
 else:
     # manimpango seems to fail for Windows 11 (works for Windows 10 though).
     # Call the Windows API directly.
@@ -16,8 +16,8 @@ else:
         file = byref(create_unicode_buffer(file))
         windll.gdi32.AddFontResourceExW(file, FR_PRIVATE, 0)
 
-    add_font(resource_filename("thesleepinglion.assets", "fonts/majallab.ttf"))
-    add_font(resource_filename("thesleepinglion.assets", "fonts/PirataOne-Regular.ttf"))
+    add_font(resource_filename("thesleepinglion.assets.gloomhaven.fonts", "majallab.ttf"))
+    add_font(resource_filename("thesleepinglion.assets.gloomhaven.fonts", "PirataOne-Regular.ttf"))
 
 # Allow end-users to import a GloomhavenClass. This is required for the automatic documentation generation.
 from .gloomhaven.gloomhavenclass import GloomhavenClass

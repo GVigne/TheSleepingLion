@@ -36,16 +36,16 @@ def text_to_pango(text : str, gml_context: GMLLineContext):
 
 def get_asset(filename):
     """
-    Get the corresponding image from the assets/ folder.
+    Get the corresponding image from the assets/gloomhaven folder.
     Ex: get_asset(attack.svg)
     """
-    return resource_filename("thesleepinglion.assets", filename)
+    return resource_filename("thesleepinglion.assets.gloomhaven", filename)
 
 def get_aoe_asset(filename):
     """
-    Get the corresponding image from the assets/aoe/ folder.
+    Get the corresponding image from the assets/gloomhaven/aoe/ folder.
     """
-    return resource_filename("thesleepinglion.assets", "aoe/"+filename)
+    return resource_filename("thesleepinglion.assets.gloomhaven", "aoe/"+filename)
 
 def get_background_asset(filename):
     """
