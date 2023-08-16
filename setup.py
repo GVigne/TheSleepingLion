@@ -21,7 +21,7 @@ setup(name='thesleepinglion',
                     'thesleepinglion.assets.fonts' : ["*.ttf"],
                     'thesleepinglion.docs' : ["*.pdf", "*.gml"],
                     'thesleepinglion.gui' : ["*.glade"],
-                    'thesleepinglion.gui_images' : ["*.png"],
+                    'thesleepinglion.gui.gui_images' : ["*.png"],
                     },
 
     include_package_data = True)

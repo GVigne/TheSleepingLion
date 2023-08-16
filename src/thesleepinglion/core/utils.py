@@ -61,9 +61,9 @@ def get_gui_asset(filename):
 
 def get_gui_images(filename):
     """
-    Get the corresponding image from the gui_images/ folder.
+    Get the corresponding image from the gui/gui_images/ folder.
     """
-    return resource_filename("thesleepinglion.gui_images", filename)
+    return resource_filename("thesleepinglion.gui.gui_images", filename)
 
 def get_doc_asset(filename):
     """

@@ -29,6 +29,6 @@ Nsis is a tool which helps distribute apps through Windows. We will also be usin
 
 The `build.sh` script starts by using PyInstaller to create an executable, then calls Nsis and Resource hacker to have a nice Setup Wizard and making sure The Sleeping Lion can be uninstalled in a "clean Windows way" (via "Add or Remove programs").
 
- Note that the icon located in `packaging` and named `the_sleeping_lion_square.ico` is different from the ones in `gui_images`: Windows can't deal with rectangular icons, so we have to use a dedicated square icon.
+ Note that the icon located in `packaging` and named `the_sleeping_lion_square.ico` is different from the ones in `gui/gui_images`: Windows can't deal with rectangular icons, so we have to use a dedicated square icon.
 
 The `build.sh` script will create folders named `dist` and `build`, as well as other files in the `packaging` folder. You can ignore them: the interesting file should be named something like `the_sleeping_lion-1.0.0-x86_64.exe` and corresponds to The Sleeping Lion's Windows installer.

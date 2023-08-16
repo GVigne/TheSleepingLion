@@ -1,4 +1,4 @@
-![](src/thesleepinglion/gui_images/full_icon.png)
+![](src/thesleepinglion/gui/gui_images/full_icon.png)
 
 Have you ever wanted to create you own custom Gloomhaven character? Do you wish there was a simple way to create beautiful cards for the class you are designing? Maybe you don't know how to use graphics editors to their best and would like to focus on class mechanic, but not bother with the graphic layout?
 
