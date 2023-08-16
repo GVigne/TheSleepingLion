@@ -3,7 +3,7 @@ import gi
 gi.require_version('PangoCairo', '1.0')
 from gi.repository import Pango, PangoCairo
 import cairo
-from .utils import text_to_pango, list_join
+from ..core.utils import text_to_pango, list_join
 from .gmllinecontext import GMLLineContext
 from pathlib import Path
 

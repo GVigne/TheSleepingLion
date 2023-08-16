@@ -1,6 +1,6 @@
 from .constants import *
 from .gmllinecontext import GMLLineContext
-from .errors import MismatchNoArguments, InvalidArgumentType
+from ..core.errors import MismatchNoArguments, InvalidArgumentType
 
 class AbstractMacro:
     """

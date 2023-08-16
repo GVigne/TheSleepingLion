@@ -1,7 +1,7 @@
 import regex as re
 from .aliases import base_aliases
-from .utils import find_opened_bracket, find_end_bracket, find_end_macro, alias_text_to_alias_list
-from .errors import InvalidCustomAlias, MaximumAliasReplacementDepthExceeded
+from ..core.utils import find_opened_bracket, find_end_bracket, find_end_macro, alias_text_to_alias_list
+from ..core.errors import InvalidCustomAlias, MaximumAliasReplacementDepthExceeded
 
 class GloomhavenLexer:
     """

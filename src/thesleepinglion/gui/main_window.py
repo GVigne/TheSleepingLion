@@ -13,12 +13,12 @@ from .card_tab import CardTab
 from .dialog_exportPDF import ExportDialogPDF
 from .dialog_exportPNG import ExportDialogPNG
 from .aoe_creator import AoECreator
-from ..utils import get_gui_asset, get_doc_asset, show_parsing_errors, show_warning_errors, freeze_event, unfreeze_event, \
+from ..core.utils import get_gui_asset, get_doc_asset, show_parsing_errors, show_warning_errors, freeze_event, unfreeze_event, \
                     gtk_error_message, get_gui_images, order_card_tabs_by_id, order_card_tabs_by_level, order_card_tabs_by_initiative
-from ..constants import card_height, card_width
-from ..gloomhavenclass import GloomhavenClass
+from ..gloomhaven.constants import card_height, card_width
+from ..gloomhaven.gloomhavenclass import GloomhavenClass
 from ..backupFileHandler import GMLFileHandler, AoEFileHandler
-from ..errors import InvalidGMLFile, CardNameAlreadyExists
+from ..core.errors import InvalidGMLFile, CardNameAlreadyExists
 
 class MainWindow(GObject.Object):
     @GObject.Signal

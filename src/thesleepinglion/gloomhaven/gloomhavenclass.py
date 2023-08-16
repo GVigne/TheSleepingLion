@@ -5,13 +5,13 @@ from yaml import safe_load, safe_dump
 
 from .constants import *
 from .gmllinecontext import GMLLineContext
-from .background_code.create_card_background import create_card_background
+from ..background_code.create_card_background import create_card_background
 from .commands import ImageCommand
-from .svg_wrapper import SVGImage
+from ..core.svg_wrapper import SVGImage
 from .items import LineItem, TextItem
-from .errors import ImageNotFound, InvalidGMLFile
+from ..core.errors import ImageNotFound, InvalidGMLFile
 from .card import Card
-from .utils import get_image, check_aliases_integrity
+from ..core.utils import get_image, check_aliases_integrity
 from pathlib import Path
 
 class GloomhavenClass:

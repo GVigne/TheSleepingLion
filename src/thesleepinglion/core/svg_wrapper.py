@@ -10,7 +10,7 @@ cairosvg.helpers.cairo = cairo
 from cairosvg.surface import Surface
 from cairosvg.parser import Tree
 from cairosvg.helpers import node_format
-from .items import AbstractItem
+from ..gloomhaven.items import AbstractItem
 
 def dict_to_hex(color):
     """

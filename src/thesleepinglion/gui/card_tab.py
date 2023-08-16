@@ -6,9 +6,9 @@ from pathlib import Path
 import yaml as yaml
 
 from .abstract_tab import AbstractTab
-from ..card import Card
-from ..gloomhavenclass import GloomhavenClass
-from ..errors import CardNameAlreadyExists
+from ..gloomhaven.card import Card
+from ..gloomhaven.gloomhavenclass import GloomhavenClass
+from ..core.errors import CardNameAlreadyExists
 from ..backupFileHandler import BackupFileHandler
 
 def get_text_from_view(view: Gtk.TextView):

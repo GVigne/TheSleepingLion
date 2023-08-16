@@ -11,7 +11,7 @@ import cairo as cairo
 from pathlib import Path
 from pkg_resources import resource_filename
 from .errors import ImageNotFound, BracketError, AoeFileNotFound
-from .gmllinecontext import GMLLineContext
+from ..gloomhaven.gmllinecontext import GMLLineContext
 
 def text_to_pango(text : str, gml_context: GMLLineContext):
     """

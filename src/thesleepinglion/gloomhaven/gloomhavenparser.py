@@ -4,9 +4,9 @@ from copy import deepcopy
 from .items import LineItem, ColumnItem, TextItem, TopmostLineItem, TopmostColumnItem
 from .commands import *
 from .macros import *
-from .errors import CommandNotFound, MacroNotFound
+from ..core.errors import CommandNotFound, MacroNotFound
 from .constants import *
-from .utils import text_to_pango, find_opened_bracket, find_end_bracket
+from ..core.utils import text_to_pango, find_opened_bracket, find_end_bracket
 from .gloomhavenlexer import GloomhavenLexer
 from .gmllinecontext import GMLLineContext
 

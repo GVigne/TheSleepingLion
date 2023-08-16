@@ -4,11 +4,11 @@ gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gtk
 
-from .constants import card_width, card_height
-from .items import *
-from .commands import *
-from .utils import show_parsing_errors, show_warning_errors
-from .gloomhavenclass import GloomhavenClass
+from .gloomhaven.constants import card_width, card_height
+from .gloomhaven.items import *
+from .gloomhaven.commands import *
+from .core.utils import show_parsing_errors, show_warning_errors
+from .gloomhaven.gloomhavenclass import GloomhavenClass
 from .gui.main_window import MainWindow
 from .backupFileHandler import GMLFileHandler
 from tempfile import TemporaryDirectory

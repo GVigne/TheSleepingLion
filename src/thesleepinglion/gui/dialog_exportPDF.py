@@ -5,9 +5,9 @@ import cairo
 from pathlib import Path
 from math import pi
 
-from ..gloomhavenclass import GloomhavenClass
-from ..utils import get_gui_asset
-from ..constants import card_height, card_width
+from ..gloomhaven.gloomhavenclass import GloomhavenClass
+from ..core.utils import get_gui_asset
+from ..gloomhaven.constants import card_height, card_width
 from .select_cards_widget import SelectCardsForExportWidget
 
 class ExportDialogPDF:

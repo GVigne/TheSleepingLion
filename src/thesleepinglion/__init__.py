@@ -20,6 +20,6 @@ else:
     add_font(resource_filename("thesleepinglion.assets", "fonts/PirataOne-Regular.ttf"))
 
 # Allow end-users to import a GloomhavenClass. This is required for the automatic documentation generation.
-from .gloomhavenclass import GloomhavenClass
-from .aliases import base_aliases
-from .constants import card_height, card_width
+from .gloomhaven.gloomhavenclass import GloomhavenClass
+from .gloomhaven.aliases import base_aliases
+from .gloomhaven.constants import card_height, card_width

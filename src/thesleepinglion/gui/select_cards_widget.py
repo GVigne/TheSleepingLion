@@ -2,8 +2,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from ..gloomhavenclass import GloomhavenClass
-from ..utils import get_gui_asset
+from ..gloomhaven.gloomhavenclass import GloomhavenClass
+from ..core.utils import get_gui_asset
 
 class SelectCardsForExportWidget:
     """
