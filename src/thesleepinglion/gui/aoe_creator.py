@@ -2,7 +2,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 
 from ..hexagonal_grid import HexagonalGrid, HexagonDict
-from ..core.utils import get_gui_asset, gtk_error_message
+from ..core.utils import get_gui_asset
+from .gui_utils import gtk_error_message
 from ..core.errors import InvalidAoEFile
 from ..backupFileHandler import AoEFileHandler
 from gi.repository import Gtk, Gdk, GObject
