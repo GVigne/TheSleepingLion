@@ -8,10 +8,122 @@ from cairosvg.parser import Tree
 from cairosvg.helpers import node_format
 
 import cairo as cairo
+from enum import Enum, auto
 from pathlib import Path
 from pkg_resources import resource_filename
 from .errors import ImageNotFound, BracketError, AoeFileNotFound
 from ..gloomhaven.gmllinecontext import GMLLineContext
+
+class Haven(Enum):
+    """
+    Use this enum when you want to make the difference between a Gloomhaven-specific behavior, a Frosthaven-specific
+    behavior, or something which behaves the same for both syntaxes.
+    """
+    GLOOMHAVEN = auto()
+    FROSTHAVEN = auto()
+    COMMON = auto()
+
+def get_asset(filename, haven_type: Haven):
+    """
+    Get the path to an asset (here, PNG or SVG file) in the assets/haven_type/ folder.
+    """
+    if haven_type == Haven.COMMON:
+        return resource_filename("thesleepinglion.assets.common", filename)
+    elif haven_type == Haven.GLOOMHAVEN:
+        return resource_filename("thesleepinglion.assets.gloomhaven", filename)
+    else:
+        return resource_filename("thesleepinglion.assets.frosthaven", filename)
+
+def get_aoe_asset(filename, haven_type: Haven):
+    """
+    Get the path to an asset (here, AOE file) in the assets/haven_type/aoe/ folder.
+    """
+    if haven_type == Haven.COMMON:
+        return resource_filename("thesleepinglion.assets.common.aoe", filename)
+    elif haven_type == Haven.GLOOMHAVEN:
+        return resource_filename("thesleepinglion.assets.gloomhaven.aoe", filename)
+    else:
+        return resource_filename("thesleepinglion.assets.frosthaven.aoe", filename)
+
+def get_background_asset(filename, haven_type: Haven):
+    """
+    Get the path to an asset (here, PNG or SVG file) in the background_assets/haven_type folder.
+    There are no common background asset, so don't call this function with haven_type = Haven.COMMON
+    """
+    if haven_type == Haven.GLOOMHAVEN:
+        return resource_filename("thesleepinglion.background_assets.gloomhaven", filename)
+    elif haven_type == Haven.FROSTHAVEN:
+        return resource_filename("thesleepinglion.background_assets.frosthaven", filename)
+
+def get_gui_asset(filename):
+    """
+    Get the path to an asset (here, .glade file) in the from the gui/ folder.
+    """
+    return resource_filename("thesleepinglion.gui", filename)
+
+def get_gui_images(filename):
+    """
+    Get the path to an asset (here, PNG file) in the gui/gui_images/ folder.
+    """
+    return resource_filename("thesleepinglion.gui.gui_images", filename)
+
+def get_doc_asset(filename):
+    """
+    Get the path to an asset (here, PDF or GML file) in the docs/ folder.
+    """
+    return resource_filename("thesleepinglion.docs", filename)
+
+def get_image(gml_path : Path|None, filepath : str|None, haven_type: Haven):
+    """
+    Given a path to a file, try to interpret it as:
+        - a relative path (from the path to the GML file) to a user-specific image
+        - if the above fails, the name of an image in the assets/haven_type folder
+        - if the above fails, the name of an image in the assets/common folder
+    If everything fails, throw an ImageNotFound error.
+    """
+    if filepath is None:
+        # Can't find an image if there is nothing to find.
+        raise ImageNotFound
+
+    # Check if the image is a custom image
+    if gml_path is not None:
+        user_image = gml_path.parent / filepath
+        if user_image.is_file():
+            return str(user_image)
+    # Check if the image if in the haven_type/folder
+    asset_path = get_asset(filepath, haven_type)
+    if Path(asset_path).is_file():
+        return asset_path
+    # Check if the image if in the common/folder
+    asset_path = get_asset(filepath, Haven.COMMON)
+    if Path(asset_path).is_file():
+        return asset_path
+
+    raise ImageNotFound(f"No image was found with the path {filepath}")
+
+def get_aoe(gml_path : Path|None, filepath : str|None, haven_type: Haven):
+    """
+    Behaves just like get_image, only with aoe files.
+    """
+    if filepath is None:
+        # Can't find an AOE if there is nothing to find.
+        raise AoeFileNotFound
+
+    # Check if the image is a custom image
+    if gml_path is not None:
+        user_image = gml_path.parent / filepath
+        if user_image.is_file():
+            return str(user_image)
+    # Check if the image if in the haven_type/folder
+    asset_path = get_aoe_asset(filepath, haven_type)
+    if Path(asset_path).is_file():
+        return asset_path
+    # Check if the image if in the common/folder
+    asset_path = get_aoe_asset(filepath, Haven.COMMON)
+    if Path(asset_path).is_file():
+        return asset_path
+
+    raise AoeFileNotFound(f"No AoE was found with the path {filepath}")
 
 def text_to_pango(text : str, gml_context: GMLLineContext):
     """
@@ -33,89 +145,6 @@ def text_to_pango(text : str, gml_context: GMLLineContext):
     # By default, the resolution is set at -1: this minus one probably has different meaning for Windows 10 and 11.
     PangoCairo.context_set_resolution(layout.get_context(), 96)
     return layout
-
-def get_asset(filename):
-    """
-    Get the corresponding image from the assets/gloomhaven folder.
-    Ex: get_asset(attack.svg)
-    """
-    return resource_filename("thesleepinglion.assets.gloomhaven", filename)
-
-def get_aoe_asset(filename):
-    """
-    Get the corresponding image from the assets/gloomhaven/aoe/ folder.
-    """
-    return resource_filename("thesleepinglion.assets.gloomhaven", "aoe/"+filename)
-
-def get_background_asset(filename):
-    """
-    Get the corresponding image from the background_assets/ folder.
-    """
-    return resource_filename("thesleepinglion.background_assets", filename)
-
-def get_gui_asset(filename):
-    """
-    Get the corresponding image from the gui/ folder.
-    """
-    return resource_filename("thesleepinglion.gui", filename)
-
-def get_gui_images(filename):
-    """
-    Get the corresponding image from the gui/gui_images/ folder.
-    """
-    return resource_filename("thesleepinglion.gui.gui_images", filename)
-
-def get_doc_asset(filename):
-    """
-    Get the corresponding image from the docs/ folder.
-    """
-    return resource_filename("thesleepinglion.docs", filename)
-
-def get_image(gml_path : Path|None, filepath : str|None):
-    """
-    Given a path to a file, try to interpret it as:
-        - a relative path (from the path to the GML file) to a user-specific image
-        - if the above fails, the name of an image in the assets/ folder
-        - if the above fails, the name of an image in the background_assets folder
-    If everything fails, throw an ImageNotFound error.
-    """
-    if filepath is None:
-        # Can't find an image if there is nothing to find.
-        raise ImageNotFound
-
-    if gml_path is not None:
-        user_image = gml_path.parent / filepath
-        if user_image.is_file():
-            return str(user_image)
-
-    asset_path = get_asset(filepath)
-    if Path(asset_path).is_file():
-        return asset_path
-
-    asset_path = get_background_asset(filepath)
-    if Path(asset_path).is_file():
-        return asset_path
-
-    raise ImageNotFound(f"No image was found with the path {filepath}")
-
-def get_aoe(gml_path : Path|None, filepath : str|None):
-    """
-    Behaves just like get_image, only with aoe files.
-    """
-    if filepath is None:
-        # Can't find an aoe if there is nothing to find.
-        raise ImageNotFound
-
-    if gml_path is not None:
-        user_image = gml_path.parent / filepath
-        if user_image.is_file():
-            return str(user_image)
-
-    asset_path = get_aoe_asset(filepath)
-    if Path(asset_path).is_file():
-        return asset_path
-
-    raise AoeFileNotFound(f"No AoE was found with the path {filepath}")
 
 def find_opened_bracket(text : str):
         """

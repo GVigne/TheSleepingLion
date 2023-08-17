@@ -11,7 +11,7 @@ from ..core.svg_wrapper import SVGImage
 from .items import LineItem, TextItem
 from ..core.errors import ImageNotFound, InvalidGMLFile
 from .card import Card
-from ..core.utils import get_image, check_aliases_integrity
+from ..core.utils import Haven, get_background_asset, check_aliases_integrity
 from pathlib import Path
 
 class GloomhavenClass:
@@ -167,7 +167,7 @@ class GloomhavenClass:
         cr.paint()
 
         # The height corresponds to 0.8*1.4*base_font_size. Note that 1.4 scaling comes from the ImageCommand.
-        crown = SVGImage(get_image(self.path_to_gml, "crown.svg"), height = 1.12*base_font_size, new_color = self.color)
+        crown = SVGImage(get_background_asset("crown.svg", Haven.GLOOMHAVEN), height = 1.12*base_font_size, new_color = self.color)
         cr.save()
         cr.translate(card_width/2 - crown.get_width() /2, 0.105*card_height)
         cr.move_to(0,0)

@@ -8,15 +8,15 @@ import cairo
 import numpy as np
 
 from .card_background_utils import pixbuf_to_array, array_to_pixbuf, rgb_to_lch, lch_to_rgb
-from ..core.utils import get_background_asset
+from ..core.utils import Haven, get_background_asset
 
 # Preload images: rune, background
-RUNES = pixbuf_to_array(GdkPixbuf.Pixbuf.new_from_file(get_background_asset("runes.png")))
-BACKGROUND = pixbuf_to_array(GdkPixbuf.Pixbuf.new_from_file(get_background_asset("cardBackground.png")))
+RUNES = pixbuf_to_array(GdkPixbuf.Pixbuf.new_from_file(get_background_asset("runes.png", Haven.GLOOMHAVEN)))
+BACKGROUND = pixbuf_to_array(GdkPixbuf.Pixbuf.new_from_file(get_background_asset("cardBackground.png", Haven.GLOOMHAVEN)))
 
 # Create mask for background image
 
-bg_image = pixbuf_to_array(GdkPixbuf.Pixbuf.new_from_file(get_background_asset("colorMask.png")))
+bg_image = pixbuf_to_array(GdkPixbuf.Pixbuf.new_from_file(get_background_asset("colorMask.png", Haven.GLOOMHAVEN)))
 COLORMASK = (BACKGROUND[:, :, 3] > 0) & (bg_image[:, :, 3] > 0)
 
 # Convert background to Lch space

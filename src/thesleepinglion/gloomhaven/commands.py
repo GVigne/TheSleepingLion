@@ -4,7 +4,7 @@ from pathlib import Path
 from .items import AbstractItem, TextItem, LineItem, ColumnItem
 from ..core.errors import EmptyArgument, MismatchNoArguments, InvalidAoEFile, ImageNotFound
 from .constants import base_font_size, title_font, small_font_size, card_width
-from ..core.utils import get_image, get_aoe, list_join
+from ..core.utils import Haven, get_image, get_aoe, list_join
 from ..hexagonal_grid import HexagonalGrid, HexagonDict
 from .gmllinecontext import GMLLineContext
 
@@ -54,9 +54,9 @@ class ImageCommand(AbstractCommand):
             raise EmptyArgument("Argument for the '\\image' command may not be empty.")
         path_to_image = arguments[0]
         try:
-            image_path = get_image(self.path_to_gml, path_to_image) # May raise the ImageNotFound error.
+            image_path = get_image(self.path_to_gml, path_to_image, Haven.GLOOMHAVEN) # May raise the ImageNotFound error.
         except ImageNotFound as e:
-            image_path = get_image(self.path_to_gml, "not_found.svg")
+            image_path = get_image(self.path_to_gml, "not_found.svg", Haven.COMMON)
             self.warnings.append(str(e))
 
         user_scaling = 1
@@ -69,13 +69,13 @@ class ImageCommand(AbstractCommand):
             try:
                 self.image = SVGImage(image_path, default_height)
             except Exception:
-                self.image = SVGImage(get_image(self.path_to_gml, "not_found.svg"), default_height)
+                self.image = SVGImage(get_image(self.path_to_gml, "not_found.svg", Haven.COMMON), default_height)
                 self.warnings.append(f"The file {image_path} isn't a readable image (.svg or .png).")
         else:
             try:
                 self.image = GdkPixbuf.Pixbuf.new_from_file_at_scale(image_path, -1, default_height, True)
             except Exception:
-                self.image = SVGImage(get_image(self.path_to_gml, "not_found.svg"), default_height)
+                self.image = SVGImage(get_image(self.path_to_gml, "not_found.svg", Haven.COMMON), default_height)
                 self.warnings.append(f"The file {image_path} isn't a readable image (.svg or .png).")
 
     def get_width(self):
@@ -265,7 +265,7 @@ class OneChargeItem(AbstractCommand):
         super().__init__(arguments, gml_context, path_to_gml, image_color)
 
         one_charge_size_factor = 2.6
-        self.one_charge = SVGImage(get_image(self.path_to_gml, "one_charge.svg"),
+        self.one_charge = SVGImage(get_image(self.path_to_gml, "one_charge.svg", Haven.GLOOMHAVEN),
                                         height = one_charge_size_factor*gml_context.font_size,
                                         old_color={"red":0, "green":0, "blue":0},
                                         new_color=image_color) # Replace the black arrow with an arrow of same color as the class
@@ -280,7 +280,7 @@ class OneChargeItem(AbstractCommand):
                 if isinstance(charge_effect.items[0], ExpCommand):
                     # Hack the ExpCommand's image so that it is of the correct color.
                     # Also slightly increase it's size.
-                    charge_effect.items[0].new_image(SVGImage(get_image(self.path_to_gml, "experience.svg"),
+                    charge_effect.items[0].new_image(SVGImage(get_image(self.path_to_gml, "experience.svg", Haven.GLOOMHAVEN),
                                                                 height = 1.1*charge_effect.items[0].get_height(),
                                                                 new_color=image_color))
                 self.charge_effect = charge_effect
@@ -341,10 +341,10 @@ class ChargesCommand(AbstractCommand):
 
         # Bypass ImageCommand as we do not want always want to put a blank space before and after those images.
         # The 1.4 scaling comes from ImageCommand
-        self.infinity = SVGImage(get_image(self.path_to_gml,"infinity.svg"), height = 1.4*base_font_size)
+        self.infinity = SVGImage(get_image(self.path_to_gml,"infinity.svg", Haven.GLOOMHAVEN), height = 1.4*base_font_size)
         self.loss_image = None
         if has_loss:
-            self.loss_image = SVGImage(get_image(self.path_to_gml,"loss.svg"), height = 1.4*base_font_size)
+            self.loss_image = SVGImage(get_image(self.path_to_gml,"loss.svg", Haven.GLOOMHAVEN), height = 1.4*base_font_size)
 
         # Will be used to get the correct spacing between charges items.
         self.blank = TextItem("  ", GMLLineContext(font_size = base_font_size))
@@ -466,20 +466,20 @@ class SummonCommand(AbstractCommand):
             raise MismatchNoArguments(f"The '\\summon' commands take 6 or 7 arguments, but {len(arguments)} were given.")
 
         if len(arguments) == 6:
-            image_path = get_image(self.path_to_gml, "summon_1_block.png")
+            image_path = get_image(self.path_to_gml, "summon_1_block.png", Haven.GLOOMHAVEN)
         else:
             # 7 arguments = 2 blocks to write in
-            image_path = get_image(self.path_to_gml, "summon_2_blocks.png")
+            image_path = get_image(self.path_to_gml, "summon_2_blocks.png", Haven.GLOOMHAVEN)
         # 0.78*card_width => fits exactly the width of the card (from one colored border to the other)
         self.image =  GdkPixbuf.Pixbuf.new_from_file_at_scale(image_path, 0.78*card_width, -1, True)
 
         # Note: for those svgs, the 1.4 comes from the ImageCommand. We build them here so we don't have to
         # rebuild them every time we draw.
         colon = TextItem(": ", GMLLineContext(font_size=small_font_size))
-        hp_image =[SVGImage(get_image(self.path_to_gml, "heal.svg"), 1.4*base_font_size), colon]
-        move_image = [SVGImage(get_image(self.path_to_gml, "move.svg"), 1.4*base_font_size), colon]
-        attack_image = [SVGImage(get_image(self.path_to_gml, "attack.svg"), 1.4*base_font_size), colon]
-        range_image = [SVGImage(get_image(self.path_to_gml, "range.svg"), 1.4*small_font_size), colon]
+        hp_image =[SVGImage(get_image(self.path_to_gml, "heal.svg", Haven.GLOOMHAVEN), 1.4*base_font_size), colon]
+        move_image = [SVGImage(get_image(self.path_to_gml, "move.svg", Haven.GLOOMHAVEN), 1.4*base_font_size), colon]
+        attack_image = [SVGImage(get_image(self.path_to_gml, "attack.svg", Haven.GLOOMHAVEN), 1.4*base_font_size), colon]
+        range_image = [SVGImage(get_image(self.path_to_gml, "range.svg", Haven.GLOOMHAVEN), 1.4*small_font_size), colon]
 
         self.parsed_arguments = []
         parser = GloomhavenParser(self.path_to_gml)
@@ -605,7 +605,7 @@ class AoECommand(AbstractCommand):
         self.hexagons = HexagonDict()
         # May raise the AoeFileNotFound error. Let's not catch it: an AoE is probably more important than an image
         # so the user really should give a path (can't be ignored like an image.)
-        aoe_path = get_aoe(path_to_gml, arguments[0])
+        aoe_path = get_aoe(path_to_gml, arguments[0], Haven.GLOOMHAVEN)
         try:
             self.hexagons = HexagonDict.CreateFromFile(aoe_path)
         except Exception as e:
