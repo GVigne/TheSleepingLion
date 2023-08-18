@@ -4,8 +4,9 @@ from pathlib import Path
 from .items import AbstractItem, TextItem, LineItem, ColumnItem
 from ..core.errors import EmptyArgument, MismatchNoArguments, InvalidAoEFile, ImageNotFound
 from .constants import base_font_size, title_font, small_font_size, card_width
-from ..core.utils import Haven, get_image, get_aoe, list_join
-from ..hexagonal_grid import HexagonalGrid, HexagonDict
+from ..core.utils import get_image, get_aoe, list_join
+from ..core.haven_type import Haven
+from ..core.hexagonal_grid import HexagonalGrid, HexagonDict
 from .gmllinecontext import GMLLineContext
 
 from ..core.svg_wrapper import SVGImage

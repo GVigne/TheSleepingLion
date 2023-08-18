@@ -268,8 +268,10 @@ class TextItem(AbstractItem):
 
     def draw(self, cr: cairo.Context):
         # Recenter if needed
+        cr.save()
         if self.needs_scaling:
-            cr.rel_move_to(0, -(self.height - self.get_height()) / 2.0)
+            cr.move_to(0, -(self.height - self.get_height()) / 2.0)
         cr.set_source_rgba(self.red / 255, self.green / 255, self.blue / 255) # By default, draw in white
         PangoCairo.update_layout(cr, self.pango_text) # Since we changed the target surface, we need to update the layout
         PangoCairo.show_layout(cr, self.pango_text)
+        cr.restore()

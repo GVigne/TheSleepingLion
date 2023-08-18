@@ -2,26 +2,13 @@ import gi
 gi.require_version('PangoCairo', '1.0')
 gi.require_version('Gtk', '3.0')
 from gi.repository import PangoCairo, Gtk
-
-from cairosvg.surface import PDFSurface
-from cairosvg.parser import Tree
-from cairosvg.helpers import node_format
-
 import cairo as cairo
-from enum import Enum, auto
 from pathlib import Path
 from pkg_resources import resource_filename
-from .errors import ImageNotFound, BracketError, AoeFileNotFound
-from .abstractlinecontext import AbstractGMLLineContext
 
-class Haven(Enum):
-    """
-    Use this enum when you want to make the difference between a Gloomhaven-specific behavior, a Frosthaven-specific
-    behavior, or something which behaves the same for both syntaxes.
-    """
-    GLOOMHAVEN = auto()
-    FROSTHAVEN = auto()
-    COMMON = auto()
+from .errors import ImageNotFound, BracketError, AoeFileNotFound
+from .abstractGMLlinecontext import AbstractGMLLineContext
+from .haven_type import Haven
 
 def get_asset(filename, haven_type: Haven):
     """

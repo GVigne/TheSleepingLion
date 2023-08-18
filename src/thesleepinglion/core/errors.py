@@ -1,3 +1,4 @@
+# Errors which can be raised by The Sleeping Lion
 
 class CommandNotFound(ValueError):
     pass

@@ -8,7 +8,8 @@ import cairo
 import numpy as np
 
 from .card_background_utils import pixbuf_to_array, array_to_pixbuf, rgb_to_lch, lch_to_rgb
-from ..core.utils import Haven, get_background_asset
+from ..core.utils import get_background_asset
+from ..core.haven_type import Haven
 
 # Preload images: rune, background
 RUNES = pixbuf_to_array(GdkPixbuf.Pixbuf.new_from_file(get_background_asset("runes.png", Haven.GLOOMHAVEN)))

@@ -11,7 +11,8 @@ from ..core.svg_wrapper import SVGImage
 from .items import LineItem, TextItem
 from ..core.errors import ImageNotFound, InvalidGMLFile
 from .card import Card
-from ..core.utils import Haven, get_background_asset, check_aliases_integrity
+from ..core.utils import get_background_asset, check_aliases_integrity
+from ..core.haven_type import Haven
 from pathlib import Path
 
 class GloomhavenClass:

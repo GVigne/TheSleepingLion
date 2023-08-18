@@ -1,8 +1,9 @@
 import cairo
 from math import sqrt
 from collections import UserDict
-from .core.errors import InvalidAoEFile
 from pathlib import Path
+
+from .errors import InvalidAoEFile
 
 class HexagonDict(UserDict):
     """

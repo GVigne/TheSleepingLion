@@ -2,7 +2,7 @@ from gi.repository import GObject
 from pathlib import Path
 from os.path import relpath
 from .gloomhaven.gloomhavenclass import GloomhavenClass
-from .hexagonal_grid import HexagonDict
+from .core.hexagonal_grid import HexagonDict
 
 class BackupFileHandler(GObject.Object):
     """
