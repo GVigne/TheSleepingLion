@@ -1,6 +1,6 @@
 import pytest
 from thesleepinglion.gloomhaven.gloomhavenlexer import GloomhavenLexer
-from thesleepinglion.gloomhaven.aliases import base_aliases
+from thesleepinglion.gloomhaven.gloomhaven_aliases import base_aliases
 
 def test_aliases():
     """

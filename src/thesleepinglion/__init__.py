@@ -21,5 +21,5 @@ else:
 
 # Allow end-users to import a GloomhavenClass. This is required for the automatic documentation generation.
 from .gloomhaven.gloomhavenclass import GloomhavenClass
-from .gloomhaven.aliases import base_aliases
-from .gloomhaven.constants import card_height, card_width
+from .gloomhaven.gloomhaven_aliases import base_aliases
+from .gloomhaven.gloomhaven_constants import card_height, card_width

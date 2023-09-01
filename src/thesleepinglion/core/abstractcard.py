@@ -11,12 +11,12 @@ class AbstractCard:
     """
     def __init__(self,
                 path_to_gml,
-                name : str,
-                level : str,
-                initiative : str,
-                ID : str,
-                top_text : str,
-                bot_text : str,
+                name: str,
+                level: str,
+                initiative: str,
+                ID: str,
+                top_text: str,
+                bot_text: str,
                 class_color: dict,
                 raw_user_aliases: str =""):
         self.path_to_gml = path_to_gml
@@ -46,7 +46,7 @@ class AbstractCard:
         it should simply call AbstractCard.parse_gml()
         """
         # Populate self.top_areas
-        column_dict, top_warnings = parser.parse(self.top_text, background_color=self.class_color, additional_aliases=self.raw_user_aliases)
+        column_dict, top_warnings = parser.parse(self.top_text, class_color=self.class_color, additional_aliases=self.raw_user_aliases)
         self.top_areas = {"topleft" : column_dict["topleft"],
                           "bottomright" : column_dict["bottomright"],
                         }
@@ -55,7 +55,7 @@ class AbstractCard:
             center.append(column_dict["center2"])
         self.top_areas["center"] = center
         # Populate self.bot_areas
-        column_dict, bot_warnings = parser.parse(self.bot_text, background_color=self.class_color, additional_aliases=self.raw_user_aliases)
+        column_dict, bot_warnings = parser.parse(self.bot_text, class_color=self.class_color, additional_aliases=self.raw_user_aliases)
         self.bot_areas = {"topleft" : column_dict["topleft"],
                           "bottomright" : column_dict["bottomright"],
                         }

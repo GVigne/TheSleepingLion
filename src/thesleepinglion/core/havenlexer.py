@@ -94,7 +94,6 @@ class HavenLexer:
         raise MaximumAliasReplacementDepthExceeded(f"Maximum alias replacement depth exceeded after {self.recursion_max_depth} iterations. "\
                                                    "You may have defined two aliases referencing each other.")
 
-
     def split_alias(self, alias : str):
         """
         Roughly split the alias into a model pattern and the string it should be replaced by.

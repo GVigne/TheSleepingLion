@@ -12,7 +12,6 @@ from .utils import text_to_pango, get_image, get_aoe
 from .errors import MismatchNoArguments, ImageNotFound, InvalidAoEFile, EmptyArgument
 from .svg_wrapper import SVGImage
 from .hexagonal_grid import HexagonalGrid, HexagonDict
-from .abstractparser import AbstractParser
 
 class AbstractItem:
     """
@@ -98,7 +97,7 @@ class LineItem(AbstractItem):
     Represents a line block which contains different items displayed side by side, centered horizontally.
     This class is meant for the developper, not the end-user.
     """
-    def __init__(self, arguments: list[str],
+    def __init__(self, arguments: list[AbstractItem],
                     gml_context: AbstractGMLLineContext,
                     path_to_gml: Path | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
@@ -138,13 +137,12 @@ class LineItem(AbstractItem):
             cr.move_to(0,0)
         cr.restore()
 
-
 class ColumnItem(AbstractItem):
     """
     Represents a column block which contains different items displayed side by side, centered vertically.
     This class is meant for the developper, not the end-user.
     """
-    def __init__(self, arguments: list[str],
+    def __init__(self, arguments: list[AbstractItem],
                     gml_context: AbstractGMLLineContext,
                     path_to_gml: Path | None = None):
         super().__init__(arguments, gml_context, path_to_gml)

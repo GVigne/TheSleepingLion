@@ -6,7 +6,7 @@ from pathlib import Path
 import yaml as yaml
 
 from .abstract_tab import AbstractTab
-from ..gloomhaven.card import Card
+from ..gloomhaven.gloomhavencard import Card
 from ..gloomhaven.gloomhavenclass import GloomhavenClass
 from ..core.errors import CardNameAlreadyExists
 from ..backupFileHandler import BackupFileHandler

@@ -7,7 +7,7 @@ from math import pi
 
 from ..gloomhaven.gloomhavenclass import GloomhavenClass
 from ..core.utils import get_gui_asset
-from ..gloomhaven.constants import card_height, card_width
+from ..gloomhaven.gloomhaven_constants import card_height, card_width
 from .select_cards_widget import SelectCardsForExportWidget
 
 class ExportDialogPDF:

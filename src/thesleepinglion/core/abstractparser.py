@@ -22,7 +22,7 @@ class AbstractParser:
 
     def parse(self,
               action : str,
-              class_color: dict = {},
+              class_color: dict = {"red": 0, "green": 0, "blue": 0},
               additional_aliases: str = ""):
         """
         This method is the highest possible function, which should only be called by an AbstractCard. Parse returns

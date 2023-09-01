@@ -15,7 +15,7 @@ from .dialog_exportPNG import ExportDialogPNG
 from .aoe_creator import AoECreator
 from ..core.utils import get_gui_asset, get_doc_asset, show_parsing_errors, show_warning_errors, get_gui_images
 from .gui_utils import freeze_event, unfreeze_event, gtk_error_message, order_card_tabs_by_id, order_card_tabs_by_level, order_card_tabs_by_initiative
-from ..gloomhaven.constants import card_height, card_width
+from ..gloomhaven.gloomhaven_constants import card_height, card_width
 from ..gloomhaven.gloomhavenclass import GloomhavenClass
 from ..backupFileHandler import GMLFileHandler, AoEFileHandler
 from ..core.errors import InvalidGMLFile, CardNameAlreadyExists

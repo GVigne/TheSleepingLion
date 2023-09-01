@@ -4,14 +4,15 @@ gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gtk
 
-from .gloomhaven.constants import card_width, card_height
-from .gloomhaven.items import *
-from .gloomhaven.commands import *
+from .gloomhaven.gloomhaven_constants import card_width, card_height
+from .gloomhaven.gloomhaven_items import *
+from .gloomhaven.gloomhaven_commands import *
 from .core.utils import show_parsing_errors, show_warning_errors
 from .gloomhaven.gloomhavenclass import GloomhavenClass
-from .gui.main_window import MainWindow
-from .backupFileHandler import GMLFileHandler
-from tempfile import TemporaryDirectory
+from .createHavenFromFile import create_haven_class_from_file
+# from .gui.main_window import MainWindow
+# from .backupFileHandler import GMLFileHandler
+# from tempfile import TemporaryDirectory
 from pathlib import Path
 import sys
 import pkg_resources
@@ -20,15 +21,16 @@ import pkg_resources
 def thesleepinglion_main():
     version = pkg_resources.require("thesleepinglion")[0].version
     if len(sys.argv) == 1:
-        # The default use for The Sleeping Lion. Fire up the GUI.
-        with TemporaryDirectory() as tmpdir:
-            tmpfile = Path(tmpdir) / "Untitled.gml"# A temporary file which will be deleted when the user quits TSL
-            tmpfile.with_suffix(".gml").touch() # Create the temporary file.
-            tempclass = GloomhavenClass(tmpfile)
-            saved_file = GMLFileHandler(tmpfile)
-            mainwindow = MainWindow(tempclass, saved_file, version)
-            mainwindow.window.show_all()
-            Gtk.main()
+        # # The default use for The Sleeping Lion. Fire up the GUI.
+        # with TemporaryDirectory() as tmpdir:
+        #     tmpfile = Path(tmpdir) / "Untitled.gml"# A temporary file which will be deleted when the user quits TSL
+        #     tmpfile.with_suffix(".gml").touch() # Create the temporary file.
+        #     tempclass = GloomhavenClass(tmpfile)
+        #     saved_file = GMLFileHandler(tmpfile)
+        #     mainwindow = MainWindow(tempclass, saved_file, version)
+        #     mainwindow.window.show_all()
+        #     Gtk.main()
+        pass
     else:
         print(f"You are using version {version} of The Sleeping Lion.")
         # The first argument should be some sort of path to a .gml file, the second the path to where the
@@ -39,8 +41,8 @@ def thesleepinglion_main():
         else:
             path_to_pdf = path_to_gml.with_suffix(".pdf")
 
-        gloomhaven_class = GloomhavenClass(path_to_gml)
-        parsing_errors, parsing_warnings = gloomhaven_class.parse_gml()
+        haven_class = create_haven_class_from_file(path_to_gml)
+        parsing_errors, parsing_warnings = haven_class.parse_gml()
         if len(parsing_errors) == 0:
             # Everything is mostly fine!
             if len(parsing_warnings) > 0:
@@ -49,9 +51,9 @@ def thesleepinglion_main():
 
             surface = cairo.PDFSurface(path_to_pdf, card_width, card_height)
             cr = cairo.Context(surface)
-            for card in gloomhaven_class.cards:
+            for card in haven_class.cards:
                 cr.save()
-                gloomhaven_class.draw_card(card, cr)
+                haven_class.draw_card(card, cr)
                 cr.restore()
                 surface.show_page() # Save the page, so that each card is drawn on a separate page.
             surface.finish()

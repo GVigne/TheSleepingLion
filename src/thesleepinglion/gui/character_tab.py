@@ -5,7 +5,7 @@ from pathlib import Path
 from yaml import safe_dump
 
 from .abstract_tab import AbstractTab
-from ..gloomhaven.constants import card_width, card_height
+from ..gloomhaven.gloomhaven_constants import card_width, card_height
 from ..gloomhaven.gloomhavenclass import GloomhavenClass
 from .gui_utils import freeze_event, unfreeze_event
 from ..backupFileHandler import BackupFileHandler

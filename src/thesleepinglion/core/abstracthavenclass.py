@@ -12,6 +12,7 @@ class AbstractHavenClass:
     An abstract class to represent a character. The main entry point to interact with and parse a GML file.
     Child classes shouldn't be instantiated directly: instead, use the create_haven_class_from_file function in
     ..createHavenFromFile.py which creates the appropriate instance based the GML file's header.
+    Child classes must overload the create_card_layout and save_header methods, and should overload check_class_errors.
     """
     def __init__(self, path_to_gml : Path, card_type: type):
         self.path_to_gml = path_to_gml
@@ -268,5 +269,5 @@ class AbstractHavenClass:
                 if bot_text is None:
                     bot_text = ""
                 self.cards.append(self.card_type(self.path_to_gml, card_name, level, initiative,
-                                       card_id, top_text, bot_text, self.color, raw_aliases = self.raw_aliases))
+                                       card_id, top_text, bot_text, self.color, raw_user_aliases = self.raw_aliases))
 

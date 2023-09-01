@@ -10,7 +10,7 @@ class AbstractMacro:
     def __init__(self, arguments : list[str] =  []):
         self.arguments = arguments
 
-    def change_context(self, gmllinecontext: AbstractGMLLineContext):
+    def change_context(self, havenLineContext: AbstractGMLLineContext):
         pass
 
 class EndLastMacro(AbstractMacro):
@@ -19,8 +19,8 @@ class EndLastMacro(AbstractMacro):
         if len(arguments) != 0:
             raise MismatchNoArguments(f"The '@endlast' macro doesn't take arguments, but {len(arguments)} were given.")
 
-    def change_context(self, gmllinecontext: AbstractGMLLineContext):
-        gmllinecontext.clear_last_effect()
+    def change_context(self, havenLineContext: AbstractGMLLineContext):
+        havenLineContext.clear_last_effect()
 
 class EndMacro(AbstractMacro):
     def __init__(self, arguments: list[str] = []):
@@ -28,8 +28,8 @@ class EndMacro(AbstractMacro):
         if len(arguments) != 0:
             raise MismatchNoArguments(f"The '@end' macro doesn't take arguments, but {len(arguments)} were given.")
 
-    def change_context(self, gmllinecontext: AbstractGMLLineContext):
-        gmllinecontext.clear()
+    def change_context(self, havenLineContext: AbstractGMLLineContext):
+        havenLineContext.clear()
 
 class AbstractPositionalMacros:
     """
@@ -50,14 +50,14 @@ class TopLeftMacro(AbstractPositionalMacros):
     def get_position(self):
         return "topleft"
 
-class BottomRightMacro(AbstractMacro):
+class BottomRightMacro(AbstractPositionalMacros):
     def __init__(self, arguments: list[str] = []):
         super().__init__("@bottomright", arguments)
 
     def get_position(self):
         return "bottomright"
 
-class Column2Macro(AbstractMacro):
+class Column2Macro(AbstractPositionalMacros):
     def __init__(self, arguments: list[str] = []):
         super().__init__("@column2", arguments)
 
