@@ -183,7 +183,7 @@ class ColumnItem(AbstractItem):
             current_y = item.get_height()
         cr.restore() # Go back to the top left of the column
 
-class TopmostLineItem(LineItem):
+class AbstractTopmostLineItem(LineItem):
     """
     Represents the line at the highest level. This is a way to distinguish between a LineItem whose only job
     is to align objects and the topmost LineItem which will be placed on the card: it's a way to break up a bit
@@ -194,49 +194,16 @@ class TopmostLineItem(LineItem):
     """
     @staticmethod
     def promoteLineItem(line_item: LineItem):
-        return TopmostLineItem(line_item.arguments, None, line_item.path_to_gml)
+        return AbstractTopmostLineItem(line_item.arguments, None, line_item.path_to_gml)
 
-class TopmostColumnItem(ColumnItem):
+class AbstractTopmostColumnItem(ColumnItem):
     """
     Represents the column at the highest level, similarly to TopMostLineItem. However, it must only hold
     TopmostLineItem, or some methods may fail.
     """
     @staticmethod
     def promoteColumnItem(column_item: ColumnItem):
-        return TopmostColumnItem(column_item.arguments, None, column_item.path_to_gml)
-
-class AbstractMultilineCommand(AbstractItem):
-    """
-    An abstract class destined to the end user allowing to stack items on top of each other (ex: Shield, \\n, Self).
-    This class must be overloaded and it takes an instance of an AbstractParser to parse this command's arguments
-    """
-    def __init__(self, arguments: list[str],
-                    gml_context: AbstractGMLLineContext,
-                    parser: AbstractParser,
-                    path_to_gml: Path | None = None):
-        super().__init__(arguments, gml_context, path_to_gml)
-        if len(arguments) == 0:
-            raise MismatchNoArguments((f"The '\\multiline' command takes more than one argument, but 0 were given."))
-        if len(arguments[0]) == 0:
-            raise EmptyArgument("Arguments for the '\\multiline' command may not be empty.")
-
-        self.parsed_arguments = []
-        for arg in arguments:
-            parsed_arg = parser.gml_line_to_items(arg, gml_context)
-            if len(parsed_arg) == 0 :
-                # one of the argument has only macros, so there is no element/item to collect
-                raise EmptyArgument("Arguments for the '\\multiline' command must be valid gml commands and not only macros.")
-            self.parsed_arguments.append(parsed_arg[0])
-        self.column = ColumnItem(self.parsed_arguments, self.path_to_gml)
-
-    def get_width(self):
-        return self.column.get_width()
-
-    def get_height(self):
-        return self.column.get_height()
-
-    def draw(self, cr: cairo.Context):
-        self.column.draw(cr)
+        return AbstractTopmostColumnItem(column_item.arguments, None, column_item.path_to_gml)
 
 # How to center an image:
 # An image is drawn with a size of 1.4 times the font size. Out of an image of height 110 (font size 100 on Inkscape):
