@@ -17,8 +17,7 @@ class AbstractCard:
                 ID: str,
                 top_text: str,
                 bot_text: str,
-                class_color: dict,
-                raw_user_aliases: str =""):
+                class_color: dict):
         self.path_to_gml = path_to_gml
         self.name = name
         self.level = level
@@ -27,7 +26,6 @@ class AbstractCard:
         self.top_text = top_text
         self.bot_text = bot_text
         self.class_color = class_color # Given by the Haven class. Shouldn't be modified.
-        self.raw_user_aliases = raw_user_aliases # User-defined aliases
 
         # The top and bot areas are dictionnaries holding TopmostColumnItems. This pairs AbstractTopMostColumnItems to
         # their position on the card (top, bottom, center).
@@ -39,14 +37,20 @@ class AbstractCard:
                           "center": []}
 
     # Virtual methods
-    def parse_gml(self, parser: AbstractParser):
+    def parse_gml(self, parser: AbstractParser, raw_user_aliases: str =""):
         """
         Parse the top text and bottom text and return a list of warnings which should be displayed to the end-user.
         Child classes must overload this function so that the GUI doesn't have to give an instance of the parser:
         it should simply call AbstractCard.parse_gml()
+
+        A note on user aliases: these are not a member of AbstractCard to reduce duplicates. Instead, they are a member
+        of AbstractHavenClass and should ALWAYS be passed as argument to the AbstractCard.parse_gml function. This also means that a
+        card can parse itself (ie we can always call card.parse_gml()), but the result might not be same as if it was the
+        HavenClass which called the parsing, since user aliases will be ignored.
+        Conclusion: always parse through the AbstractHavenClass and NEVER parse a card directly.
         """
         # Populate self.top_areas
-        column_dict, top_warnings = parser.parse(self.top_text, class_color=self.class_color, additional_aliases=self.raw_user_aliases)
+        column_dict, top_warnings = parser.parse(self.top_text, class_color=self.class_color, additional_aliases=raw_user_aliases)
         self.top_areas = {"topleft" : column_dict["topleft"],
                           "bottomright" : column_dict["bottomright"],
                         }
@@ -55,7 +59,7 @@ class AbstractCard:
             center.append(column_dict["center2"])
         self.top_areas["center"] = center
         # Populate self.bot_areas
-        column_dict, bot_warnings = parser.parse(self.bot_text, class_color=self.class_color, additional_aliases=self.raw_user_aliases)
+        column_dict, bot_warnings = parser.parse(self.bot_text, class_color=self.class_color, additional_aliases=raw_user_aliases)
         self.bot_areas = {"topleft" : column_dict["topleft"],
                           "bottomright" : column_dict["bottomright"],
                         }

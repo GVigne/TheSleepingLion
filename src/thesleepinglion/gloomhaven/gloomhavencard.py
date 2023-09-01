@@ -19,9 +19,8 @@ class GloomhavenCard(AbstractCard):
                 ID: str,
                 top_text: str,
                 bot_text: str,
-                class_color: dict,
-                raw_user_aliases: str = ""):
-        super().__init__(path_to_gml, name, level, initiative, ID, top_text, bot_text, class_color, raw_user_aliases)
+                class_color: dict):
+        super().__init__(path_to_gml, name, level, initiative, ID, top_text, bot_text, class_color)
         self.top_areas = {"topleft": GHTopmostColumnItem([], None, self.path_to_gml),
                           "bottomright": GHTopmostColumnItem([], None, self.path_to_gml),
                           "center": []}
@@ -29,9 +28,9 @@ class GloomhavenCard(AbstractCard):
                           "bottomright": GHTopmostColumnItem([], None, self.path_to_gml),
                           "center": []}
 
-    def parse_gml(self):
+    def parse_gml(self, raw_user_aliases: str =""):
         parser = GloomhavenParser(self.path_to_gml)
-        return super().parse_gml(parser)
+        return super().parse_gml(parser, raw_user_aliases)
 
     def draw(self, cr : cairo.Context):
         """

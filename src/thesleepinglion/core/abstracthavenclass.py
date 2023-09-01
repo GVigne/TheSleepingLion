@@ -132,7 +132,7 @@ class AbstractHavenClass:
         all_warnings = {}
         for card in self.cards:
             try:
-                warnings = card.parse_gml()
+                warnings = card.parse_gml(self.raw_aliases)
                 if len(warnings) > 0:
                     all_warnings[card.name] = warnings
             except Exception as e:
@@ -160,7 +160,7 @@ class AbstractHavenClass:
         Create and return a new blank card (ie it only has a valid name).
         """
         card_name = self.valid_rename("Card 1", None)
-        card = self.card_type(self.path_to_gml, card_name, "", "", "", "", "", self.color, raw_aliases= self.raw_aliases)
+        card = self.card_type(self.path_to_gml, card_name, "", "", "", "", "", self.color)
         self.cards.append(card)
         return card
 
@@ -235,8 +235,6 @@ class AbstractHavenClass:
         Internally, this means propagating the new aliases to the cards.
         """
         self.raw_aliases = new_aliases
-        for card in self.cards:
-            card.raw_aliases = new_aliases
 
     # Internals
     def cards_from_gml(self):
@@ -269,5 +267,5 @@ class AbstractHavenClass:
                 if bot_text is None:
                     bot_text = ""
                 self.cards.append(self.card_type(self.path_to_gml, card_name, level, initiative,
-                                       card_id, top_text, bot_text, self.color, raw_user_aliases = self.raw_aliases))
+                                       card_id, top_text, bot_text, self.color))
 
