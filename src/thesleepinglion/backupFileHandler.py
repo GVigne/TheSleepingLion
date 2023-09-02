@@ -1,8 +1,9 @@
 from gi.repository import GObject
 from pathlib import Path
 from os.path import relpath
-from .gloomhaven.gloomhavenclass import GloomhavenClass
+from .core.abstracthavenclass import AbstractHavenClass
 from .core.hexagonal_grid import HexagonDict
+from .createHavenFromFile import create_haven_class_from_file
 
 class BackupFileHandler(GObject.Object):
     """
@@ -179,7 +180,7 @@ class GMLFileHandler(BackupFileHandler):
 
         super().automatic_save()
 
-    def save(self, custom_character: GloomhavenClass):
+    def save(self, custom_character: AbstractHavenClass):
         """
         A true save, ie the user wants to write on the .gml file (not the backup .gml~ file).
         """
@@ -196,9 +197,9 @@ class GMLFileHandler(BackupFileHandler):
         path_to_gml = Path(new_path)
         if load_backup:
             path_to_gml = Path(new_path).with_suffix(".gml~")
-        gloomhaven_class = GloomhavenClass.CreateFromFile(path_to_gml) # May raise an error, so that the next line isn't executed
+        custom_character = create_haven_class_from_file(path_to_gml) # May raise an error, so that the next line isn't executed
         super().open_new_file(new_path, load_backup, read_only, in_temporary_dir)
-        return gloomhaven_class
+        return custom_character
 
 class AoEFileHandler(BackupFileHandler):
     """

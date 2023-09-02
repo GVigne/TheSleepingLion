@@ -1,31 +1,30 @@
 import gi
 gi.require_version('Gtk', '3.0')
-gi.require_version('PangoCairo', '1.0')
+from gi.repository import Gtk, Gdk, GObject, GdkPixbuf
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import subprocess
 import sys
 import os
-from gi.repository import Gtk, Gdk, GObject, GdkPixbuf, PangoCairo
 
+from ..core.utils import get_gui_asset, get_doc_asset, show_parsing_errors, show_warning_errors, get_gui_images
+from ..core.abstracthavenclass import AbstractHavenClass
+from ..core.errors import InvalidGMLFile, CardNameAlreadyExists
+from ..gloomhaven.gloomhaven_constants import card_height, card_width
+from ..backupFileHandler import GMLFileHandler
 from .character_tab import CharacterTab
 from .card_tab import CardTab
 from .dialog_exportPDF import ExportDialogPDF
 from .dialog_exportPNG import ExportDialogPNG
 from .aoe_creator import AoECreator
-from ..core.utils import get_gui_asset, get_doc_asset, show_parsing_errors, show_warning_errors, get_gui_images
 from .gui_utils import freeze_event, unfreeze_event, gtk_error_message, order_card_tabs_by_id, order_card_tabs_by_level, order_card_tabs_by_initiative
-from ..gloomhaven.gloomhaven_constants import card_height, card_width
-from ..gloomhaven.gloomhavenclass import GloomhavenClass
-from ..backupFileHandler import GMLFileHandler, AoEFileHandler
-from ..core.errors import InvalidGMLFile, CardNameAlreadyExists
 
 class MainWindow(GObject.Object):
     @GObject.Signal
     def custom_character_changed(self):
         pass
 
-    def __init__(self, custom_character: GloomhavenClass, backup_handler: GMLFileHandler, version):
+    def __init__(self, custom_character: AbstractHavenClass, backup_handler: GMLFileHandler, version):
         """
         The Sleeping Lion's main window.
         """

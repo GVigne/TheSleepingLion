@@ -1,15 +1,12 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GObject, Gdk
-from pathlib import Path
-from yaml import safe_dump
 
 from .abstract_tab import AbstractTab
-from ..gloomhaven.gloomhaven_constants import card_width, card_height
-from ..gloomhaven.gloomhavenclass import GloomhavenClass
-from .gui_utils import freeze_event, unfreeze_event
+from ..core.abstracthavenclass import AbstractHavenClass
 from ..backupFileHandler import BackupFileHandler
 from .card_tab import get_text_from_view
+from .gui_utils import freeze_event, unfreeze_event
 
 class CharacterTab(AbstractTab, GObject.Object):
     @GObject.Signal
@@ -41,7 +38,7 @@ class CharacterTab(AbstractTab, GObject.Object):
         self.class_name.set_position(-1)
         self.set_iteration_order([self.class_name, self.aliases_box])
 
-    def update_custom_character(self, custom_character: GloomhavenClass, backup: BackupFileHandler):
+    def update_custom_character(self, custom_character: AbstractHavenClass, backup: BackupFileHandler):
         """
         Modify the given Gloomhaven class based on the information contained in this tab.
         Return True if at least one field in the tab is different from the information in the GloomhavenClass
@@ -73,7 +70,7 @@ class CharacterTab(AbstractTab, GObject.Object):
 
         return was_modified
 
-    def load_custom_character(self, custom_character: GloomhavenClass, backup: BackupFileHandler):
+    def load_custom_character(self, custom_character: AbstractHavenClass, backup: BackupFileHandler):
         """
         Modify the tab to reflect the given Gloomhaven class.
         """

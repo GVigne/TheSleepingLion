@@ -1,15 +1,15 @@
 import gi
 gi.require_version('Gtk', '3.0')
-
-from ..core.hexagonal_grid import HexagonalGrid, HexagonDict
-from ..core.utils import get_gui_asset
-from .gui_utils import gtk_error_message
-from ..core.errors import InvalidAoEFile
-from ..backupFileHandler import AoEFileHandler
 from gi.repository import Gtk, Gdk, GObject
 from pathlib import Path
 from tempfile import mkdtemp
 from shutil import rmtree
+
+from ..core.hexagonal_grid import HexagonalGrid, HexagonDict
+from ..core.utils import get_gui_asset
+from ..core.errors import InvalidAoEFile
+from ..backupFileHandler import AoEFileHandler
+from .gui_utils import gtk_error_message
 
 class AoECreator(GObject.Object):
     @GObject.Signal

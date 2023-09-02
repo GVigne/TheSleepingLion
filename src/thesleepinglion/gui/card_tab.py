@@ -1,15 +1,14 @@
 import gi
-
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GObject, Gdk
 from pathlib import Path
 import yaml as yaml
 
-from .abstract_tab import AbstractTab
-from ..gloomhaven.gloomhavencard import Card
-from ..gloomhaven.gloomhavenclass import GloomhavenClass
+from ..core.abstractcard import AbstractCard
+from ..core.abstracthavenclass import AbstractHavenClass
 from ..core.errors import CardNameAlreadyExists
 from ..backupFileHandler import BackupFileHandler
+from .abstract_tab import AbstractTab
 
 def get_text_from_view(view: Gtk.TextView):
     """
@@ -22,8 +21,8 @@ def get_text_from_view(view: Gtk.TextView):
 
 class CardTab(AbstractTab):
 
-    def __init__(self, path_to_glade, card: Card):
-        self.card = card # Pointer towards a card from a GloomhavenClass
+    def __init__(self, path_to_glade, card: AbstractCard):
+        self.card = card # Pointer towards a card from a HavenClass
 
         builder = Gtk.Builder()
         builder.add_from_file(path_to_glade)
@@ -42,7 +41,7 @@ class CardTab(AbstractTab):
         self.card_name.set_position(-1)
         self.set_iteration_order([self.card_name, self.level, self.initiative, self.top_action, self.bottom_action, self.card_ID])
 
-    def update_custom_character(self, custom_character: GloomhavenClass, backup: BackupFileHandler):
+    def update_custom_character(self, custom_character: AbstractHavenClass, backup: BackupFileHandler):
         """
         Modify the given self.card based on the information contained in this tab. Return True is a field was indeed
         modified and False if nothing is changed (this tab and associated card are synchronized).
@@ -88,7 +87,7 @@ class CardTab(AbstractTab):
         self.top_action.get_buffer().set_text(self.card.top_text)
         self.bottom_action.get_buffer().set_text(self.card.bot_text)
 
-    def delete(self, custom_character: GloomhavenClass):
+    def delete(self, custom_character: AbstractHavenClass):
         """
         Delete the card.
         """

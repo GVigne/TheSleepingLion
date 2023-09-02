@@ -2,15 +2,15 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-from ..gloomhaven.gloomhavenclass import GloomhavenClass
+from ..core.abstracthavenclass import AbstractHavenClass
 from ..core.utils import get_gui_asset
 
 class SelectCardsForExportWidget:
     """
     A wrapper around a widget allowing to select one or multiple cards in checkboxes to export.
     """
-    def __init__(self, gloomhavenclass: GloomhavenClass):
-        self.gloomhavenclass = gloomhavenclass
+    def __init__(self, havenclass: AbstractHavenClass):
+        self.havenclass = havenclass
 
         builder = Gtk.Builder()
         builder.add_from_file(get_gui_asset("select_cards_widget.glade"))
@@ -22,7 +22,7 @@ class SelectCardsForExportWidget:
 
         # By default, select every card for export
         self.select_all_cards.set_active(True)
-        for card in self.gloomhavenclass.cards:
+        for card in self.havenclass.cards:
             check_button = Gtk.CheckButton(card.name)
             check_button.set_active(True)
             check_button.connect("toggled", self.check_toggle_main_chbox)
@@ -58,7 +58,7 @@ class SelectCardsForExportWidget:
         for checkbutton in self.card_box.get_children():
             if checkbutton.get_active():
                 active.append(checkbutton.get_label())
-        return [card for card in self.gloomhavenclass.cards if card.name in active]
+        return [card for card in self.havenclass.cards if card.name in active]
 
     def has_cards_to_save(self):
         """

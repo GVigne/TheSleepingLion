@@ -1,16 +1,16 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk
 import cairo
 from pathlib import Path
 
-from ..gloomhaven.gloomhavenclass import GloomhavenClass
+from ..core.abstracthavenclass import AbstractHavenClass
 from ..core.utils import get_gui_asset
 from ..gloomhaven.gloomhaven_constants import card_height, card_width
 from .select_cards_widget import SelectCardsForExportWidget
 
 class ExportDialogPNG:
-    def __init__(self, gloomhavenclass: GloomhavenClass):
+    def __init__(self, gloomhavenclass: AbstractHavenClass):
         self.gloomhavenclass = gloomhavenclass
 
         builder = Gtk.Builder()

@@ -75,7 +75,7 @@ class AbstractHavenClass:
         """
         with open(self.path_to_gml, 'a') as file:
             file.write(f"format: {format_id}")
-            file.write("\n")
+            file.write("\n\n")
 
     def check_class_errors(self):
         """
@@ -242,7 +242,7 @@ class AbstractHavenClass:
         Populate self.cards with the correct instances of AbstractCard objects. This function doesn't do any parsing.
         """
         for i, (card_name, instructions) in enumerate(self.python_gml.items()):
-            if card_name !="class" and card_name !="aliases":
+            if card_name != "format" and card_name !="class" and card_name !="aliases":
                 if instructions is None:
                     # If the user only gives the card name, there is no reason for the parser to fail.
                     # For compatibility, treat the instructions as if they are empty.

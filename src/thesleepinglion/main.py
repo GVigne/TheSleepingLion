@@ -1,35 +1,30 @@
 import cairo
 import gi
 gi.require_version('Gtk', '3.0')
-
 from gi.repository import Gtk
-
-from .gloomhaven.gloomhaven_constants import card_width, card_height
-from .gloomhaven.gloomhaven_items import *
-from .gloomhaven.gloomhaven_commands import *
-from .core.utils import show_parsing_errors, show_warning_errors
-from .gloomhaven.gloomhavenclass import GloomhavenClass
-from .createHavenFromFile import create_haven_class_from_file
-# from .gui.main_window import MainWindow
-# from .backupFileHandler import GMLFileHandler
-# from tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory
 from pathlib import Path
 import sys
 import pkg_resources
 
+from .gloomhaven.gloomhaven_constants import card_width, card_height
+from .core.utils import show_parsing_errors, show_warning_errors
+from .createHavenFromFile import create_haven_class_from_file
+from .gui.main_window import MainWindow
+from .backupFileHandler import GMLFileHandler
 
 def thesleepinglion_main():
     version = pkg_resources.require("thesleepinglion")[0].version
     if len(sys.argv) == 1:
-        # # The default use for The Sleeping Lion. Fire up the GUI.
-        # with TemporaryDirectory() as tmpdir:
-        #     tmpfile = Path(tmpdir) / "Untitled.gml"# A temporary file which will be deleted when the user quits TSL
-        #     tmpfile.with_suffix(".gml").touch() # Create the temporary file.
-        #     tempclass = GloomhavenClass(tmpfile)
-        #     saved_file = GMLFileHandler(tmpfile)
-        #     mainwindow = MainWindow(tempclass, saved_file, version)
-        #     mainwindow.window.show_all()
-        #     Gtk.main()
+        # The default use for The Sleeping Lion. Fire up the GUI.
+        with TemporaryDirectory() as tmpdir:
+            tmpfile = Path(tmpdir) / "Untitled.gml"# A temporary file which will be deleted when the user quits TSL
+            tmpfile.with_suffix(".gml").touch() # Create the temporary file.
+            tempclass = create_haven_class_from_file(tmpfile)
+            saved_file = GMLFileHandler(tmpfile)
+            mainwindow = MainWindow(tempclass, saved_file, version)
+            mainwindow.window.show_all()
+            Gtk.main()
         pass
     else:
         print(f"You are using version {version} of The Sleeping Lion.")
