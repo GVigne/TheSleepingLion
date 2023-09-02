@@ -11,14 +11,14 @@ class AbstractGMLLineContext:
     def __init__(self,
                 font: str,
                 font_size: int,
-                is_small_context: bool,
+                is_indented_context: bool,
                 bold: bool,
                 text_color: dict,
                 class_color: dict,
                 haven_type: Haven):
         self.font = font
         self.font_size = font_size
-        self.is_small_context = is_small_context
+        self.is_indented_context = is_indented_context
         self.bold = bold
         # The following must be dictionnaries holding the keys "red", "green" and "blue", with an int between 0 and 255
         self.text_color = text_color
