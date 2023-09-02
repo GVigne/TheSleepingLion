@@ -59,20 +59,21 @@ class GloomhavenClass(AbstractHavenClass):
         attack = ImageCommand(["attack.svg"], GloomhavenLineContext(font_size = 1.05*small_font_size))
         move = ImageCommand(["move.svg"], GloomhavenLineContext(font_size = 1.05*small_font_size))
         two = TextItem(["2"], GloomhavenLineContext(font=title_font, font_size = small_font_size))
+        blank = TextItem([" "], GloomhavenLineContext(font_size = small_font_size))
 
         # We need to aline manually the glyphs as they do not have the base font size.
         cr.save()
-        cr.translate(0.134* card_width, 0.485*card_height)
+        cr.translate(0.134*card_width + blank.get_width(), 0.485*card_height)
         cr.move_to(0,0)
         attack.draw(cr)
-        cr.translate(attack.get_width(), - 0.15*attack.get_height())
+        cr.translate(attack.get_width() + blank.get_width(), - 0.15*attack.get_height())
         two.draw(cr)
         cr.restore()
         # Same as above
         cr.save()
-        cr.translate(0.134* card_width, 0.545*card_height)
+        cr.translate(0.134*card_width + blank.get_width(), 0.545*card_height)
         move.draw(cr)
-        cr.translate(move.get_width(), - 0.15*move.get_height())
+        cr.translate(move.get_width() + blank.get_width(), - 0.15*move.get_height())
         two.draw(cr)
         cr.restore() # Go back to the top of the page.
 
