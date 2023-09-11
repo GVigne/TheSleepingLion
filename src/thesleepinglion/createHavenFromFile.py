@@ -4,6 +4,7 @@ from yaml import safe_load
 
 from .core.errors import InvalidGMLFile
 from .gloomhaven.gloomhavenclass import GloomhavenClass
+from .frosthaven.frosthavenclass import FrosthavenClass
 
 def create_haven_class_from_file(path_to_gml: Path):
     """
@@ -19,3 +20,7 @@ def create_haven_class_from_file(path_to_gml: Path):
 
     if format == "gloomhaven":
         return GloomhavenClass(path_to_gml)
+    elif format == "frosthaven":
+        return FrosthavenClass(path_to_gml)
+    else:
+        raise InvalidGMLFile

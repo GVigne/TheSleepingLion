@@ -19,6 +19,8 @@ eggs/
 src/thesleepinglion/docs/Doc_generation/Aliases_images/
 src/thesleepinglion/docs/Doc_generation/Commands_images/
 src/thesleepinglion/docs/Doc_generation/Macros_images/
+src/thesleepinglion/background_assets/frosthaven/
+src/thesleepinglion/assets/frosthaven/
 
 # Ignore packaging files
 packaging/ResourceHacker.exe

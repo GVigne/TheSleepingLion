@@ -7,6 +7,8 @@ from pathlib import Path
 if sys.platform == "linux":
     manimpango.register_font(resource_filename("thesleepinglion.assets.gloomhaven.fonts", "majallab.ttf"))
     manimpango.register_font(resource_filename("thesleepinglion.assets.gloomhaven.fonts", "PirataOne-Regular.ttf"))
+    manimpango.register_font(resource_filename("thesleepinglion.assets.frosthaven.fonts", "GermaniaOne-Regular.ttf"))
+    manimpango.register_font(resource_filename("thesleepinglion.assets.frosthaven.fonts", "MarkaziText-Regular.ttf"))
 else:
     # manimpango seems to fail for Windows 11 (works for Windows 10 though).
     # Call the Windows API directly.
@@ -18,6 +20,8 @@ else:
 
     add_font(resource_filename("thesleepinglion.assets.gloomhaven.fonts", "majallab.ttf"))
     add_font(resource_filename("thesleepinglion.assets.gloomhaven.fonts", "PirataOne-Regular.ttf"))
+    add_font(resource_filename("thesleepinglion.assets.frosthaven.fonts", "GermaniaOne-Regular.ttf"))
+    add_font(resource_filename("thesleepinglion.assets.frosthaven.fonts", "MarkaziText-Regular.ttf"))
 
 # Allow end-users to import a GloomhavenClass. This is required for the automatic documentation generation.
 from .gloomhaven.gloomhavenclass import GloomhavenClass

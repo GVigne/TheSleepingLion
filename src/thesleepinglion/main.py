@@ -8,6 +8,8 @@ import sys
 import pkg_resources
 
 from .gloomhaven.gloomhaven_constants import card_width, card_height
+from .frosthaven.frosthaven_constants import fh_card_width, fh_card_height
+from .frosthaven.frosthavenclass import FrosthavenClass
 from .core.utils import show_parsing_errors, show_warning_errors
 from .createHavenFromFile import create_haven_class_from_file
 from .gui.main_window import MainWindow
@@ -43,8 +45,10 @@ def thesleepinglion_main():
             if len(parsing_warnings) > 0:
                 print("Warning: the following non-blocking errors occurred when parsing the GML file.")
                 print(show_warning_errors(parsing_warnings))
-
-            surface = cairo.PDFSurface(path_to_pdf, card_width, card_height)
+            width, height = card_width, card_height
+            if isinstance(haven_class, FrosthavenClass):
+                width, heigh = fh_card_width, fh_card_height
+            surface = cairo.PDFSurface(path_to_pdf, width, heigh)
             cr = cairo.Context(surface)
             for card in haven_class.cards:
                 cr.save()
