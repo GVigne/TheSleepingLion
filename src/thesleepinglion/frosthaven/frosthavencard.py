@@ -36,8 +36,6 @@ class FrosthavenCard(AbstractCard):
         # Name
         name_col = TextItem([self.name], FrosthavenLineContext(font = fh_title_font, font_size = fh_title_font_size))
         cr.save()
-        cr.translate(fh_card_width/2 - name_col.get_width()/2, 0) # Center the middle of the line to the middle of the card
-        cr.translate(0, 0.08*fh_card_height - name_col.get_height()/2) # Center the name at y = 0.08*card_height
         cr.move_to(0,0)
         name_col.draw(cr)
         # Go back to the original position

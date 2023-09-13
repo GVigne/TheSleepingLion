@@ -10,7 +10,7 @@ from .frosthaven_items import FHTopmostColumnItem
 from .frosthavenlinecontext import FrosthavenLineContext
 from .frosthaven_constants import *
 from .frosthaven_commands import SecondaryActionBox, MandatoryBox, AbilityLine
-from .frosthaven_macros import MandatoryMacro
+from .frosthaven_macros import MandatoryMacro, BaseSizeMacro, MediumSizeMacro, BigSizeMacro
 
 
 class FrosthavenParser(AbstractParser):
@@ -27,7 +27,10 @@ class FrosthavenParser(AbstractParser):
                        "@topleft": TopLeftMacro,
                        "@bottomright": BottomRightMacro,
                        "@column2": Column2Macro,
-                       "@mandatory": MandatoryMacro}
+                       "@mandatory": MandatoryMacro,
+                       "@small": BaseSizeMacro,
+                       "@medium": MediumSizeMacro,
+                       "@big": BigSizeMacro}
 
     def parse(self,
               action: str,
@@ -65,7 +68,8 @@ class FrosthavenParser(AbstractParser):
                                 secondary_lines: list[str],
                                 class_color: dict = {"red": 0, "green": 0, "blue": 0}):
         """
-        Parse the primary line, then parse all secondary lines using a whitish background.
+        Parse the primary line, then parse all secondary lines using a whitish background. By default, secondary
+        lines are parsed using the medium font.
         Inputs should be raw gml text which hasn't been splitted into lexemes yet.
         Returns a list of LineItems, which should be displayed on the card, or None is both primary_line
         and secondary_lines are empty.
@@ -99,14 +103,14 @@ class FrosthavenParser(AbstractParser):
             if is_mandatory:
                 secondary_lines_width -= MandatoryBox.TotalAddedWith()
             secondary_items.append(self.gml_line_to_items(lexemes,
-                                                          FrosthavenLineContext(class_color=class_color),
+                                                          FrosthavenLineContext(font_size=fh_medium_font_size, class_color=class_color),
                                                           width = secondary_lines_width))
 
         # Flatten the secondary LineItems
         secondary_action = None
         if len(secondary_items) > 0:
             secondary_items = [e for lines in secondary_items for e in lines]
-            secondary_action = SecondaryActionBox([ColumnItem(secondary_items, FrosthavenLineContext())], FrosthavenLineContext())
+            secondary_action = SecondaryActionBox([ColumnItem(secondary_items, None)], FrosthavenLineContext())
 
         blank = TextItem(" ", FrosthavenLineContext())
         result = None
@@ -120,7 +124,7 @@ class FrosthavenParser(AbstractParser):
                 result = [LineItem([secondary_action])]
         # Now add a mandatory box if needed
         if is_mandatory:
-            result = [LineItem([MandatoryBox([ColumnItem(result)],FrosthavenLineContext(class_color=class_color))])]
+            result = [LineItem([MandatoryBox([ColumnItem(result)], FrosthavenLineContext(class_color=class_color))])]
         return result
 
     def is_mandatory_action(self, line: list[str]):
