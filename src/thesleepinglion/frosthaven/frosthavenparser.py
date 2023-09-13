@@ -9,7 +9,8 @@ from .frosthaven_aliases import fh_base_aliases
 from .frosthaven_items import FHTopmostColumnItem
 from .frosthavenlinecontext import FrosthavenLineContext
 from .frosthaven_constants import *
-from .frosthaven_commands import SecondaryActionBox
+from .frosthaven_commands import SecondaryActionBox, MandatoryBox, AbilityLine
+from .frosthaven_macros import MandatoryMacro
 
 
 class FrosthavenParser(AbstractParser):
@@ -18,13 +19,15 @@ class FrosthavenParser(AbstractParser):
         self.lexer = HavenLexer(fh_base_aliases)
         self.command_tokens = {"\\image": ImageCommand,
                         "\\aoe": AoECommand,
+                        "\\ability_line": AbilityLine
                     }
 
         self.macro_tokens = {"@end": EndMacro,
                        "@endlast": EndLastMacro,
                        "@topleft": TopLeftMacro,
                        "@bottomright": BottomRightMacro,
-                       "@column2": Column2Macro}
+                       "@column2": Column2Macro,
+                       "@mandatory": MandatoryMacro}
 
     def parse(self,
               action: str,
@@ -32,24 +35,25 @@ class FrosthavenParser(AbstractParser):
               additional_aliases: str = ""):
         splitted_lines = self.lexer.separate_lines(action, additional_aliases = additional_aliases)
 
+        # Parse all the lines as combinations of a primary action and secondary actions (which are indented in the GML file)
         central_column_items = []
         primary_line = ""
         secondary_lines = []
-        for i, (text, had_tabulation) in enumerate(splitted_lines):
+        for text, had_tabulation in splitted_lines:
             if not had_tabulation:
                 # This is a primary line, or we reached the end of instructions: create the associated items
                 item = self.create_and_order_items(primary_line, secondary_lines, class_color)
                 if item is not None:
-                    central_column_items.append(item)
+                    central_column_items += item
                 primary_line = text
                 secondary_lines = []
             else:
                 # Secondary line - wait until there is a primary line for it to be parsed.
                 secondary_lines.append(text)
-        if len(secondary_lines) > 0:
+        if len(primary_line) > 0 or len(secondary_lines) > 0:
             item = self.create_and_order_items(primary_line, secondary_lines, class_color)
             if item is not None:
-                central_column_items.append(item)
+                central_column_items += item
 
         first_column = FHTopmostColumnItem(central_column_items, self.path_to_gml)
 
@@ -63,35 +67,79 @@ class FrosthavenParser(AbstractParser):
         """
         Parse the primary line, then parse all secondary lines using a whitish background.
         Inputs should be raw gml text which hasn't been splitted into lexemes yet.
+        Returns a list of LineItems, which should be displayed on the card, or None is both primary_line
+        and secondary_lines are empty.
         """
-        primary_lexemes = self.lexer.input(primary_line)
+        if len(primary_line)==0 and len(secondary_lines) == 0:
+            return None
+
         primary_action = None
+        is_mandatory = False
         if len(primary_line) > 0:
-            primary_action = self.gml_line_to_items(primary_lexemes, FrosthavenLineContext(class_color=class_color))
-            # Warning: primary_action is a list of LineItem
+            lexemes = self.lexer.input(primary_line)
+            # Check if a mandatory box should be drawn, and if it is the case, reduce the allowed width for items parsing
+            is_mandatory = self.is_mandatory_action(lexemes)
+            primary_line_width = card_drawing_width
+            if is_mandatory:
+                primary_line_width -= MandatoryBox.TotalAddedWith()
+            primary_action = self.gml_line_to_items(lexemes,
+                                                    FrosthavenLineContext(class_color=class_color),
+                                                    width = primary_line_width)
+        # Note that primary_action is a list of LineItem. The first ones will be placed on the card, and
+        # the secondary actions will be aligned with the last one.
+        secondary_lines_width = card_drawing_width - 2*SecondaryActionBox.BoxAdditionalWidth()
+        if primary_action is not None:
+            secondary_lines_width -= primary_action[-1].get_width()
 
         secondary_items = []
         for line in secondary_lines:
-            line_lexemes = self.lexer.input(line)
-            secondary_items.append(self.gml_line_to_items(line_lexemes, FrosthavenLineContext(class_color=class_color)))
+            lexemes = self.lexer.input(line)
+            # Same as above: reduce the allowed width if there is a mandatory box
+            is_mandatory = is_mandatory or self.is_mandatory_action(lexemes)
+            if is_mandatory:
+                secondary_lines_width -= MandatoryBox.TotalAddedWith()
+            secondary_items.append(self.gml_line_to_items(lexemes,
+                                                          FrosthavenLineContext(class_color=class_color),
+                                                          width = secondary_lines_width))
+
         # Flatten the secondary LineItems
+        secondary_action = None
         if len(secondary_items) > 0:
             secondary_items = [e for lines in secondary_items for e in lines]
             secondary_action = SecondaryActionBox([ColumnItem(secondary_items, FrosthavenLineContext())], FrosthavenLineContext())
 
-        all_actions = []
+        blank = TextItem(" ", FrosthavenLineContext())
+        result = None
         if primary_action is not None:
-            all_actions.append(primary_action[0])
-        if len(secondary_items) > 0:
-            all_actions.append(secondary_action)
-        all_actions = list_join(all_actions, TextItem(" ", FrosthavenLineContext()))
-        return LineItem(all_actions, FrosthavenLineContext())
+            result = primary_action
+            if secondary_action is not None:
+                # The default case. Add all secondary lines next to the last primary line
+                result[-1] = LineItem([result[-1], blank, secondary_action])
+        else:
+            if secondary_action is not None:
+                result = [LineItem([secondary_action])]
+        # Now add a mandatory box if needed
+        if is_mandatory:
+            result = [LineItem([MandatoryBox([ColumnItem(result)],FrosthavenLineContext(class_color=class_color))])]
+        return result
+
+    def is_mandatory_action(self, line: list[str]):
+        """
+        Similar to self.find_line_position, search the given line of lexemes and return True if it contains
+        the macro "@mandatory"
+        """
+        for lexeme in line:
+            if self.is_macro(lexeme):
+                macro = self.create_macro(lexeme)
+                if isinstance(macro, MandatoryMacro):
+                    return True
+        return False
 
     def gml_line_to_items(self,
                           gml_line : str | list[str],
                           gml_context: FrosthavenLineContext,
                           ongoing_line : list[AbstractItem] = None,
-                          width : int = fh_card_width*0.78,
+                          width : int = card_drawing_width,
                           ongoing_x: int = 0,
                           ongoing_blank: TextItem | None = None,
                           ):

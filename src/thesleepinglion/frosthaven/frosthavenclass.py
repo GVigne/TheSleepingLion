@@ -1,8 +1,8 @@
 from pathlib import Path
 import cairo
 import gi
-gi.require_version('Gdk', '3.255')
-gi.require_version('GdkPixbuf', '2.255')
+gi.require_version('Gdk', '3.0')
+gi.require_version('GdkPixbuf', '2.0')
 from gi.repository import Gdk, GdkPixbuf
 
 from ..core.abstracthavenclass import AbstractHavenClass

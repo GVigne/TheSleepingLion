@@ -16,7 +16,7 @@ def change_pixbuff_color(asset_name: str, red: int, green: int, blue: int) -> Gd
     red, green and blue are RGB color code on a 0-255 scale
 
     Note that all assets are assumed to be of size fh_card_width*fh_card_height and should be transparent
-    in the areas where the color shade shouldn't be added. Unlike gloomhaven, there is no mask here - or we can
+    in the areas where the color shade shouldn't be added. Unlike gloomhaven, there is no mask here - we can
     consider that the mask is a white rectangle of size gh_card_width*fh_card_height.
     """
     # Convert background to Lch space

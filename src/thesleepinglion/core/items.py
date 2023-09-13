@@ -98,7 +98,7 @@ class LineItem(AbstractItem):
     This class is meant for the developper, not the end-user.
     """
     def __init__(self, arguments: list[AbstractItem],
-                    gml_context: AbstractGMLLineContext,
+                    gml_context: AbstractGMLLineContext | None = None,
                     path_to_gml: Path | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         self.items = arguments # list of AbstractItems
@@ -143,7 +143,7 @@ class ColumnItem(AbstractItem):
     This class is meant for the developper, not the end-user.
     """
     def __init__(self, arguments: list[AbstractItem],
-                    gml_context: AbstractGMLLineContext,
+                    gml_context: AbstractGMLLineContext | None = None,
                     path_to_gml: Path | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         self.items = arguments # list of AbstractItems
