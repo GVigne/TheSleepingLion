@@ -4,7 +4,7 @@ import cairo
 
 from .errors import InvalidGMLFile
 from .abstractcard import AbstractCard
-from .utils import check_aliases_integrity
+from .utils import check_aliases_integrity, color_string_to_dict
 from .items import ImageCommand
 
 class AbstractHavenClass:
@@ -12,7 +12,8 @@ class AbstractHavenClass:
     An abstract class to represent a character. The main entry point to interact with and parse a GML file.
     Child classes shouldn't be instantiated directly: instead, use the create_haven_class_from_file function in
     ..createHavenFromFile.py which creates the appropriate instance based the GML file's header.
-    Child classes must overload the create_card_layout and save_header methods, and should overload check_class_errors.
+    Child classes must overload the create_card_layout and save_header methods, and should overload check_class_errors
+    and save_additional_class_attributes.
     """
     def __init__(self, path_to_gml : Path, card_type: type):
         self.path_to_gml = path_to_gml
@@ -41,14 +42,11 @@ class AbstractHavenClass:
         self.name = self.python_gml["class"].get("name", "")
         self.path_to_icon = self.python_gml["class"].get("path_to_icon", "")
 
-        color = self.python_gml["class"].get("color", "")
-        try:
-           red, green, blue = color.split(",")
-           red, green, blue = int(red), int(green), int(blue)
-        except Exception as e:
-            # Something went wrong, couldn't extract three colors from GML
-            red, green, blue = 0,0,0
-        self.color["red"], self.color["green"], self.color["blue"] = red, green, blue
+        color = color_string_to_dict(self.python_gml["class"].get("color", ""))
+        if color is None: # failed to extract color
+            self.color["red"], self.color["green"], self.color["blue"] = 0,0,0
+        else:
+            self.color = color
 
         try:
             self.raw_aliases = self.python_gml["aliases"].strip()
@@ -77,6 +75,14 @@ class AbstractHavenClass:
             file.write(f"format: {format_id}")
             file.write("\n\n")
 
+    def save_additional_class_attributes(self):
+        """
+        Internal function called when serialising a class. Child classes may overload this function to save in the GML
+        file specific class attributes.
+        Return a dictionnary with keys being strings (the attributes' names) and values being int or strings
+        """
+        return {}
+
     def check_class_errors(self):
         """
         Check for errors in what the user defined at a class level. Return errors and warnings as lists of
@@ -103,6 +109,9 @@ class AbstractHavenClass:
         if self.path_to_icon is not None and len(self.path_to_icon) > 0:
             # path_to_icon is not empty, it is a path to some image (valid or not)
             class_description["class"]["path_to_icon"] = self.path_to_icon
+        # Add specific class attributes
+        class_description["class"] = class_description["class"] | self.save_additional_class_attributes()
+
         with open(self.path_to_gml, 'a') as file:
             # Save the aliases: this is done similarly as in card.save
             tabulation_character = "  "

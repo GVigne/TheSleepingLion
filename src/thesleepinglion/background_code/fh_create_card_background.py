@@ -4,6 +4,7 @@ gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk, GdkPixbuf
 import cairo
 import numpy as np
+import time
 
 from .card_background_utils import pixbuf_to_array, array_to_pixbuf, rgb_to_lch, lch_to_rgb
 from ..core.utils import get_background_asset
@@ -46,35 +47,18 @@ def change_pixbuff_color(asset_name: str, red: int, green: int, blue: int) -> Gd
 
     return array_to_pixbuf(final_image)
 
-def fh_draw_card_background(cr : cairo.Context,
-                            background_color: dict,
+def fh_generate_card_background(background_color: dict,
                             title_border_color: dict,
                             stone_borders_color: dict,
                             side_runes_color: dict = {"red": 255, "green": 255, "blue": 255}) -> None:
     """
-    Draw the Frosthaven background on the given cairo context
+    Return a list of Pixbuffs which make up a card's bacground. They should be displayed in the order they are in the list.
     """
     card_background = change_pixbuff_color("card_background.png", background_color["red"], background_color["green"], background_color["blue"])
-    Gdk.cairo_set_source_pixbuf(cr, card_background.scale_simple(fh_card_width, fh_card_height, GdkPixbuf.InterpType.NEAREST),0,0)
-    cr.paint()
-
     center_runes = change_pixbuff_color("central_runes.png", stone_borders_color["red"], stone_borders_color["green"], stone_borders_color["blue"])
-    Gdk.cairo_set_source_pixbuf(cr, center_runes.scale_simple(fh_card_width, fh_card_height, GdkPixbuf.InterpType.NEAREST),0,0)
-    cr.paint()
-
     stone_borders = change_pixbuff_color("card_stone_borders.png", 255, 255, 255)
-    Gdk.cairo_set_source_pixbuf(cr, stone_borders.scale_simple(fh_card_width, fh_card_height, GdkPixbuf.InterpType.NEAREST),0,0)
-    cr.paint()
-
     title_border = change_pixbuff_color("title_stone_border.png", title_border_color["red"], title_border_color["green"], title_border_color["blue"])
-    Gdk.cairo_set_source_pixbuf(cr, title_border.scale_simple(fh_card_width, fh_card_height, GdkPixbuf.InterpType.NEAREST),0,0)
-    cr.paint()
-
     side_borders = change_pixbuff_color("side_stone_border.png", stone_borders_color["red"], stone_borders_color["green"], stone_borders_color["blue"])
-    Gdk.cairo_set_source_pixbuf(cr, side_borders.scale_simple(fh_card_width, fh_card_height, GdkPixbuf.InterpType.NEAREST),0,0)
-    cr.paint()
-
     side_runes = change_pixbuff_color("side_runes.png", side_runes_color["red"], side_runes_color["green"], side_runes_color["blue"])
-    Gdk.cairo_set_source_pixbuf(cr, side_runes.scale_simple(fh_card_width, fh_card_height, GdkPixbuf.InterpType.NEAREST),0,0)
-    cr.paint()
+    return [card_background, center_runes, stone_borders, title_border, side_borders, side_runes]
 

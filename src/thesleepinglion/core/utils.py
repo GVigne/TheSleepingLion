@@ -239,6 +239,18 @@ def list_join(input: list, pattern):
             res.append(pattern)
     return res
 
+def color_string_to_dict(color):
+    """
+    Converts the given string representing a color into a dictionnary. If the string isn't in the correct format,
+    return None
+    """
+    try:
+        red, green, blue = color.split(",")
+        return {"red": int(red), "green": int(green), "blue": int(blue)}
+    except Exception as e:
+        # Something went wrong, couldn't extract three colors from the given string
+        return None
+
 def alias_text_to_alias_list(raw_aliases: str):
     """
     Conversion from raw alias text to a splitted list of aliases.
