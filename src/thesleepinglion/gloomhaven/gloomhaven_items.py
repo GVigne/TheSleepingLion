@@ -3,8 +3,12 @@ from thesleepinglion.core.items import AbstractItem
 import cairo
 from pathlib import Path
 
-from ..core.items import AbstractItem, LineItem, ColumnItem
+from ..core.items import AbstractItem, AbstractImageItem, LineItem, ColumnItem
 from .gloomhavenlinecontext import GloomhavenLineContext
+
+class GloomhavenImage(AbstractImageItem):
+    def get_default_height(self, gml_context: GloomhavenLineContext):
+        return 1.4 * gml_context.font_size
 
 class GloomhavenLineItem(LineItem):
     """

@@ -1,23 +1,24 @@
 from pathlib import Path
 from ..core.abstractparser import AbstractParser
 from ..core.havenlexer import HavenLexer
-from ..core.items import  AbstractItem, ImageCommand, AoECommand, TextItem, LineItem, ColumnItem
+
+from ..core.items import  AbstractItem, AoECommand, TextItem, LineItem, ColumnItem
 from ..core.macros import AbstractMacro, EndMacro, EndLastMacro, TopLeftMacro, BottomRightMacro, Column2Macro
 from ..core.utils import list_join
 
 from .frosthaven_aliases import fh_base_aliases
-from .frosthaven_items import FHTopmostColumnItem
+from .frosthaven_items import FrosthavenImage, FHTopmostColumnItem
 from .frosthavenlinecontext import FrosthavenLineContext
 from .frosthaven_constants import *
 from .frosthaven_commands import SecondaryActionBox, MandatoryBox, AbilityLine
-from .frosthaven_macros import MandatoryMacro, BaseSizeMacro, MediumSizeMacro, BigSizeMacro
+from .frosthaven_macros import MandatoryMacro, BaseSizeMacro, BigSizeMacro
 
 
 class FrosthavenParser(AbstractParser):
     def __init__(self, path_to_gml: Path):
         super().__init__(path_to_gml)
         self.lexer = HavenLexer(fh_base_aliases)
-        self.command_tokens = {"\\image": ImageCommand,
+        self.command_tokens = {"\\image": FrosthavenImage,
                         "\\aoe": AoECommand,
                         "\\ability_line": AbilityLine
                     }
@@ -29,7 +30,6 @@ class FrosthavenParser(AbstractParser):
                        "@column2": Column2Macro,
                        "@mandatory": MandatoryMacro,
                        "@small": BaseSizeMacro,
-                       "@medium": MediumSizeMacro,
                        "@big": BigSizeMacro}
 
     def parse(self,
@@ -103,14 +103,14 @@ class FrosthavenParser(AbstractParser):
             if is_mandatory:
                 secondary_lines_width -= MandatoryBox.TotalAddedWith()
             secondary_items.append(self.gml_line_to_items(lexemes,
-                                                          FrosthavenLineContext(font_size=fh_medium_font_size, class_color=class_color),
+                                                          FrosthavenLineContext(image_size=fh_medium_image_size, class_color=class_color),
                                                           width = secondary_lines_width))
 
         # Flatten the secondary LineItems
         secondary_action = None
         if len(secondary_items) > 0:
             secondary_items = [e for lines in secondary_items for e in lines]
-            secondary_action = SecondaryActionBox([ColumnItem(secondary_items, None)], FrosthavenLineContext())
+            secondary_action = SecondaryActionBox([ColumnItem(secondary_items)], FrosthavenLineContext())
 
         blank = TextItem(" ", FrosthavenLineContext())
         result = None
@@ -226,5 +226,5 @@ class FrosthavenParser(AbstractParser):
         # Now, we convert all lines into LineItems with blank inbetween every element
         result = []
         for line in lines:
-            result.append(LineItem(list_join(line, blank), gml_context, self.path_to_gml))
+            result.append(LineItem(line, gml_context, self.path_to_gml))
         return result

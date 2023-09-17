@@ -10,8 +10,8 @@ from ..core.haven_type import Haven
 from ..core.abstracthavenclass import AbstractHavenClass
 from ..core.svg_wrapper import SVGImage
 from ..core.utils import get_background_asset
-from ..core.items import ImageCommand, TextItem
-from .gloomhaven_items import GloomhavenLineItem
+from ..core.items import TextItem
+from .gloomhaven_items import GloomhavenImage, GloomhavenLineItem
 from .gloomhavencard import GloomhavenCard
 from .gloomhavenlinecontext import GloomhavenLineContext
 from .gloomhaven_constants import *
@@ -46,7 +46,7 @@ class GloomhavenClass(AbstractHavenClass):
         Gdk.cairo_set_source_pixbuf(cr, self.card_background.scale_simple(card_width, card_height, GdkPixbuf.InterpType.NEAREST),0,0)
         cr.paint()
 
-        # The height corresponds to 0.8*1.4*base_font_size. Note that 1.4 scaling comes from the ImageCommand.
+        # The height corresponds to 0.8*1.4*base_font_size. Note that 1.4 scaling comes from the GloomhavenImage.
         crown = SVGImage(get_background_asset("crown.svg", Haven.GLOOMHAVEN), height = 1.12*base_font_size, new_color = self.color)
         cr.save()
         cr.translate(card_width/2 - crown.get_width() /2, 0.105*card_height)
@@ -56,8 +56,8 @@ class GloomhavenClass(AbstractHavenClass):
         cr.restore()
 
         # Even on real cards, the attack and move image is a bit bigger than their small font counterpart.
-        attack = ImageCommand(["attack.svg"], GloomhavenLineContext(font_size = 1.05*small_font_size))
-        move = ImageCommand(["move.svg"], GloomhavenLineContext(font_size = 1.05*small_font_size))
+        attack = GloomhavenImage(["attack.svg"], GloomhavenLineContext(font_size = 1.05*small_font_size))
+        move = GloomhavenImage(["move.svg"], GloomhavenLineContext(font_size = 1.05*small_font_size))
         two = TextItem(["2"], GloomhavenLineContext(font=title_font, font_size = small_font_size))
         blank = TextItem([" "], GloomhavenLineContext(font_size = small_font_size))
 
@@ -79,7 +79,7 @@ class GloomhavenClass(AbstractHavenClass):
 
         if len(self.path_to_icon) > 0:
             # The user gave a class icon
-            icon = ImageCommand([self.path_to_icon],
+            icon = GloomhavenImage([self.path_to_icon],
                                 GloomhavenLineContext(font_size =0.8*title_font_size),
                                 path_to_gml=self.path_to_gml)
             icon_line = GloomhavenLineItem([icon])
@@ -99,7 +99,7 @@ class GloomhavenClass(AbstractHavenClass):
         """
         class_errors, class_warnings = super().check_class_errors()
         if len(self.path_to_icon) >0:
-            icon_image = ImageCommand([self.path_to_icon], GloomhavenLineContext(), path_to_gml=self.path_to_gml)
+            icon_image = GloomhavenImage([self.path_to_icon], GloomhavenLineContext(), path_to_gml=self.path_to_gml)
             class_warnings += icon_image.warnings
         return class_errors, class_warnings
 

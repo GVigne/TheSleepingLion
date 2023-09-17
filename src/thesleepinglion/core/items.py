@@ -207,9 +207,11 @@ class AbstractTopmostColumnItem(ColumnItem):
 # An image is drawn with a size of 1.4 times the font size. Out of an image of height 110 (font size 100 on Inkscape):
 #   - the text baseline (bottom of letter A) is located at 31.3 from the bottom (73.7 from top)
 #   - the top of A is at 78.3 from the bottom (21.7 from top)
-class ImageCommand(AbstractItem):
+class AbstractImageItem(AbstractItem):
     """
-    Represents an image rendered on a card.
+    Abstract class to represent an image rendered on a card.
+    Child classes MUST overload the get_default_height function, which gives the height to font height ratio of
+    the image.
     This is the most widespread way to show an image. For more precise handling of the image (for example, changing
     the color of a SVG file), use the SVGImage class directly.
     """
@@ -230,8 +232,8 @@ class ImageCommand(AbstractItem):
         user_scaling = 1
         if len(arguments) == 2:
             user_scaling = float(arguments[1])
-        default_height = 1.4 * gml_context.font_size  * user_scaling # Height to font height ratio.
 
+        default_height = self.get_default_height(gml_context) * user_scaling # Height to font height ratio.
         # Load SVG as vector graphic, other files as pixbuf
         if Path(image_path).suffix == ".svg":
             try:
@@ -245,6 +247,12 @@ class ImageCommand(AbstractItem):
             except Exception:
                 self.image = SVGImage(get_image(self.path_to_gml, "not_found.svg", Haven.COMMON), default_height)
                 self.warnings.append(f"The file {image_path} isn't a readable image (.svg or .png).")
+
+    def get_default_height(self, gml_context: AbstractGMLLineContext):
+        """
+        Return the default height to font height ratio. This method must be overloaded by child classes.
+        """
+        pass
 
     def get_width(self):
         return self.image.get_width()

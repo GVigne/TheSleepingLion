@@ -6,11 +6,11 @@ import cairo
 from pathlib import Path
 
 from ..core.haven_type import Haven
-from ..core.items import AbstractItem, ImageCommand, TextItem
+from ..core.items import AbstractItem, TextItem
 from ..core.errors import EmptyArgument, MismatchNoArguments
 from ..core.svg_wrapper import SVGImage
 from ..core.utils import get_image, list_join
-from .gloomhaven_items import GloomhavenColumnItem, GloomhavenLineItem
+from .gloomhaven_items import GloomhavenImage, GloomhavenColumnItem, GloomhavenLineItem
 from .gloomhaven_constants import *
 from .gloomhavenlinecontext import GloomhavenLineContext
 
@@ -52,7 +52,7 @@ class EnhancementDotCommand(AbstractItem):
     """
     A class to represent the default enhancement in Gloomhaven (a dot). This dot always has a fixed size, no matter
     the environment it is in (summon, big or small text)... Hence, this command is just a wrapper around the
-    ImageCommand.
+    GloomhavenImage.
     """
     def __init__(self, arguments: list[str],
                 gml_context: GloomhavenLineContext,
@@ -60,7 +60,7 @@ class EnhancementDotCommand(AbstractItem):
         super().__init__(arguments, gml_context, path_to_gml)
         if len(arguments) != 0:
             raise MismatchNoArguments(f"The '\\dot' command takes no arguments but {len(arguments)} were given.")
-        self.image = ImageCommand(["enhancement_dot.svg"], GloomhavenLineContext(font_size = base_font_size), path_to_gml=path_to_gml)
+        self.image = GloomhavenImage(["enhancement_dot.svg"], GloomhavenLineContext(font_size = base_font_size), path_to_gml=path_to_gml)
 
     def get_width(self):
         return self.image.get_width()
@@ -138,7 +138,7 @@ class ExpCommand(AbstractItem):
 
         # Allow the exp image to be hacked so that it's color may be changed.
         context = GloomhavenLineContext(font_size=1.2*gml_context.font_size)
-        exp_image = ImageCommand(["experience.svg"], context,
+        exp_image = GloomhavenImage(["experience.svg"], context,
                                 path_to_gml=self.path_to_gml)
 
         font_size_factor = 1
@@ -152,7 +152,7 @@ class ExpCommand(AbstractItem):
         # Hackish way to use the InsideCommand, by bypassing the parsing.
         self.exp_item = InsideCommand([exp_image, self.exp_value], gml_context, path_to_gml=self.path_to_gml)
 
-    def new_image(self, image: ImageCommand|SVGImage):
+    def new_image(self, image: GloomhavenImage|SVGImage):
         """
         Hack to allow to replace the image by another one.
         Since it's a hack, we can replace the GML context by None: it won't be used by the InsideCommand as we
@@ -253,8 +253,8 @@ class ChargesCommand(AbstractItem):
             raise MismatchNoArguments("The '\\charges' and '\\charges_non_loss' commands take up to 6 arguments "
             f"but {len(arguments)} were given.")
 
-        # Bypass ImageCommand as we do not want always want to put a blank space before and after those images.
-        # The 1.4 scaling comes from ImageCommand
+        # Bypass GloomhavenImage as we do not want always want to put a blank space before and after those images.
+        # The 1.4 scaling comes from GloomhavenImage
         self.infinity = SVGImage(get_image(self.path_to_gml,"infinity.svg", Haven.GLOOMHAVEN), height = 1.4*base_font_size)
         self.loss_image = None
         if has_loss:
@@ -384,7 +384,7 @@ class SummonCommand(AbstractItem):
         # 0.78*card_width => fits exactly the width of the card (from one colored border to the other)
         self.image =  GdkPixbuf.Pixbuf.new_from_file_at_scale(image_path, 0.78*card_width, -1, True)
 
-        # Note: for those svgs, the 1.4 comes from the ImageCommand. We build them here so we don't have to
+        # Note: for those svgs, the 1.4 comes from the GloomhavenImage. We build them here so we don't have to
         # rebuild them every time we draw.
         colon = TextItem([": "], GloomhavenLineContext(font_size=small_font_size))
         hp_image =[SVGImage(get_image(self.path_to_gml, "heal.svg", Haven.GLOOMHAVEN), 1.4*base_font_size), colon]

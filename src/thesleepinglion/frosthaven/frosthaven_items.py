@@ -1,5 +1,10 @@
-from ..core.items import LineItem, ColumnItem
+from ..core.items import AbstractImageItem, LineItem, ColumnItem
 from .frosthavenlinecontext import FrosthavenLineContext
+from .frosthaven_constants import *
+
+class FrosthavenImage(AbstractImageItem):
+    def get_default_height(self, gml_context: FrosthavenLineContext):
+        return gml_context.image_size
 
 class FHTopmostLineItem(LineItem):
     """

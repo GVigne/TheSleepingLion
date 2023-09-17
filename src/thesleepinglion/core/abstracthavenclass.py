@@ -5,7 +5,6 @@ import cairo
 from .errors import InvalidGMLFile
 from .abstractcard import AbstractCard
 from .utils import check_aliases_integrity, color_string_to_dict
-from .items import ImageCommand
 
 class AbstractHavenClass:
     """

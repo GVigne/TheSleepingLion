@@ -3,10 +3,10 @@ from copy import deepcopy
 
 from ..core.abstractparser import AbstractParser
 from ..core.havenlexer import HavenLexer
-from ..core.items import AbstractItem, ImageCommand, AoECommand, TextItem
+from ..core.items import AbstractItem, AoECommand, TextItem
 from ..core.macros import AbstractMacro, EndMacro, EndLastMacro, TopLeftMacro, BottomRightMacro, Column2Macro
 from ..core.utils import list_join
-from .gloomhaven_items import GloomhavenColumnItem, GloomhavenLineItem, GHTopmostColumnItem, GHTopmostLineItem
+from .gloomhaven_items import GloomhavenImage, GloomhavenColumnItem, GloomhavenLineItem, GHTopmostColumnItem, GHTopmostLineItem
 from .gloomhaven_macros import TitleFontMacro, ColorMacro, SmallSizeMacro, BaseSizeMacro, BannerMacro
 from .gloomhavenlinecontext import GloomhavenLineContext
 from .gloomhaven_aliases import base_aliases
@@ -19,7 +19,7 @@ class GloomhavenParser(AbstractParser):
     def __init__(self, path_to_gml: Path):
         super().__init__(path_to_gml)
         self.lexer = HavenLexer(base_aliases)
-        self.command_tokens = {"\\image": ImageCommand,
+        self.command_tokens = {"\\image": GloomhavenImage,
                         "\\aoe": AoECommand,
                         "\\dot": EnhancementDotCommand,
                        "\\inside": InsideCommand,
