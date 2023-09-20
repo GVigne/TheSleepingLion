@@ -34,39 +34,69 @@ class FrosthavenCard(AbstractCard):
 
     def draw(self, cr: cairo.Context):
         # Name
-        name_col = TextItem([self.name], FrosthavenLineContext(font = fh_title_font, font_size = fh_title_font_size))
+        name_item = TextItem([self.name], FrosthavenLineContext(font = fh_title_font,
+                                                                font_size = fh_title_font_size,
+                                                                text_color = {"red": 0, "green": 0, "blue": 0}))
         cr.save()
+        cr.translate(0.5*fh_card_width - name_item.get_width()/2, 0.09*fh_card_height - name_item.get_height()/2)
         cr.move_to(0,0)
-        name_col.draw(cr)
-        # Go back to the original position
+        name_item.draw(cr)
         cr.restore()
 
         # Level
-        # TODO: should be in black
-        level_col = TextItem([self.level], FrosthavenLineContext(font = fh_title_font, font_size = 0.7*fh_title_font_size))
+        level_item = TextItem([self.level], FrosthavenLineContext(font = fh_level_font, font_size = fh_level_font_size,
+                                                                  text_color = {"red": 0, "green": 0, "blue": 0}))
         cr.save()
-        cr.translate(fh_card_width/2 - level_col.get_width()/2, 0) # Center the middle of the line to the middle of the card
-        cr.translate(0, 0.1325*fh_card_height - level_col.get_height()/2) # Center the level at y = 0.1325*card_height
+        cr.translate(0.117*fh_card_width - level_item.get_width()/2, 0.09*fh_card_height - level_item.get_height()/2)
         cr.move_to(0,0)
-        level_col.draw(cr)
-        # Go back to the original position
+        level_item.draw(cr)
         cr.restore()
 
         # Initiative
-        init_col = TextItem([self.initiative], FrosthavenLineContext(font = fh_title_font, font_size = 1.6*fh_title_font_size))
+        init_item = TextItem([self.initiative], FrosthavenLineContext(font = fh_init_font, font_size = fh_init_font_size))
         cr.save()
-        cr.translate(fh_card_width/2 - init_col.get_width()/2, 0) # Center the middle of the line to the middle of the card
-        cr.translate(0, 0.535*fh_card_height - init_col.get_height()/2) # Center the initiative at y = 0.535*card_height
+        cr.translate(0.5*fh_card_width - init_item.get_width()/2, 0.53*fh_card_height - init_item.get_height()/2)
         cr.move_to(0,0)
-        init_col.draw(cr)
-        # Go back to the original position
+        init_item.draw(cr)
         cr.restore()
 
+        # Card ID
+        ID_col = TextItem([self.card_ID], FrosthavenLineContext(font = fh_card_ID_font, font_size = fh_card_ID_font_size, bold = True))
+        cr.save()
+        cr.translate(0.15*fh_card_width - ID_col.get_width()/2, 0.93*fh_card_height - ID_col.get_height()/2) # Center the ID at y = 0.9*card_height
+        cr.move_to(0,0)
+        ID_col.draw(cr)
+        cr.restore()
+
+
+        card_drawing_height = 0.35*fh_card_height
         # Top action
-        if len(self.top_areas["center"]) > 0:
-            cr.save()
-            cr.translate(0.11*fh_card_width, 0.17*fh_card_height)
-            cr.translate(fh_card_width*0.78/2 - self.top_areas["center"][0].get_width()/2, 0)
+        cr.save()
+        cr.translate((fh_card_width - card_drawing_width)/2, 0.13*fh_card_height) # Card's top left corner
+        cr.move_to(0,0)
+        if len(self.top_areas["center"]) > 0: #TODO: add other columns
+            cr.translate((card_drawing_width - self.top_areas["center"][0].get_width())/2,
+                         (card_drawing_height - self.top_areas["center"][0].get_height())/2)
             cr.move_to(0,0)
             self.top_areas["center"][0].draw(cr)
-            cr.restore()
+        cr.restore()
+        # Bottomright
+        cr.save()
+        # Translate to the rightmost corner of the card
+        cr.translate((fh_card_width - card_drawing_width)/2 + card_drawing_width, 0.533*fh_card_height)
+        right_column = self.top_areas["bottomright"]
+        cr.translate(-right_column.get_width(), -right_column.get_height())
+        cr.move_to(0,0)
+        right_column.draw(cr)
+        cr.restore()
+
+        # Bottom action
+        cr.save()
+        cr.translate((fh_card_width - card_drawing_width)/2, 0.575*fh_card_height)
+        cr.move_to(0,0)
+        if len(self.bot_areas["center"]) > 0: #TODO: add other columns
+            cr.translate((card_drawing_width - self.bot_areas["center"][0].get_width())/2,
+                         (card_drawing_height - self.bot_areas["center"][0].get_height())/2)
+            cr.move_to(0,0)
+            self.bot_areas["center"][0].draw(cr)
+        cr.restore()

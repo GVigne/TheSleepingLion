@@ -7,9 +7,12 @@ from gi.repository import Gdk, GdkPixbuf
 
 from ..core.abstracthavenclass import AbstractHavenClass
 from ..core.utils import color_string_to_dict
+from ..core.items import LineItem, TextItem
 from ..background_code.fh_create_card_background import fh_generate_card_background
 from .frosthavencard import FrosthavenCard
 from .frosthaven_constants import *
+from .frosthaven_items import FrosthavenImage
+from .frosthavenlinecontext import FrosthavenLineContext
 
 class FrosthavenClass(AbstractHavenClass):
     def __init__(self, path_to_gml: Path):
@@ -49,3 +52,33 @@ class FrosthavenClass(AbstractHavenClass):
         for pixbuf in self.background_pixbufs:
             Gdk.cairo_set_source_pixbuf(cr, pixbuf.scale_simple(fh_card_width, fh_card_height, GdkPixbuf.InterpType.NEAREST),0,0)
             cr.paint()
+
+        # Add the basic attack two ability
+        blank = TextItem([" "], FrosthavenLineContext())
+        attack = FrosthavenImage(["attack.svg"], FrosthavenLineContext(image_size=0.875*fh_small_image_size))
+        two = TextItem(["2"], FrosthavenLineContext())
+        basic_attack = LineItem([attack, blank, two])
+        cr.save()
+        cr.translate(0.15*fh_card_width - basic_attack.get_width()/2, 0.515*fh_card_height - basic_attack.get_height()/2)
+        basic_attack.draw(cr)
+        cr.restore()
+        # Add the basic move two ability
+        move = FrosthavenImage(["move.svg"], FrosthavenLineContext(image_size=0.875*fh_small_image_size))
+        basic_move = LineItem([move, blank, two])
+        cr.save()
+        cr.translate(0.84*fh_card_width - basic_move.get_width()/2, 0.55*fh_card_height - basic_move.get_height()/2)
+        basic_move.draw(cr)
+        cr.restore()
+
+        # Class icon
+        if len(self.path_to_icon) > 0:
+            # The user gave a class icon
+            icon = FrosthavenImage([self.path_to_icon],
+                                FrosthavenLineContext(font_size =fh_medium_image_size),
+                                path_to_gml=self.path_to_gml)
+            cr.save()
+            cr.translate(0.89*fh_card_width - icon.get_width()/2, 0.08*fh_card_height - icon.get_height()/2)
+            cr.move_to(0,0)
+            icon.draw(cr)
+            # Go back to the original position
+            cr.restore()

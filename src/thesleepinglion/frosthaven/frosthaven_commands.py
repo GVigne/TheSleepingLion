@@ -6,7 +6,8 @@ from ..core.abstractGMLlinecontext import AbstractGMLLineContext
 from ..core.items import AbstractItem, TextItem
 from ..core.errors import MismatchNoArguments
 
-from ..frosthaven.frosthavenlinecontext import FrosthavenLineContext
+from .frosthavenlinecontext import FrosthavenLineContext
+from .frosthaven_constants import *
 
 class SecondaryActionBox(AbstractItem):
     """
@@ -106,7 +107,8 @@ class MandatoryBox(AbstractItem):
         self.line_width = 2
         self.item = arguments[0]
         self.box_color = gml_context.class_color
-        self.exclamation = TextItem(["!"], FrosthavenLineContext(text_color = self.box_color))
+        self.exclamation = TextItem(["!"], FrosthavenLineContext(text_color = self.box_color,
+                                                                 font_size=fh_big_font_size))
 
         # Store these as attributes so they aren't recomputed every time we use them
         self.total_added_width = MandatoryBox.TotalAddedWith()
