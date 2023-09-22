@@ -32,4 +32,8 @@ fh_base_aliases = [
 "\\bless = \\image{bless.svg}",
 "\\strengthen = \\image{strengthen.svg}",
 "\\invisible = \\image{invisible.svg}",
+"\\generate{$x$} = @mandatory @big \\image{$x$.svg} @endlast",
+"\\loss = @bottomright @mandatory @big \\image{loss.svg} @endlast",
+"\\persistent = @bottomright @mandatory @big \\image{persistent.svg} @endlast",
+"\\round_bonus = @bottomright @mandatory @big \\image{round_bonus.svg} @endlast",
 ]

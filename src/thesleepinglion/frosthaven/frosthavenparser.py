@@ -10,7 +10,7 @@ from .frosthaven_aliases import fh_base_aliases
 from .frosthaven_items import FrosthavenImage, FHTopmostColumnItem
 from .frosthavenlinecontext import FrosthavenLineContext
 from .frosthaven_constants import *
-from .frosthaven_commands import SecondaryActionBox, MandatoryBox, AbilityLine
+from .frosthaven_commands import SecondaryActionBox, MandatoryBox, BottomRightMandatoryBox, AbilityLine
 from .frosthaven_macros import MandatoryMacro, BaseSizeMacro, BigSizeMacro
 
 class FrosthavenParser(AbstractParser):
@@ -41,11 +41,16 @@ class FrosthavenParser(AbstractParser):
         all_items = {"topleft": [], "center": [], "center2": [], "bottomright": []}
         primary_line = ""
         secondary_lines = []
+        bottomright_is_mandatory = False
         for text, had_tabulation in splitted_lines:
             if not had_tabulation:
                 # This is a primary line, or we reached the end of instructions: create the associated items
-                item, pos = self.create_and_order_items(primary_line, secondary_lines, class_color)
+                item, pos, is_mandatory = self.create_and_order_items(primary_line, secondary_lines, class_color)
                 if item is not None:
+                    if is_mandatory and pos !="bottomright":
+                        item = [LineItem([MandatoryBox([ColumnItem(item)], FrosthavenLineContext(class_color=class_color))])]
+                    if pos == "bottomright":
+                        bottomright_is_mandatory = bottomright_is_mandatory or is_mandatory
                     all_items[pos] += item
                 primary_line = text
                 secondary_lines = []
@@ -53,15 +58,19 @@ class FrosthavenParser(AbstractParser):
                 # Secondary line - wait until there is a primary line for it to be parsed.
                 secondary_lines.append(text)
         if len(primary_line) > 0 or len(secondary_lines) > 0:
-            item, pos = self.create_and_order_items(primary_line, secondary_lines, class_color)
+            item, pos, is_mandatory = self.create_and_order_items(primary_line, secondary_lines, class_color)
             if item is not None:
+                if is_mandatory and pos !="bottomright":
+                    item = [LineItem([MandatoryBox([ColumnItem(item)], FrosthavenLineContext(class_color=class_color))])]
+                if pos == "bottomright":
+                    bottomright_is_mandatory = bottomright_is_mandatory or is_mandatory
                 all_items[pos] += item
         center_column = FHTopmostColumnItem(all_items["center"], self.path_to_gml)
 
         # Wrap the bottomright column in a mandatory box
         bottomright_items = all_items["bottomright"]
-        if len(bottomright_items) > 0:
-            bottomright_items = [MandatoryBox(bottomright_items, FrosthavenLineContext(class_color=class_color))]
+        if len(bottomright_items) and bottomright_is_mandatory> 0:
+            bottomright_items = [BottomRightMandatoryBox(bottomright_items, FrosthavenLineContext(class_color=class_color))]
         botright_column = FHTopmostColumnItem(bottomright_items, self.path_to_gml)
 
         other_column = FHTopmostColumnItem([], FrosthavenLineContext(), self.path_to_gml)
@@ -75,17 +84,20 @@ class FrosthavenParser(AbstractParser):
         Parse the primary line, then parse all secondary lines using a whitish background. By default, secondary
         lines are parsed using the medium font.
         Inputs should be raw gml text which hasn't been splitted into lexemes yet.
-        Returns a list of LineItems, which should be displayed on the card, or None is both primary_line
-        and secondary_lines are empty.
+        Returns
+        - a list of LineItems, which should be displayed on the card, or None is both primary_line
+        and secondary_lines are empty
+        - a string representing the position of the group of lines
+        - a boolean which is True if the line should be placed in a mandatory box
         """
         position = "center"
         primary_position = "center"
         secondary_positions = []
+        is_mandatory = False
         if len(primary_line)==0 and len(secondary_lines) == 0:
-            return None, position
+            return None, position, is_mandatory
 
         primary_action = None
-        is_mandatory = False
         if len(primary_line) > 0:
             lexemes = self.lexer.input(primary_line)
             primary_position = self.find_line_position(lexemes)
@@ -136,10 +148,7 @@ class FrosthavenParser(AbstractParser):
         else:
             if secondary_action is not None:
                 result = [LineItem([secondary_action])]
-        # Now add a mandatory box if needed
-        if is_mandatory:
-            result = [LineItem([MandatoryBox([ColumnItem(result)], FrosthavenLineContext(class_color=class_color))])]
-        return result, position
+        return result, position, is_mandatory
 
     def is_mandatory_action(self, line: list[str]):
         """
