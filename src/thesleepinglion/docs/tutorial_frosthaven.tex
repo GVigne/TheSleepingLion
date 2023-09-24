@@ -1,0 +1,85 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[english]{babel}
+\usepackage{spverbatim}
+\usepackage{fancyvrb}
+\usepackage{hyperref}
+
+\title{Introduction}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+
+Note to self: there should be someg global tutorial, then two separate sections whith an overview of the Frosthaven formatting, then Gloomhaven formatting.
+
+For now, this document tries to describe the Frosthaven syntax. It assumes that the reader knows of macros, aliases and commands.
+
+\section{Writing the top and bottom half of a card}
+There are mostly 3 things we must be able to write on a card to make a valid action:
+\begin{itemize}
+\item an ability, which consists in an image and a numerical value written using a large font size.
+\item added effects, which are represented on the same line as an ability, but using a smaller font size and in a whitish box.
+\item additional text to describe an ability, requirements, or conditional effects. 
+\end{itemize}
+
+(Put an image on the side illustrating this with Boneshaper's Decaying Will)
+
+By default, The Sleeping Lion uses the small font size. This means that whenever you need to use to large font size, you need to specify it using the macro \verb'@big'. 
+
+To distinguish added effects from text, The Sleeping Lion uses indentation: indented text will automatically to the side of the previous line and a white box will be placed around it.
+
+For example, Boneshaper's Decaying Will can be written as
+\begin{spverbatim}
+	@big \image{attack.svg} 1
+    		\image{range.svg} 5
+	Add +1 \image{attack.svg} if the target is adjacent to at least one of your summons.
+\end{spverbatim}
+Note how despite writing two separate lines, one for the attack and one for the added effect (range 5), both symbols shown side by side on the output image: this is due to the indentation added in front of the added effect.
+
+(Put an image of how this is parsed using TSL)
+
+It is tedious to always specify the \verb`@big` macro before every ability, and it is also tedious to specify the \verb`\image` command before every image, so a set of aliases have been specified.
+
+Common images can be displayed simply by typing their name preceded by a backslash, such as \verb`\attack`, \verb`\move` or \verb`\target`.
+
+Furthermore, adding a pair of brackets immediately after will display the text using the large font size, even if there is no text in the brackets. 
+
+Boneshaper's Decaying Will can be rewritten the following way:
+\begin{spverbatim}
+	\attack{1}
+    		\range 5
+	Add +1 \attack if the target is adjacent to at least one of your summons.
+\end{spverbatim}
+
+Some abilities consists in applying a status to a figure, such as the bottom of Boneshaper's Damned Horde. The same convention applies for statuses: simply type \verb`\curse{}` if you want the status to be displayed using the large font size, and \verb`\curse` if you want it to be shown using the smaller font size.
+
+This is how you would write the bottom of Damned Horde. Notice the pair of brackets on the line describing the ability, as a way to write it using the large font.
+\begin{spverbatim}
+	\curse{}
+		\target 2 \range 2
+\end{spverbatim}
+
+And this is how you would write the top of Bannerspear's Incendiary Throw. Notice the lack of brackets, as we simply wish to display the status using the default font, not the large one. 
+\begin{spverbatim}
+	\attack{1}
+		\range 3
+	If the target suffers \damage from the attack, the target and all enemies adjacent to it gain \wound.
+\end{spverbatim}
+
+(Put an image of how these are parsed in TSL)
+
+\section{TLDR}
+In short,
+\begin{itemize}
+\item When writing abilities (which should be displayed using the large font), use the dedicated aliases with a pair of curly brackets, even if those are empty. For example, use  \verb`\attack{3}`, \verb`\teleport{3}`, \verb`\wound{}` or \verb`\bless{}`
+\item Indent the line representing added effects so that it is added next to the ability and is displayed inside a white box.
+\item Simply type the rest of the text you wish to be displayed on a card. When adding images, use the aliases which do not have a pair of curly brackets: for example, write \verb`Add +1 \attack`, or \verb`Gain \wound`.
+\end{itemize}
+
+
+\end{document}
+
