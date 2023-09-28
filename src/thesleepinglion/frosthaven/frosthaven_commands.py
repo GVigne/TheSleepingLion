@@ -6,6 +6,7 @@ from ..core.abstractGMLlinecontext import AbstractGMLLineContext
 from ..core.items import AbstractItem, TextItem
 from ..core.errors import MismatchNoArguments
 
+from .frosthaven_items import ColumnItem
 from .frosthavenlinecontext import FrosthavenLineContext
 from .frosthaven_constants import *
 
@@ -19,7 +20,7 @@ class SecondaryActionBox(AbstractItem):
     def BoxAdditionalWidth():
         """
         SecondaryActionBox adds some space to the left and right of the action to draw the whitish background.
-        Return half the value of the total space added.
+        Return half the total value of the space added.
         """
         return 45
 
@@ -299,3 +300,152 @@ class AbilityLine(AbstractItem):
         cr.line_to(self.get_width(), 0)
         cr.stroke()
         cr.restore()
+
+class BaseConditionalBox(AbstractItem):
+    """
+    A class to define a box around a conditional ability. Like SecondaryActionBox, it places a whitish background
+    around the given item, as well as a dashed line at the edges of the box
+    """
+    def AdditionalWidth():
+        """
+        This class adds some space to the left and right of the action to draw the whitish background.
+        Return half the total value of the space added.
+        """
+        return 45
+
+    def AdditionalHeight():
+        """
+        The total additional height required to draw the whitish background, by default, 0
+        """
+        return 0
+
+    @staticmethod
+    def LineWidth():
+        """
+        The width of the line used to draw the conditional box
+        """
+        return 2
+
+    def __init__(self,
+                arguments: list[str],
+                gml_context: FrosthavenLineContext,
+                path_to_gml: Path | None = None):
+        super().__init__(arguments, gml_context, path_to_gml)
+        if len(arguments) !=1:
+            raise MismatchNoArguments(f"The command '\\conditional' takes one argument but {len(arguments)} were given.")
+        self.conditional_action = ColumnItem(FrosthavenParser(path_to_gml).gml_line_to_items(arguments[0], gml_context))
+        self.box_color = gml_context.class_color
+
+    def get_width(self):
+        return self.conditional_action.get_width() + 2*BaseConditionalBox.AdditionalWidth()
+
+    def get_height(self):
+        return self.conditional_action.get_height() + BaseConditionalBox.AdditionalHeight()
+
+    def draw(self, cr: cairo.Context):
+        # Draw the whitish background with a dotted line
+        cr.save()
+        cr.set_dash([5,5]) #TODO: this should be using the Class's color
+                        # TODO: better dash position so there isn't an ugly gap/the vertical line
+                        # added in ConditionalConsumeBox is correctly aligned with the dashes
+        cr.save()
+        # cr.move_to(BaseConditionalBox.AdditionalWidth(), 0)
+        cr.move_to(self.get_width()/2, 0)
+        cr.set_source_rgba(1,1,1,0.4)
+        cr.set_line_width(BaseConditionalBox.LineWidth())
+        cr.line_to(self.get_width() - BaseConditionalBox.AdditionalWidth(), 0)
+        # Rightmost arc
+        cr.save()
+        cr.translate(self.get_width() - BaseConditionalBox.AdditionalWidth(), self.conditional_action.get_height()/2)
+        cr.scale(BaseConditionalBox.AdditionalWidth(), self.conditional_action.get_height()/2)
+        cr.arc(0, 0, 1, -pi/2, pi/2)
+        cr.restore()
+        cr.line_to(BaseConditionalBox.AdditionalWidth(), self.conditional_action.get_height())
+        # Leftmost arc
+        cr.save()
+        cr.translate(BaseConditionalBox.AdditionalWidth(), self.conditional_action.get_height()/2)
+        cr.scale(BaseConditionalBox.AdditionalWidth(), self.conditional_action.get_height()/2)
+        cr.arc(0,0, 1, pi/2, -pi/2)
+        cr.restore()
+        # Close path and draw
+        cr.close_path()
+        cr.fill_preserve()
+        cr.set_source_rgba(1,1,1,1)
+        cr.stroke()
+        cr.restore()
+        # Draw the inner item
+        cr.save()
+        cr.translate(BaseConditionalBox.AdditionalWidth(), 0)
+        cr.move_to(0,0)
+        self.conditional_action.draw(cr)
+        cr.restore()
+
+        cr.restore()
+
+class ConditionalConsumeBox(BaseConditionalBox):
+    """
+    Very similar to BaseConditionalBox, only an extra line is added above the whitish background, similar
+    to an ability line. This is used for Consume Elements actions for example.
+    """
+    @staticmethod
+    def AdditionalHeight():
+        return 30
+
+    def __init__(self,
+                arguments: list[str],
+                gml_context: FrosthavenLineContext,
+                path_to_gml: Path | None = None):
+        if len(arguments) !=1:
+            raise MismatchNoArguments(f"The command '\\conditional_consumption' takes one argument but {len(arguments)} were given.")
+        super().__init__(arguments, gml_context, path_to_gml)
+
+    def get_height(self):
+        return self.conditional_action.get_height() + ConditionalConsumeBox.AdditionalHeight()
+
+    def draw(self, cr):
+        cr.save()
+        cr.translate(0, ConditionalConsumeBox.AdditionalHeight())
+        super().draw(cr)
+        line_width = 2
+        # Draw the vertical line
+        cr.save()
+        cr.move_to((self.get_width() - line_width)/2, 0)
+        cr.set_source_rgb(self.box_color["red"], self.box_color["green"], self.box_color["blue"])
+        cr.set_line_width(line_width)
+        cr.line_to((self.get_width() - line_width)/2, -ConditionalConsumeBox.AdditionalHeight() + line_width)
+        cr.stroke()
+        cr.restore()
+        # And the horizontal one. Once again, we need a gradient....
+        gradient_length = 41
+        total_line_length = 182
+        start_x = (self.get_width() - total_line_length)/2
+        line_y = -ConditionalConsumeBox.AdditionalHeight() + ConditionalConsumeBox.LineWidth()
+        # Fadeout to the left
+        cr.save()
+        cr.set_line_width(line_width)
+        cr.move_to(start_x, line_y)
+        gradient = cairo.LinearGradient(start_x, line_y, start_x + gradient_length, line_y)
+        gradient.add_color_stop_rgba(0,self.box_color["red"], self.box_color["green"], self.box_color["blue"], 0)
+        gradient.add_color_stop_rgba(1,self.box_color["red"], self.box_color["green"], self.box_color["blue"], 1)
+        cr.set_source(gradient)
+        cr.line_to(start_x + gradient_length, line_y)
+        cr.stroke()
+        # Full stroke
+        cr.set_source_rgb(self.box_color["red"], self.box_color["green"], self.box_color["blue"])
+        cr.move_to(start_x + gradient_length, line_y)
+        cr.line_to(start_x + total_line_length - gradient_length, line_y)
+        cr.stroke()
+        # Seconde fadeout
+        gradient = cairo.LinearGradient(start_x + total_line_length - gradient_length, line_y,
+                                        start_x + total_line_length, line_y)
+        gradient.add_color_stop_rgba(0,self.box_color["red"], self.box_color["green"], self.box_color["blue"], 1)
+        gradient.add_color_stop_rgba(1,self.box_color["red"], self.box_color["green"], self.box_color["blue"], 0)
+        cr.set_source(gradient)
+        cr.move_to(start_x + total_line_length - gradient_length, line_y)
+        cr.line_to(start_x + total_line_length, line_y)
+        cr.stroke()
+        cr.restore()
+
+        cr.restore()
+
+from .frosthavenparser import FrosthavenParser

@@ -10,7 +10,6 @@ from .frosthaven_aliases import fh_base_aliases
 from .frosthaven_items import FrosthavenImage, FHTopmostColumnItem
 from .frosthavenlinecontext import FrosthavenLineContext
 from .frosthaven_constants import *
-from .frosthaven_commands import SecondaryActionBox, MandatoryBox, BottomRightMandatoryBox, AbilityLine
 from .frosthaven_macros import MandatoryMacro, BaseSizeMacro, BigSizeMacro
 
 class FrosthavenParser(AbstractParser):
@@ -19,7 +18,9 @@ class FrosthavenParser(AbstractParser):
         self.lexer = HavenLexer(fh_base_aliases)
         self.command_tokens = {"\\image": FrosthavenImage,
                         "\\aoe": AoECommand,
-                        "\\ability_line": AbilityLine
+                        "\\ability_line": AbilityLine,
+                        "\\conditional": BaseConditionalBox,
+                        "\\conditional_consumption": ConditionalConsumeBox
                     }
 
         self.macro_tokens = {"@end": EndMacro,
@@ -251,3 +252,6 @@ class FrosthavenParser(AbstractParser):
         for line in lines:
             result.append(LineItem(line, gml_context, self.path_to_gml))
         return result
+
+from .frosthaven_commands import SecondaryActionBox, MandatoryBox, BottomRightMandatoryBox, AbilityLine, \
+                                BaseConditionalBox, ConditionalConsumeBox
