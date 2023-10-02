@@ -291,7 +291,7 @@ class AbilityLine(AbstractItem):
         cr.move_to(self.gradient_length, 0)
         cr.line_to(self.get_width() - self.gradient_length, 0)
         cr.stroke()
-        # Seconde fadeout
+        # Second fadeout
         gradient = cairo.LinearGradient(self.get_width() - self.gradient_length, 0, self.get_width(), 0)
         gradient.add_color_stop_rgba(0,self.line_color["red"], self.line_color["green"], self.line_color["blue"], 1)
         gradient.add_color_stop_rgba(1,self.line_color["red"], self.line_color["green"], self.line_color["blue"], 0)
@@ -342,15 +342,28 @@ class BaseConditionalBox(AbstractItem):
     def get_height(self):
         return self.conditional_action.get_height() + BaseConditionalBox.AdditionalHeight()
 
+    def get_perimeter(self):
+        """
+        Return the perimeter of the added box. As a reminder, the box is made up of two half ellipses and two
+        straight lines.
+        """
+        # Compute the ellipse's axis, then its perimeter
+        a,b = BaseConditionalBox.AdditionalWidth() - BaseConditionalBox.LineWidth(), self.get_height()/2 - BaseConditionalBox.LineWidth()
+        h = (a-b)**2 / (a+b)**2
+        ellipse_perimeter = pi *(a+b) *(1+3*h/(10+sqrt(4-3*h)))
+        return 2*self.conditional_action.get_width() + ellipse_perimeter
+
     def draw(self, cr: cairo.Context):
         # Draw the whitish background with a dotted line
         cr.save()
-        cr.set_dash([5,5]) #TODO: this should be using the Class's color
-                        # TODO: better dash position so there isn't an ugly gap/the vertical line
-                        # added in ConditionalConsumeBox is correctly aligned with the dashes
+
+        # We assumes dashes are of length ~5, with gaps of same length inbetween them.
+        perimeter = self.get_perimeter()
+        nb_dashes = perimeter // 10
+        space_to_add = (perimeter % 10) / nb_dashes / 2
+        cr.set_dash([5+space_to_add])
         cr.save()
-        # cr.move_to(BaseConditionalBox.AdditionalWidth(), 0)
-        cr.move_to(self.get_width()/2, 0)
+        cr.move_to(self.get_width()/2 - (5+space_to_add)/2, 0) # Center the first dash on (width/2, 0)
         cr.set_source_rgba(1,1,1,0.4)
         cr.set_line_width(BaseConditionalBox.LineWidth())
         cr.line_to(self.get_width() - BaseConditionalBox.AdditionalWidth(), 0)
@@ -370,7 +383,7 @@ class BaseConditionalBox(AbstractItem):
         # Close path and draw
         cr.close_path()
         cr.fill_preserve()
-        cr.set_source_rgba(1,1,1,1)
+        cr.set_source_rgba(self.box_color["red"],self.box_color["green"],self.box_color["blue"],1)
         cr.stroke()
         cr.restore()
         # Draw the inner item
@@ -409,10 +422,10 @@ class ConditionalConsumeBox(BaseConditionalBox):
         line_width = 2
         # Draw the vertical line
         cr.save()
-        cr.move_to((self.get_width() - line_width)/2, 0)
+        cr.move_to(self.get_width()/2, 0)
         cr.set_source_rgb(self.box_color["red"], self.box_color["green"], self.box_color["blue"])
         cr.set_line_width(line_width)
-        cr.line_to((self.get_width() - line_width)/2, -ConditionalConsumeBox.AdditionalHeight() + line_width)
+        cr.line_to(self.get_width()/2, -ConditionalConsumeBox.AdditionalHeight() + line_width)
         cr.stroke()
         cr.restore()
         # And the horizontal one. Once again, we need a gradient....
@@ -435,7 +448,7 @@ class ConditionalConsumeBox(BaseConditionalBox):
         cr.move_to(start_x + gradient_length, line_y)
         cr.line_to(start_x + total_line_length - gradient_length, line_y)
         cr.stroke()
-        # Seconde fadeout
+        # Second fadeout
         gradient = cairo.LinearGradient(start_x + total_line_length - gradient_length, line_y,
                                         start_x + total_line_length, line_y)
         gradient.add_color_stop_rgba(0,self.box_color["red"], self.box_color["green"], self.box_color["blue"], 1)
