@@ -6,7 +6,7 @@ from ..core.abstractGMLlinecontext import AbstractGMLLineContext
 from ..core.items import AbstractItem, TextItem
 from ..core.errors import MismatchNoArguments
 
-from .frosthaven_items import ColumnItem
+from .frosthaven_items import ColumnItem, FrosthavenImage
 from .frosthavenlinecontext import FrosthavenLineContext
 from .frosthaven_constants import *
 
@@ -460,5 +460,48 @@ class ConditionalConsumeBox(BaseConditionalBox):
         cr.restore()
 
         cr.restore()
+
+
+class FHExpCommand(AbstractItem):
+    """
+    In Frosthaven, experience is always written in white.
+    """
+    def __init__(self, arguments: list[str],
+                gml_context: FrosthavenLineContext,
+                path_to_gml: Path | None = None):
+        super().__init__(arguments, gml_context, path_to_gml)
+
+        if len(arguments) != 1:
+            raise MismatchNoArguments(f"The '\\exp' command takes only 1 argument but {len(arguments)} were given.")
+
+        height = gml_context.image_size
+        if gml_context.image_size == fh_big_image_size:
+            height = 0.9*fh_big_image_size
+
+        local_context = FrosthavenLineContext(font = fh_init_font,
+                                              font_size = 0.5*gml_context.font_size,
+                                              text_color={"red":0, "blue":0, "green":0},
+                                              image_size=height)
+        self.exp_image = FrosthavenImage(["experience.svg"], local_context, path_to_gml=path_to_gml)
+        self.exp_value = TextItem(arguments, local_context, path_to_gml)
+
+    """
+    For get_width and get_height, we assume that the text doesn't overflow out of the experience image.
+    """
+    def get_width(self):
+        return self.exp_image.get_width()
+
+    def get_height(self):
+        return self.exp_image.get_height()
+
+    def draw(self, cr):
+        cr.save()
+        self.exp_image.draw(cr)
+        cr.translate((self.get_width() - self.exp_value.get_width())/2,
+                     (self.get_height() - self.exp_value.get_height())/2,)
+        cr.move_to(0,0)
+        self.exp_value.draw(cr)
+        cr.restore()
+
 
 from .frosthavenparser import FrosthavenParser

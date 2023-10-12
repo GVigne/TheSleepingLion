@@ -20,7 +20,8 @@ class FrosthavenParser(AbstractParser):
                         "\\aoe": AoECommand,
                         "\\ability_line": AbilityLine,
                         "\\conditional": BaseConditionalBox,
-                        "\\conditional_consumption": ConditionalConsumeBox
+                        "\\conditional_consumption": ConditionalConsumeBox,
+                        "\\exp": FHExpCommand
                     }
 
         self.macro_tokens = {"@end": EndMacro,
@@ -254,4 +255,4 @@ class FrosthavenParser(AbstractParser):
         return result
 
 from .frosthaven_commands import SecondaryActionBox, MandatoryBox, BottomRightMandatoryBox, AbilityLine, \
-                                BaseConditionalBox, ConditionalConsumeBox
+                                BaseConditionalBox, ConditionalConsumeBox, FHExpCommand
