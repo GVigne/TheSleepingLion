@@ -3,8 +3,9 @@ import cairo
 from math import pi, sqrt
 
 from ..core.abstractGMLlinecontext import AbstractGMLLineContext
-from ..core.items import AbstractItem, TextItem
+from ..core.items import AbstractItem, TextItem, LineItem
 from ..core.errors import MismatchNoArguments
+from ..core.utils import list_join
 
 from .frosthaven_items import ColumnItem, FrosthavenImage
 from .frosthavenlinecontext import FrosthavenLineContext
@@ -496,12 +497,133 @@ class FHExpCommand(AbstractItem):
 
     def draw(self, cr):
         cr.save()
+        cr.move_to(0,0)
         self.exp_image.draw(cr)
         cr.translate((self.get_width() - self.exp_value.get_width())/2,
                      (self.get_height() - self.exp_value.get_height())/2,)
         cr.move_to(0,0)
         self.exp_value.draw(cr)
         cr.restore()
+
+class FHChargesCommand(AbstractItem):
+    def __init__(self, arguments: list[str],
+                 gml_context: FrosthavenLineContext,
+                 one_line: bool = False,
+                 path_to_gml: Path | None = None):
+        super().__init__(arguments, gml_context, path_to_gml)
+        self.one_line = one_line
+        if len(arguments) > 6 or len(arguments) == 0:
+            raise MismatchNoArguments(f"The '\\charges' command take up to 6 arguments but {len(arguments)} were given.")
+        # Manage exp values
+        try:
+            exp_nums = [str(int(e)) if len(e)>0 else None for e in arguments]
+        except:
+            raise MismatchNoArguments("Arguments for the '\\charges' command must be integers.")
+        exp_context = FrosthavenLineContext(image_size=1.28*fh_small_image_size, font_size=1.3*fh_base_font_size)
+        self.exp_values = [FHExpCommand([e], exp_context)
+                           if e is not None else None for e in exp_nums]
+        self.one_exp_width = FHExpCommand(["1"], exp_context).get_width()
+
+        first_line_images = []
+        snd_line_images = []
+        self.blank = TextItem(["  "], FrosthavenLineContext())
+        charge_contect = FrosthavenLineContext(image_size=1.6*fh_big_image_size)
+        n = len(arguments)
+        if n == 1:
+            first_line_images.append(FrosthavenImage(["start_end_charge.svg"], charge_contect))
+        else:
+            first_line_images.append(FrosthavenImage(["start_charge.svg"], charge_contect))
+            if n == 2:
+                first_line_images.append(FrosthavenImage(["end_charge.svg"], charge_contect))
+            else:
+                if one_line:
+                    first_line_images += [FrosthavenImage(["charge.svg"], charge_contect) for _ in range(n-2)]
+                    first_line_images.append(FrosthavenImage(["end_charge.svg"], charge_contect))
+                else:
+                    # The additional number of charges which should be added
+                    nb_charges_first, nb_charges_snd = (n+1)//2 -1, n - (n+1)//2 -1
+                    first_line_images += [FrosthavenImage(["charge.svg"], charge_contect) for _ in range(nb_charges_first)]
+                    snd_line_images += [FrosthavenImage(["charge.svg"], charge_contect) for _ in range(nb_charges_snd)]
+                    snd_line_images.append(FrosthavenImage(["end_charge.svg"], charge_contect))
+
+        self.n_first_line = len(first_line_images)
+        self.n_snd_line = len(snd_line_images)
+        self.first_line = LineItem(list_join(first_line_images, self.blank))
+        self.snd_line = LineItem(list_join(snd_line_images, self.blank))
+        # Constants
+        # X-translation required to "shift" the two lines so they don't overlap
+        self.x_translation = self.first_line.items[0].get_width()*2/3
+        # Additional space between the two lines so they don't overlap
+        self.y_translation = self.first_line.items[0].get_width()*0.17
+        # Additional space required to place the exp values
+        self.exp_added_width = 0
+        if len(self.arguments) != 4:
+            if self.exp_values[self.n_first_line-1] is not None:
+                self.exp_added_width = self.one_exp_width/2
+        else:
+            if self.exp_values[self.n_snd_line-1] is not None:
+                self.exp_added_width = self.one_exp_width/2
+        self.exp_added_height = 0
+        for e in self.exp_values[:self.n_first_line]:
+            if e is not None:
+                self.exp_added_height = self.one_exp_width/2
+
+    def get_width(self):
+        added_width = 0
+        if not self.one_line and (len(self.arguments) == 4 or len(self.arguments) == 6):
+            added_width = self.x_translation
+        return self.first_line.get_width() + added_width + self.exp_added_width
+
+    def get_height(self):
+        added_height = 0
+        if not self.one_line and len(self.arguments) > 3:
+            added_height = self.y_translation
+        return self.first_line.get_height()+self.snd_line.get_height() + added_height + self.exp_added_height
+
+    def draw(self, cr):
+        cr.save()
+        cr.translate(0, self.exp_added_height)
+        # Draw the first line ...
+        cr.save()
+        if not self.one_line and len(self.arguments)==6:
+            cr.translate(self.x_translation, 0)
+        cr.move_to(0,0)
+        self.first_line.draw(cr)
+        for i,exp in enumerate(self.exp_values[:self.n_first_line]):
+            if exp is not None:
+                cr.save()
+                cr.translate((i+1)*self.first_line.items[0].get_width() + i*self.blank.get_width() - self.one_exp_width/2,
+                             - self.one_exp_width/2)
+                cr.move_to(0,0)
+                exp.draw(cr)
+                cr.restore()
+        cr.restore()
+        # ... and the second one
+        cr.save()
+        cr.translate(0, self.first_line.get_height() + self.y_translation)
+        if not self.one_line and (len(self.arguments) in [3,4,5]):
+            cr.translate(self.x_translation, 0)
+        cr.move_to(0,0)
+        self.snd_line.draw(cr)
+        for i,exp in enumerate(self.exp_values[self.n_first_line:]):
+            if exp is not None:
+                cr.save()
+                cr.translate((i+1)*self.first_line.items[0].get_width() + i*self.blank.get_width() - self.one_exp_width/2,
+                              - self.one_exp_width/2)
+                cr.move_to(0,0)
+                exp.draw(cr)
+                cr.restore()
+        cr.restore()
+        cr.restore()
+
+
+class FHOneLineChargesCommand(FHChargesCommand):
+    def __init__(self, arguments: list[str],
+                 gml_context: FrosthavenLineContext,
+                 path_to_gml: Path | None = None):
+        if len(arguments) > 5 or len(arguments) == 0:
+            raise MismatchNoArguments(f"The '\\charges_line' commands takes up to 4 arguments but f{len(arguments)} were given")
+        super().__init__(arguments, gml_context, True, path_to_gml)
 
 
 from .frosthavenparser import FrosthavenParser
