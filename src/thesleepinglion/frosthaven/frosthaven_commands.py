@@ -519,7 +519,7 @@ class FHChargesCommand(AbstractItem):
             exp_nums = [str(int(e)) if len(e)>0 else None for e in arguments]
         except:
             raise MismatchNoArguments("Arguments for the '\\charges' command must be integers.")
-        exp_context = FrosthavenLineContext(image_size=1.28*fh_small_image_size, font_size=1.3*fh_base_font_size)
+        exp_context = FrosthavenLineContext(image_size=1.28*fh_tiny_image_size, font_size=1.3*fh_base_font_size)
         self.exp_values = [FHExpCommand([e], exp_context)
                            if e is not None else None for e in exp_nums]
         self.one_exp_width = FHExpCommand(["1"], exp_context).get_width()

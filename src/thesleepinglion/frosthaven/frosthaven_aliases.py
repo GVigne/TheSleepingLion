@@ -3,6 +3,8 @@ fh_base_aliases = [
 "\\attack = \\image{attack.svg}",
 "\\move{$x$} = @big \\image{move.svg} $x$ @endlast",
 "\\move = \\image{move.svg}",
+"\\teleport{$x$} = @big \\image{teleport.svg} $x$ @endlast",
+"\\teleport = \\image{teleport.svg}",
 "\\heal{$x$} = @big \\image{heal.svg} $x$ @endlast",
 "\\heal = \\image{heal.svg}",
 "\\shield{$x$} = @big \\image{shield.svg} $x$ @endlast",
@@ -18,6 +20,7 @@ fh_base_aliases = [
 "\\target = \\image{target.svg}",
 "\\range = \\image{range.svg}",
 "\\pierce = \\image{pierce.svg}",
+"\\damage = \\image{damage.svg}",
 
 "\\regenerate{$x$} = @big \\image{regenerate.svg} @endlast",
 "\\regenerate = \\image{regenerate.svg}",
@@ -47,6 +50,9 @@ fh_base_aliases = [
 "\\bane{$x$} = @big \\image{bane.svg} @endlast",
 "\\bane = \\image{bane.svg}",
 
+
+"\\generate{$x$}{$y$}{$z$} = @mandatory @big \\image{$x$.svg} \\image{$y$.svg} \\image{$z$.svg} @endlast",
+"\\generate{$x$}{$y$} = @mandatory @big \\image{$x$.svg} \\image{$y$.svg} @endlast",
 "\\generate{$x$} = @mandatory @big \\image{$x$.svg} @endlast",
 "\\loss = @bottomright @mandatory @big \\image{loss.svg} @endlast",
 "\\persistent = @bottomright @mandatory @big \\image{persistent.svg} @endlast",

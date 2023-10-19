@@ -2,11 +2,11 @@
 
 fh_card_font = "Markazi Text" # Default font for the card
 fh_big_font_size = 156*12/16 # In pixels
-fh_medium_font_size = 126*12/16 # In pixels
+fh_medium_font_size = 126*12/16 # In pixels, isn't used anywhere for now
 fh_base_font_size = 82*12/16 # In pixels
 fh_big_image_size = 114 # In pixels
-fh_medium_image_size = 77 # In pixels
-fh_small_image_size = 62 # In pixels
+fh_small_image_size = 77 # In pixels
+fh_tiny_image_size = 62 # In pixels
 
 fh_title_font = "Germania One" # Default font for the title
 fh_title_font_size = 92*12/16 # In pixels. Note that since this doesn't use the same font as the text, text using this size

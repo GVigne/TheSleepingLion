@@ -12,8 +12,8 @@ class FrosthavenLineContext(AbstractGMLLineContext):
                 image_size: int = fh_small_image_size):
         super().__init__(font, font_size, is_indented_context, bold, text_color, class_color, Haven.FROSTHAVEN)
         self.image_size = image_size
-        if self.is_indented_context: # If this is a secondary line (which uses a whitish background), use medium font for images
-            self.image_size = fh_medium_image_size
+        if self.is_indented_context: # If this is a secondary line (which uses a whitish background), use small font for images
+            self.image_size = fh_small_image_size
 
     def new_context_effects(self,
                             font_size: int = None,

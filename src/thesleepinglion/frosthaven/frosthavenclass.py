@@ -55,7 +55,7 @@ class FrosthavenClass(AbstractHavenClass):
 
         # Add the basic attack two ability
         blank = TextItem([" "], FrosthavenLineContext())
-        attack = FrosthavenImage(["attack.svg"], FrosthavenLineContext(image_size=0.875*fh_small_image_size))
+        attack = FrosthavenImage(["attack.svg"], FrosthavenLineContext(image_size=0.875*fh_tiny_image_size))
         two = TextItem(["2"], FrosthavenLineContext())
         basic_attack = LineItem([attack, blank, two])
         cr.save()
@@ -63,7 +63,7 @@ class FrosthavenClass(AbstractHavenClass):
         basic_attack.draw(cr)
         cr.restore()
         # Add the basic move two ability
-        move = FrosthavenImage(["move.svg"], FrosthavenLineContext(image_size=0.875*fh_small_image_size))
+        move = FrosthavenImage(["move.svg"], FrosthavenLineContext(image_size=0.875*fh_tiny_image_size))
         basic_move = LineItem([move, blank, two])
         cr.save()
         cr.translate(0.84*fh_card_width - basic_move.get_width()/2, 0.55*fh_card_height - basic_move.get_height()/2)
@@ -74,7 +74,7 @@ class FrosthavenClass(AbstractHavenClass):
         if len(self.path_to_icon) > 0:
             # The user gave a class icon
             icon = FrosthavenImage([self.path_to_icon],
-                                FrosthavenLineContext(font_size =fh_medium_image_size),
+                                FrosthavenLineContext(font_size =fh_small_image_size),
                                 path_to_gml=self.path_to_gml)
             cr.save()
             cr.translate(0.89*fh_card_width - icon.get_width()/2, 0.08*fh_card_height - icon.get_height()/2)

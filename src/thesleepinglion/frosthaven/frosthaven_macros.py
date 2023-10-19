@@ -1,3 +1,4 @@
+from thesleepinglion.core.abstractGMLlinecontext import AbstractGMLLineContext
 from ..core.errors import MismatchNoArguments
 from ..core.macros import AbstractMacro
 
@@ -29,3 +30,12 @@ class BigSizeMacro(AbstractMacro):
 
     def change_context(self, frosthavenContext: FrosthavenLineContext):
         frosthavenContext.new_context_effects(font_size = fh_big_font_size, image_size=fh_big_image_size)
+
+class TinyImageMacro(AbstractMacro):
+    def __init__(self, arguments: list[str] = []):
+        super().__init__(arguments)
+        if len(arguments) != 0:
+            raise MismatchNoArguments(f"The '@tiny' macro doesn't take arguments, but {len(arguments)} were given.")
+
+    def change_context(self, frosthavenContext: FrosthavenLineContext):
+        frosthavenContext.new_context_effects(image_size=fh_tiny_image_size)
