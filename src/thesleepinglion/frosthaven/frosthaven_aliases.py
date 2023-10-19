@@ -50,7 +50,7 @@ fh_base_aliases = [
 "\\bane{$x$} = @big \\image{bane.svg} @endlast",
 "\\bane = \\image{bane.svg}",
 
-
+"\\consume{$x$} = @conditional_consumption @big \\image{$x$_consume.svg} @endlast :",
 "\\generate{$x$}{$y$}{$z$} = @mandatory @big \\image{$x$.svg} \\image{$y$.svg} \\image{$z$.svg} @endlast",
 "\\generate{$x$}{$y$} = @mandatory @big \\image{$x$.svg} \\image{$y$.svg} @endlast",
 "\\generate{$x$} = @mandatory @big \\image{$x$.svg} @endlast",

@@ -10,7 +10,8 @@ from .frosthaven_aliases import fh_base_aliases
 from .frosthaven_items import FrosthavenImage, FHTopmostColumnItem
 from .frosthavenlinecontext import FrosthavenLineContext
 from .frosthaven_constants import *
-from .frosthaven_macros import MandatoryMacro, BaseSizeMacro, BigSizeMacro
+from .frosthaven_macros import MandatoryMacro, ConditionalMacro, ConditionalConsumptionMacro, BaseSizeMacro, \
+                             BigSizeMacro, TinyImageMacro
 
 class FrosthavenParser(AbstractParser):
     def __init__(self, path_to_gml: Path):
@@ -32,8 +33,11 @@ class FrosthavenParser(AbstractParser):
                        "@bottomright": BottomRightMacro,
                        "@column2": Column2Macro,
                        "@mandatory": MandatoryMacro,
+                       "@conditional": ConditionalMacro,
+                       "@conditional_consumption": ConditionalConsumptionMacro,
                        "@small": BaseSizeMacro,
-                       "@big": BigSizeMacro}
+                       "@big": BigSizeMacro,
+                       "@tiny": TinyImageMacro}
 
     def parse(self,
               action: str,
@@ -98,6 +102,8 @@ class FrosthavenParser(AbstractParser):
         primary_position = "center"
         secondary_positions = []
         is_mandatory = False
+        is_conditional = False
+        is_conditional_consumption = False
         if len(primary_line)==0 and len(secondary_lines) == 0:
             return None, position, is_mandatory
 
@@ -106,10 +112,14 @@ class FrosthavenParser(AbstractParser):
             lexemes = self.lexer.input(primary_line)
             primary_position = self.find_line_position(lexemes)
             # Check if a mandatory box should be drawn, and if it is the case, reduce the allowed width for items parsing
-            is_mandatory = self.is_mandatory_action(lexemes)
+            is_mandatory = self.is_specific_action(lexemes, MandatoryMacro)
+            is_conditional = self.is_specific_action(lexemes, ConditionalMacro)
+            is_conditional_consumption = self.is_specific_action(lexemes, ConditionalConsumptionMacro)
             primary_line_width = card_drawing_width
             if is_mandatory:
                 primary_line_width -= MandatoryBox.TotalAddedWith()
+            if is_conditional or is_conditional_consumption:
+                primary_line_width -= 2*BaseConditionalBox.AdditionalWidth()
             primary_action = self.gml_line_to_items(lexemes,
                                                     FrosthavenLineContext(class_color=class_color),
                                                     width = primary_line_width)
@@ -124,17 +134,22 @@ class FrosthavenParser(AbstractParser):
             lexemes = self.lexer.input(line)
             secondary_positions.append(self.find_line_position(lexemes))
             # Same as above: reduce the allowed width if there is a mandatory box
-            is_mandatory = is_mandatory or self.is_mandatory_action(lexemes)
+            is_mandatory = is_mandatory or self.is_specific_action(lexemes, MandatoryMacro)
+            is_conditional = is_conditional or self.is_specific_action(lexemes, ConditionalMacro)
+            is_conditional_consumption = is_conditional_consumption or self.is_specific_action(lexemes, ConditionalConsumptionMacro)
             if is_mandatory:
                 secondary_lines_width -= MandatoryBox.TotalAddedWith()
+            if is_conditional or is_conditional_consumption:
+                primary_line_width -= 2*BaseConditionalBox.AdditionalWidth()
             secondary_items.append(self.gml_line_to_items(lexemes,
-                                                          FrosthavenLineContext(image_size=fh_medium_image_size, class_color=class_color),
-                                                          width = secondary_lines_width))
+                                                          FrosthavenLineContext(image_size=fh_small_image_size,
+                                                                                class_color=class_color),
+                                                                                width = secondary_lines_width))
         # Flatten the secondary LineItems
         secondary_action = None
         if len(secondary_items) > 0:
             secondary_items = [e for lines in secondary_items for e in lines]
-            secondary_action = SecondaryActionBox([ColumnItem(secondary_items)], FrosthavenLineContext())
+            secondary_action = SecondaryActionBox([ColumnItem(secondary_items)], FrosthavenLineContext(class_color=class_color))
 
         # Now check the lines position by consuming the first macro
         position = primary_position
@@ -152,17 +167,22 @@ class FrosthavenParser(AbstractParser):
         else:
             if secondary_action is not None:
                 result = [LineItem([secondary_action])]
+
+        if is_conditional:
+            result = [LineItem([BaseConditionalBox(result, FrosthavenLineContext(class_color=class_color), True, self.path_to_gml)])]
+        elif is_conditional_consumption:
+            result = [LineItem([ConditionalConsumeBox(result, FrosthavenLineContext(class_color=class_color), True, self.path_to_gml)])]
         return result, position, is_mandatory
 
-    def is_mandatory_action(self, line: list[str]):
+    def is_specific_action(self, line: list[str], pyth_object: type):
         """
         Similar to self.find_line_position, search the given line of lexemes and return True if it contains
-        the macro "@mandatory"
+        a specific macro, represented by the given python object (ex: "@mandatory" -> MandatoryMacro)
         """
         for lexeme in line:
             if self.is_macro(lexeme):
                 macro = self.create_macro(lexeme)
-                if isinstance(macro, MandatoryMacro):
+                if isinstance(macro, pyth_object):
                     return True
         return False
 

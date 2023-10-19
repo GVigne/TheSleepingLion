@@ -330,11 +330,17 @@ class BaseConditionalBox(AbstractItem):
     def __init__(self,
                 arguments: list[str],
                 gml_context: FrosthavenLineContext,
+                is_parsed: bool = False,
                 path_to_gml: Path | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
-        if len(arguments) !=1:
-            raise MismatchNoArguments(f"The command '\\conditional' takes one argument but {len(arguments)} were given.")
-        self.conditional_action = ColumnItem(FrosthavenParser(path_to_gml).gml_line_to_items(arguments[0], gml_context))
+        if is_parsed:
+            # Small hack so that developpers can use this class as a wrapper around existing items
+            self.conditional_action = ColumnItem(arguments)
+        else:
+            if len(arguments) !=1:
+                raise MismatchNoArguments(f"The command '\\conditional' takes one argument but {len(arguments)} were given.")
+            self.conditional_action = ColumnItem(FrosthavenParser(path_to_gml).gml_line_to_items(arguments[0], gml_context))
+
         self.box_color = gml_context.class_color
 
     def get_width(self):
@@ -408,10 +414,11 @@ class ConditionalConsumeBox(BaseConditionalBox):
     def __init__(self,
                 arguments: list[str],
                 gml_context: FrosthavenLineContext,
+                is_parsed: bool = False,
                 path_to_gml: Path | None = None):
         if len(arguments) !=1:
             raise MismatchNoArguments(f"The command '\\conditional_consumption' takes one argument but {len(arguments)} were given.")
-        super().__init__(arguments, gml_context, path_to_gml)
+        super().__init__(arguments, gml_context, is_parsed, path_to_gml)
 
     def get_height(self):
         return self.conditional_action.get_height() + ConditionalConsumeBox.AdditionalHeight()

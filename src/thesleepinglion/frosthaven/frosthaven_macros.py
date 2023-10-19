@@ -13,6 +13,22 @@ class MandatoryMacro:
         if len(arguments) != 0:
             raise MismatchNoArguments(f"The '@mandatory' macro doesn't take arguments, but {len(arguments)} were given.")
 
+class ConditionalMacro:
+    """
+    A macro to control the placement of conditional boxes. It is neither a PositionalMacro nor an AbstractMacro.
+    """
+    def __init__(self, arguments: list[str]):
+        if len(arguments) != 0:
+            raise MismatchNoArguments(f"The '@conditional' macro doesn't take arguments, but {len(arguments)} were given.")
+
+class ConditionalConsumptionMacro:
+    """
+    Same as above, but for conditional boxes used for elemental consumption
+    """
+    def __init__(self, arguments: list[str]):
+        if len(arguments) != 0:
+            raise MismatchNoArguments(f"The '@conditional_consumption' macro doesn't take arguments, but {len(arguments)} were given.")
+
 class BaseSizeMacro(AbstractMacro):
     def __init__(self, arguments: list[str] = []):
         super().__init__(arguments)
