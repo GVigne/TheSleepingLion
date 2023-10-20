@@ -46,7 +46,8 @@ class GloomhavenParser(AbstractParser):
               action: str,
               class_color: dict = {"red": 0, "green": 0, "blue": 0},
               additional_aliases: str = "",
-              action_box_size = 0.775*card_width):
+              action_box_size = 0.775*card_width,
+              is_top_action: bool = True):
         """
         The conversion from lexemes to items is done in a specific way to respect the lines' positions (units are given
         as percentages of the card's width):

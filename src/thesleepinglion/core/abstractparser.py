@@ -23,7 +23,8 @@ class AbstractParser:
     def parse(self,
               action : str,
               class_color: dict = {"red": 0, "green": 0, "blue": 0},
-              additional_aliases: str = ""):
+              additional_aliases: str = "",
+              is_top_action: bool = False):
         """
         This method is the highest possible function, which should only be called by an AbstractCard. Parse returns
         a dictionnary with keys being positions and values being AbstractTopmostColumnItems which should be drawn. It also

@@ -82,7 +82,7 @@ class MandatoryBox(AbstractItem):
         """
         Return the total additional width required to draw a mandatory box
         """
-        # We need 2 SlantedLineWidth and the exclamation mark before drawing the item, then an additional SlantedLineWidth the right
+        # We need 2 SlantedLineWidth and the exclamation mark before drawing the item, then an additional SlantedLineWidth to the right
         return 3*MandatoryBox.SlantedLineWidth() + MandatoryBox.LineWidth() + \
                 TextItem(["!"], FrosthavenLineContext(font_size=fh_medium_font_size)).get_width()
 
@@ -120,56 +120,65 @@ class MandatoryBox(AbstractItem):
                                                                  font_size=fh_medium_font_size))
 
         # Store these as attributes so they aren't recomputed every time we use them
-        self.total_added_width = MandatoryBox.TotalAddedWith()
+        self.total_added_width = self.TotalAddedWith()
 
     def get_width(self):
         return self.item.get_width() + self.total_added_width
 
     def get_height(self):
-        return self.item.get_height() + MandatoryBox.TotalAddedHeight()
+        return self.item.get_height() + self.TotalAddedHeight()
 
     def draw(self, cr: cairo.Context):
         # Draw the rectangular box
         cr.save()
         cr.set_source_rgb(self.box_color["red"], self.box_color["green"], self.box_color["blue"])
-        cr.set_line_width(MandatoryBox.LineWidth())
-        cr.move_to(MandatoryBox.SlantedLineWidth(), 0)
-        cr.line_to(self.get_width() - MandatoryBox.SlantedLineWidth(), 0)
-        cr.line_to(self.get_width(), MandatoryBox.SlantedLineWidth()) # 45° angle
-        cr.line_to(self.get_width(), self.get_height() - MandatoryBox.SlantedLineWidth())
-        cr.line_to(self.get_width() - MandatoryBox.SlantedLineWidth(), self.get_height())
-        cr.line_to(MandatoryBox.SlantedLineWidth(), self.get_height())
-        cr.line_to(0, self.get_height() - MandatoryBox.SlantedLineWidth())
-        cr.line_to(0, MandatoryBox.SlantedLineWidth())
+        cr.set_line_width(self.LineWidth())
+        cr.move_to(self.SlantedLineWidth(), 0)
+        cr.line_to(self.get_width() - self.SlantedLineWidth(), 0)
+        cr.line_to(self.get_width(), self.SlantedLineWidth()) # 45° angle
+        cr.line_to(self.get_width(), self.get_height() - self.SlantedLineWidth())
+        cr.line_to(self.get_width() - self.SlantedLineWidth(), self.get_height())
+        cr.line_to(self.SlantedLineWidth(), self.get_height())
+        cr.line_to(0, self.get_height() - self.SlantedLineWidth())
+        cr.line_to(0, self.SlantedLineWidth())
         cr.close_path()
         cr.stroke()
         cr.restore()
         # Draw the exclamation mark...
         cr.save()
-        cr.translate(0.75*MandatoryBox.SlantedLineWidth(), self.get_height()/2 - self.exclamation.get_height()/2)
+        cr.translate(0.75*self.SlantedLineWidth(), self.get_height()/2 - self.exclamation.get_height()/2)
         cr.move_to(0,0)
         self.exclamation.draw(cr)
         cr.restore()
         # ... and the line next to it
         cr.save()
         cr.set_source_rgb(self.box_color["red"], self.box_color["green"], self.box_color["blue"])
-        cr.set_line_width(MandatoryBox.LineWidth())
-        cr.move_to(1.5*MandatoryBox.SlantedLineWidth() + self.exclamation.get_width(), 0)
-        cr.line_to(1.5*MandatoryBox.SlantedLineWidth() + self.exclamation.get_width(), self.get_height())
+        cr.set_line_width(self.LineWidth())
+        cr.move_to(1.5*self.SlantedLineWidth() + self.exclamation.get_width(), 0)
+        cr.line_to(1.5*self.SlantedLineWidth() + self.exclamation.get_width(), self.get_height())
         cr.stroke()
         cr.restore()
         # Draw the item
         cr.save()
-        cr.translate(2*MandatoryBox.SlantedLineWidth() + self.exclamation.get_width(), MandatoryBox.TotalAddedHeight()/2)
+        cr.translate(2*self.SlantedLineWidth() + self.exclamation.get_width(), self.TotalAddedHeight()/2)
         cr.move_to(0,0)
         self.item.draw(cr)
         cr.restore()
 
-class BottomRightMandatoryBox(MandatoryBox):
+class TopActionBRMandatoryBox(MandatoryBox):
     """
-    Mandatory box put in the bottom right corner. The bottom line shouldn't be displayed, and side lines
-    should have a gradient of color.
+    Mandatory box put in the bottom right corner of the top part of a card. The bottom line shouldn't be displayed,
+    and side lines should have a gradient of color.
     """
+    @staticmethod
+    def TotalAddedWith():
+        """
+        Bottomright mandatory box need a different kind of spacing to the right (not a slanted line,
+        but space for the top line to extend)
+        """
+        return 2*MandatoryBox.SlantedLineWidth() +  MandatoryBox.LineWidth() + \
+                TextItem(["!"], FrosthavenLineContext(font_size=fh_medium_font_size)).get_width()
+
     @staticmethod
     def TotalAddedHeight():
         """
@@ -180,11 +189,11 @@ class BottomRightMandatoryBox(MandatoryBox):
     def draw(self, cr):
         # Draw the rectangular box
         cr.save()
-        cr.set_line_width(MandatoryBox.LineWidth())
+        cr.set_line_width(self.LineWidth())
         # Top horizontal line
         gradient_length = 10
-        start = MandatoryBox.SlantedLineWidth()
-        end = self.get_width() - MandatoryBox.SlantedLineWidth() - gradient_length
+        start = self.SlantedLineWidth()
+        end = self.get_width() - self.SlantedLineWidth() - gradient_length
         endgradient = self.get_width()
         cr.save()
         cr.move_to(start, 0)
@@ -202,13 +211,13 @@ class BottomRightMandatoryBox(MandatoryBox):
         cr.stroke()
         cr.restore()
         # Left vertical line
-        start = MandatoryBox.SlantedLineWidth()
+        start = self.SlantedLineWidth()
         endVertical = 0.6*self.get_height()
         endgradientVertical = self.get_height()
         fadeout = 0.2 # Opacity value for the bottom of the line
         cr.save()
         cr.set_source_rgb(self.box_color["red"], self.box_color["green"], self.box_color["blue"])
-        cr.move_to(MandatoryBox.SlantedLineWidth(), 0)
+        cr.move_to(self.SlantedLineWidth(), 0)
         cr.line_to(0,start) # 45° angle
         cr.stroke()
         cr.restore()
@@ -217,18 +226,18 @@ class BottomRightMandatoryBox(MandatoryBox):
         gradient.add_color_stop_rgba(0,self.box_color["red"], self.box_color["green"], self.box_color["blue"], 1)
         gradient.add_color_stop_rgba(1,self.box_color["red"], self.box_color["green"], self.box_color["blue"], fadeout)
         cr.set_source(gradient)
-        cr.move_to(0,MandatoryBox.SlantedLineWidth())
+        cr.move_to(0,self.SlantedLineWidth())
         cr.line_to(0, endgradientVertical)
         cr.stroke()
         cr.restore()
         # Draw the exclamation mark (same as in MandatoryBox)
         cr.save()
-        cr.translate(0.75*MandatoryBox.SlantedLineWidth(), self.get_height()/2 - self.exclamation.get_height()/2)
+        cr.translate(0.75*self.SlantedLineWidth(), self.get_height()/2 - self.exclamation.get_height()/2)
         cr.move_to(0,0)
         self.exclamation.draw(cr)
         cr.restore()
         # ... and the line next to it, with a gradient :)
-        x_vertical_line = 1.5*MandatoryBox.SlantedLineWidth() + self.exclamation.get_width()
+        x_vertical_line = 1.5*self.SlantedLineWidth() + self.exclamation.get_width()
         cr.save()
         cr.move_to(x_vertical_line, 0)
         cr.set_source_rgb(self.box_color["red"], self.box_color["green"], self.box_color["blue"])
@@ -246,11 +255,26 @@ class BottomRightMandatoryBox(MandatoryBox):
         cr.restore()
         # Draw the item (same as in MandatoryBox)
         cr.save()
-        cr.translate(2*MandatoryBox.SlantedLineWidth() + self.exclamation.get_width(), MandatoryBox.TotalAddedHeight()/2)
+        cr.translate(2*self.SlantedLineWidth() + self.exclamation.get_width(), self.TotalAddedHeight()/2)
         cr.move_to(0,0)
         self.item.draw(cr)
         cr.restore()
         cr.restore() # Goes with the cr.save() in the first line
+
+class BotActionBRMandatoryBox(TopActionBRMandatoryBox):
+    """
+    Mandatory box put in the bottom right corner of the bottom part of a card.
+    The top line is slightly longer to the right than for mandatory boxes in the top half of a card
+    """
+    @staticmethod
+    def BottomCorrection():
+        return 25
+
+    @staticmethod
+    def TotalAddedWith():
+        return 2*MandatoryBox.SlantedLineWidth() + BotActionBRMandatoryBox.BottomCorrection() + MandatoryBox.LineWidth() + \
+                TextItem(["!"], FrosthavenLineContext(font_size=fh_medium_font_size)).get_width()
+
 
 class AbilityLine(AbstractItem):
     """

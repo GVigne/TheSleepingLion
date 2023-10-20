@@ -59,7 +59,7 @@ class AbstractCard:
             center.append(column_dict["center2"])
         self.top_areas["center"] = center
         # Populate self.bot_areas
-        column_dict, bot_warnings = parser.parse(self.bot_text, class_color=self.class_color, additional_aliases=raw_user_aliases)
+        column_dict, bot_warnings = parser.parse(self.bot_text, class_color=self.class_color, additional_aliases=raw_user_aliases, is_top_action=False)
         self.bot_areas = {"topleft" : column_dict["topleft"],
                           "bottomright" : column_dict["bottomright"],
                         }

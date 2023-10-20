@@ -6,6 +6,7 @@ from .frosthaven_items import FHTopmostColumnItem
 from .frosthavenlinecontext import FrosthavenLineContext
 from .frosthaven_constants import *
 from .frosthavenparser import FrosthavenParser
+from .frosthaven_commands import BotActionBRMandatoryBox
 
 class FrosthavenCard(AbstractCard):
     """
@@ -68,7 +69,6 @@ class FrosthavenCard(AbstractCard):
         ID_col.draw(cr)
         cr.restore()
 
-
         card_drawing_height = 0.35*fh_card_height
         # Top action
         cr.save()
@@ -99,4 +99,15 @@ class FrosthavenCard(AbstractCard):
                          (card_drawing_height - self.bot_areas["center"][0].get_height())/2)
             cr.move_to(0,0)
             self.bot_areas["center"][0].draw(cr)
+        cr.restore()
+        # Bottomright
+        cr.save()
+        # Translate to the rightmost corner of the card. Not that there is a small extra offset
+        # for bottom right mandatory boxes, they are not aligned with the top ones
+        cr.translate((fh_card_width - card_drawing_width)/2 + card_drawing_width + 15 + BotActionBRMandatoryBox.BottomCorrection(),
+                     0.935*fh_card_height)
+        right_column = self.bot_areas["bottomright"]
+        cr.translate(-right_column.get_width(), -right_column.get_height())
+        cr.move_to(0,0)
+        right_column.draw(cr)
         cr.restore()

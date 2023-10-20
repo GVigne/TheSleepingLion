@@ -20,4 +20,4 @@ fh_init_font_size = 184*12/16
 fh_card_ID_font_size = fh_base_font_size*5/14 # Is supposed to be 5 pt
 fh_card_height = 2250
 fh_card_width = 1650
-card_drawing_width = 0.78*fh_card_width
+card_drawing_width = 0.79*fh_card_width

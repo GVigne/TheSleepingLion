@@ -42,7 +42,8 @@ class FrosthavenParser(AbstractParser):
     def parse(self,
               action: str,
               class_color: dict = {"red": 0, "green": 0, "blue": 0},
-              additional_aliases: str = ""):
+              additional_aliases: str = "",
+              is_top_action: bool = True):
         splitted_lines = self.lexer.separate_lines(action, additional_aliases = additional_aliases)
 
         # Parse all the lines as combinations of a primary action and secondary actions (which are indented in the GML file)
@@ -78,7 +79,11 @@ class FrosthavenParser(AbstractParser):
         # Wrap the bottomright column in a mandatory box
         bottomright_items = all_items["bottomright"]
         if len(bottomright_items) and bottomright_is_mandatory> 0:
-            bottomright_items = [BottomRightMandatoryBox(bottomright_items, FrosthavenLineContext(class_color=class_color))]
+            if is_top_action:
+                bottomright_items = [TopActionBRMandatoryBox(bottomright_items, FrosthavenLineContext(class_color=class_color))]
+            else:
+                bottomright_items = [BotActionBRMandatoryBox(bottomright_items, FrosthavenLineContext(class_color=class_color))]
+
         botright_column = FHTopmostColumnItem(bottomright_items, self.path_to_gml)
 
         other_column = FHTopmostColumnItem([], FrosthavenLineContext(), self.path_to_gml)
@@ -276,6 +281,6 @@ class FrosthavenParser(AbstractParser):
             result.append(LineItem(line, gml_context, self.path_to_gml))
         return result
 
-from .frosthaven_commands import SecondaryActionBox, MandatoryBox, BottomRightMandatoryBox, AbilityLine, \
-                                BaseConditionalBox, ConditionalConsumeBox, FHExpCommand, FHChargesCommand, \
+from .frosthaven_commands import SecondaryActionBox, MandatoryBox, TopActionBRMandatoryBox, BotActionBRMandatoryBox, \
+                                AbilityLine, BaseConditionalBox, ConditionalConsumeBox, FHExpCommand, FHChargesCommand, \
                                 FHOneLineChargesCommand
