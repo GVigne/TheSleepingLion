@@ -440,7 +440,7 @@ class ConditionalConsumeBox(BaseConditionalBox):
                 gml_context: FrosthavenLineContext,
                 is_parsed: bool = False,
                 path_to_gml: Path | None = None):
-        if len(arguments) !=1:
+        if len(arguments) !=1 and not is_parsed:
             raise MismatchNoArguments(f"The command '\\conditional_consumption' takes one argument but {len(arguments)} were given.")
         super().__init__(arguments, gml_context, is_parsed, path_to_gml)
 

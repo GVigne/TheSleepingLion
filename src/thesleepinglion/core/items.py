@@ -69,8 +69,9 @@ class TextItem(AbstractItem):
         self.green = gml_context.text_color["green"]
         self.blue = gml_context.text_color["blue"]
         self.text_height = Pango.units_to_double(self.pango_text.get_size().height)
-        # This font has too much space, this is manually compensated here
-        self.needs_scaling = gml_context.font == "Sakkal Majalla Bold"
+        # These fonts have too much space, this is manually compensated here
+        self.needs_scaling = gml_context.font == "Sakkal Majalla Bold" or \
+                             gml_context.font == "Markazi Text"
 
     def get_text(self):
         return self.text
