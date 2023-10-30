@@ -4,7 +4,7 @@ from gi.repository import Pango
 from.abstractGMLlinecontext import AbstractGMLLineContext
 from .utils import find_opened_bracket, find_end_bracket, text_to_pango
 from .errors import CommandNotFound, MacroNotFound
-from .items import TextItem
+from .items import AbstractParserArguments, TextItem
 from .macros import AbstractPositionalMacros
 
 class AbstractParser:
@@ -40,13 +40,20 @@ class AbstractParser:
         """
         pass
 
-    def gml_line_to_items(self):
+    def gml_line_to_items(self,
+                          gml_line : str | list[str],
+                          gml_context: AbstractGMLLineContext,
+                          arguments: AbstractParserArguments):
         """
         Converts a list of lexemes, representing a user-defined line into AbstractItems. Returns a list of
         LineItems, ie a list of objects which should be placed on the AbstractCard.
         This function is recursive, and can be called by each created item.
         This function ignores positional macros, they should be handled in AbstractParser.parse.
-        This function must be overloaded, and child classes must define their own API for this method.
+        This function must be overloaded, and the arguments are as follow:
+            - gml_line is either a line of gml text or a list of lexemes which need to be converted into AbstractItems
+            - gml_context is a line context which will be modified by macros
+            - parser_args is a collection of arguments which needs to be defined by child classes in order for
+              AbstractItems to be able to call the parser
         """
         pass
 
@@ -124,7 +131,8 @@ class AbstractParser:
 
     def create_command(self,
                         text : str,
-                        gml_context: AbstractGMLLineContext):
+                        gml_context: AbstractGMLLineContext,
+                        parser_arguments: AbstractParserArguments):
         """
         Converts a string representing a command into the corresponding AbstractItem.
         """
@@ -140,7 +148,7 @@ class AbstractParser:
             arg = text[i+1:i+j -1] # Exclude both brackets
             arguments.append(arg)
             i +=j
-        return command_item(arguments, gml_context, path_to_gml= self.path_to_gml)
+        return command_item(arguments, gml_context, path_to_gml= self.path_to_gml, parser_arguments=parser_arguments)
 
     def create_macro(self, text : str):
         """

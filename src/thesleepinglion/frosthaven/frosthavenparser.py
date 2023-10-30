@@ -1,8 +1,9 @@
 from pathlib import Path
+
 from ..core.abstractparser import AbstractParser
 from ..core.havenlexer import HavenLexer
 
-from ..core.items import  AbstractItem, AoECommand, TextItem, LineItem, ColumnItem
+from ..core.items import  AbstractItem, AoECommand, TextItem, LineItem, ColumnItem, AbstractParserArguments
 from ..core.macros import AbstractMacro, EndMacro, EndLastMacro, TopLeftMacro, BottomRightMacro, Column2Macro
 from ..core.utils import list_join
 
@@ -12,6 +13,16 @@ from .frosthavenlinecontext import FrosthavenLineContext
 from .frosthaven_constants import *
 from .frosthaven_macros import MandatoryMacro, ConditionalMacro, ConditionalConsumptionMacro, BaseSizeMacro, \
                              BigSizeMacro, TinyImageMacro
+
+class FrosthavenParserArguments(AbstractParserArguments):
+    def __init__(self, ongoing_line : list[AbstractItem] = None,
+                 width : int = card_drawing_width,
+                 ongoing_x: int = 0,
+                 ongoing_blank: TextItem | None = None):
+        self.ongoing_line = ongoing_line
+        self.width = width
+        self.ongoing_x = ongoing_x
+        self.ongoing_blank = ongoing_blank
 
 class FrosthavenParser(AbstractParser):
     def __init__(self, path_to_gml: Path):
@@ -127,7 +138,7 @@ class FrosthavenParser(AbstractParser):
                 primary_line_width -= 2*BaseConditionalBox.AdditionalWidth()
             primary_action = self.gml_line_to_items(lexemes,
                                                     FrosthavenLineContext(class_color=class_color),
-                                                    width = primary_line_width)
+                                                    FrosthavenParserArguments(width=primary_line_width))
         # Note that primary_action is a list of LineItem. The first ones will be placed on the card, and
         # the secondary actions will be aligned with the last one.
         secondary_lines_width = card_drawing_width - 2*SecondaryActionBox.BoxAdditionalWidth()
@@ -147,9 +158,8 @@ class FrosthavenParser(AbstractParser):
             if is_conditional or is_conditional_consumption:
                 primary_line_width -= 2*BaseConditionalBox.AdditionalWidth()
             secondary_items.append(self.gml_line_to_items(lexemes,
-                                                          FrosthavenLineContext(image_size=fh_small_image_size,
-                                                                                class_color=class_color),
-                                                                                width = secondary_lines_width))
+                                                          FrosthavenLineContext(image_size=fh_small_image_size, class_color=class_color),
+                                                          FrosthavenParserArguments(width=secondary_lines_width)))
         # Flatten the secondary LineItems
         secondary_action = None
         if len(secondary_items) > 0:
@@ -192,13 +202,9 @@ class FrosthavenParser(AbstractParser):
         return False
 
     def gml_line_to_items(self,
-                          gml_line : str | list[str],
+                          gml_line: str | list[str],
                           gml_context: FrosthavenLineContext,
-                          ongoing_line : list[AbstractItem] = None,
-                          width : int = card_drawing_width,
-                          ongoing_x: int = 0,
-                          ongoing_blank: TextItem | None = None,
-                          ):
+                          arguments: FrosthavenParserArguments):
         """
         Return a list of LineItems corresponding to the given GML line. The input may either be a string (for example,
         an entire line to parse), or a list of string (which have already been splitted by the lexer).
@@ -211,22 +217,22 @@ class FrosthavenParser(AbstractParser):
             splitted_gml = gml_line
         else:
             splitted_gml = self.lexer.input(gml_line)
-        x = ongoing_x # The space currently taken by the items which have already been parsed.
+        x = arguments.ongoing_x # The space currently taken by the items which have already been parsed.
         lines = []
         current_line = []
-        if ongoing_line is not None:
-            current_line = ongoing_line # Needed for recursion using macros.
+        if arguments.ongoing_line is not None:
+            current_line = arguments.ongoing_line # Needed for recursion using macros.
 
         ## This blank will be added inbetween every item in a line.
         ## It's size can be changed if a macro changes the size policy for this GML line
         blank = TextItem([" "], FrosthavenLineContext(font_size=gml_context.font_size))
-        if ongoing_blank is not None:
-            blank = ongoing_blank
+        if arguments.ongoing_blank is not None:
+            blank = arguments.ongoing_blank
 
         while len(splitted_gml) > 0:
             current_str = splitted_gml[0]
             if self.is_command(current_str):
-                item = self.create_command(current_str, gml_context)
+                item = self.create_command(current_str, gml_context, arguments)
             elif self.is_macro(current_str):
                 macro = self.create_macro(current_str)
                 if isinstance(macro, AbstractMacro):
@@ -239,18 +245,16 @@ class FrosthavenParser(AbstractParser):
                 result = []
                 for line in lines:
                     result.append(FrosthavenLineContext(list_join(line, blank), gml_context, self.path_to_gml))
-                return result + self.gml_line_to_items(splitted_gml,
-                                                      gml_context,
-                                                      ongoing_line = current_line,
-                                                      width = width,
-                                                      ongoing_x = x,
-                                                      ongoing_blank = blank)
+                # Update parser's arguments
+                arguments.ongoing_line = current_line
+                arguments.ongoing_blank = blank
+                return result + self.gml_line_to_items(splitted_gml, gml_context, arguments)
             else: # current_str is a text
                 # Compute the maximum space allowed for this text
-                if width == -1:
+                if arguments.width == -1:
                     allowed_width = -1
                 else:
-                    allowed_width = width - x
+                    allowed_width = arguments.width - x
 
                 minimum_one_word = (len(current_line)==0) # If at least one word should be placed in the line or if 0 words can be placed
                 item, remain_str = self.create_text(current_str, allowed_width, gml_context, minimum_one_word)
@@ -263,7 +267,7 @@ class FrosthavenParser(AbstractParser):
                     splitted_gml[0] = remain_str # Reminder: splitted_gml[0] is the current item being parsed
                     continue
 
-            if width == -1 or item.get_width() < width - x:
+            if arguments.width == -1 or item.get_width() < arguments.width - x:
                 current_line.append(item)
             else:
                 lines.append(current_line)

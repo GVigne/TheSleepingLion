@@ -13,6 +13,12 @@ from .errors import MismatchNoArguments, ImageNotFound, InvalidAoEFile, EmptyArg
 from .svg_wrapper import SVGImage
 from .hexagonal_grid import HexagonalGrid, HexagonDict
 
+class AbstractParserArguments:
+    """
+    A container class to hold a parser's arguments. Allows for recursivity when building an item.
+    """
+    pass
+
 class AbstractItem:
     """
     Abstract class to represent an item. An item has a rectangular shape and can be drawn onto a cairo context.
@@ -25,7 +31,8 @@ class AbstractItem:
     """
     def __init__(self, arguments : list[str], # can also be a list of AbstractItems
                     gml_context: AbstractGMLLineContext,
-                    path_to_gml : Path | None = None):
+                    path_to_gml : Path | None = None,
+                    parser_arguments: AbstractParserArguments | None = None):
         self.path_to_gml = path_to_gml # All items know which GML file they depend on.
         self.arguments = arguments
         self.warnings = []
@@ -59,7 +66,8 @@ class TextItem(AbstractItem):
     """
     def __init__(self, arguments: list[str],
                     gml_context: AbstractGMLLineContext,
-                    path_to_gml: Path | None = None):
+                    path_to_gml: Path | None = None,
+                    parser_arguments: AbstractParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         self.text = arguments[0]
 
@@ -100,7 +108,8 @@ class LineItem(AbstractItem):
     """
     def __init__(self, arguments: list[AbstractItem],
                     gml_context: AbstractGMLLineContext | None = None,
-                    path_to_gml: Path | None = None):
+                    path_to_gml: Path | None = None,
+                    parser_arguments: AbstractParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         self.items = arguments # list of AbstractItems
 
@@ -145,7 +154,8 @@ class ColumnItem(AbstractItem):
     """
     def __init__(self, arguments: list[AbstractItem],
                     gml_context: AbstractGMLLineContext | None = None,
-                    path_to_gml: Path | None = None):
+                    path_to_gml: Path | None = None,
+                    parser_arguments: AbstractParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         self.items = arguments # list of AbstractItems
 
@@ -218,7 +228,8 @@ class AbstractImageItem(AbstractItem):
     """
     def __init__(self, arguments: list[str],
                     gml_context: AbstractGMLLineContext,
-                    path_to_gml: Path | None = None):
+                    path_to_gml: Path | None = None,
+                    parser_arguments: AbstractParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
 
         if len(arguments) != 1 and len(arguments) != 2:
@@ -277,7 +288,8 @@ class AoECommand(AbstractItem):
     """
     def __init__(self, arguments: list[str],
                     gml_context: AbstractGMLLineContext,
-                    path_to_gml: Path | None = None):
+                    path_to_gml: Path | None = None,
+                    parser_arguments: AbstractParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         if len(arguments) != 1 :
             raise MismatchNoArguments(f"The '\\aoe' command takes 1 argument {len(arguments)} were given.")

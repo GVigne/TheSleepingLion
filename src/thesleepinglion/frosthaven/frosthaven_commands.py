@@ -10,6 +10,7 @@ from ..core.utils import list_join
 from .frosthaven_items import ColumnItem, FrosthavenImage
 from .frosthavenlinecontext import FrosthavenLineContext
 from .frosthaven_constants import *
+from .frosthavenparser import FrosthavenParserArguments
 
 class SecondaryActionBox(AbstractItem):
     """
@@ -28,7 +29,8 @@ class SecondaryActionBox(AbstractItem):
     def __init__(self,
                 arguments: list[AbstractItem],
                 gml_context: AbstractGMLLineContext,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: FrosthavenParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         self.secondary_action = arguments[0]
 
@@ -112,7 +114,8 @@ class MandatoryBox(AbstractItem):
     def __init__(self,
                 arguments: list[AbstractItem],
                 gml_context: AbstractGMLLineContext,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: FrosthavenParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         self.item = arguments[0]
         self.box_color = gml_context.class_color
@@ -283,7 +286,8 @@ class AbilityLine(AbstractItem):
     def __init__(self,
                 arguments: list[str],
                 gml_context: FrosthavenLineContext,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: FrosthavenParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         if len(arguments) !=0:
             raise MismatchNoArguments(f"The '\\ability_line' takes no arguments but {len(arguments)} were given.")
@@ -355,7 +359,8 @@ class BaseConditionalBox(AbstractItem):
                 arguments: list[str],
                 gml_context: FrosthavenLineContext,
                 is_parsed: bool = False,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: FrosthavenParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         if is_parsed:
             # Small hack so that developpers can use this class as a wrapper around existing items
@@ -439,7 +444,8 @@ class ConditionalConsumeBox(BaseConditionalBox):
                 arguments: list[str],
                 gml_context: FrosthavenLineContext,
                 is_parsed: bool = False,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: FrosthavenParserArguments | None = None):
         if len(arguments) !=1 and not is_parsed:
             raise MismatchNoArguments(f"The command '\\conditional_consumption' takes one argument but {len(arguments)} were given.")
         super().__init__(arguments, gml_context, is_parsed, path_to_gml)
@@ -500,7 +506,8 @@ class FHExpCommand(AbstractItem):
     """
     def __init__(self, arguments: list[str],
                 gml_context: FrosthavenLineContext,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: FrosthavenParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
 
         if len(arguments) != 1:
@@ -540,7 +547,8 @@ class FHChargesCommand(AbstractItem):
     def __init__(self, arguments: list[str],
                  gml_context: FrosthavenLineContext,
                  one_line: bool = False,
-                 path_to_gml: Path | None = None):
+                 path_to_gml: Path | None = None,
+                 parser_arguments: FrosthavenParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         self.one_line = one_line
         if len(arguments) > 6 or len(arguments) == 0:
@@ -651,7 +659,8 @@ class FHChargesCommand(AbstractItem):
 class FHOneLineChargesCommand(FHChargesCommand):
     def __init__(self, arguments: list[str],
                  gml_context: FrosthavenLineContext,
-                 path_to_gml: Path | None = None):
+                 path_to_gml: Path | None = None,
+                 parser_arguments: FrosthavenParserArguments | None = None):
         if len(arguments) > 5 or len(arguments) == 0:
             raise MismatchNoArguments(f"The '\\charges_line' commands takes up to 4 arguments but f{len(arguments)} were given")
         super().__init__(arguments, gml_context, True, path_to_gml)
