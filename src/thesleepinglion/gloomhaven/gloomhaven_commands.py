@@ -6,13 +6,14 @@ import cairo
 from pathlib import Path
 
 from ..core.haven_type import Haven
-from ..core.items import AbstractItem, TextItem
+from ..core.items import AbstractItem, TextItem, AbstractParserArguments
 from ..core.errors import EmptyArgument, MismatchNoArguments
 from ..core.svg_wrapper import SVGImage
 from ..core.utils import get_image, list_join
 from .gloomhaven_items import GloomhavenImage, GloomhavenColumnItem, GloomhavenLineItem
 from .gloomhaven_constants import *
 from .gloomhavenlinecontext import GloomhavenLineContext
+from .gloomhavenparser import GloomhavenParserArguments
 
 class MultilineCommand(AbstractItem):
     """
@@ -21,7 +22,8 @@ class MultilineCommand(AbstractItem):
     """
     def __init__(self, arguments: list[str],
                 gml_context: GloomhavenLineContext,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: GloomhavenParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         if len(arguments) == 0:
             raise MismatchNoArguments((f"The '\\multiline' command takes more than one argument, but 0 were given."))
@@ -32,7 +34,7 @@ class MultilineCommand(AbstractItem):
         parser = GloomhavenParser(self.path_to_gml)
         self.parsed_arguments = []
         for arg in arguments:
-            parsed_arg = parser.gml_line_to_items(arg, gml_context)
+            parsed_arg = parser.gml_line_to_items(arg, gml_context, GloomhavenParserArguments())
             if len(parsed_arg) == 0 :
                 # one of the argument has only macros, so there is no element/item to collect
                 raise EmptyArgument("Arguments for the '\\multiline' command must be valid gml commands and not only macros.")
@@ -56,7 +58,8 @@ class EnhancementDotCommand(AbstractItem):
     """
     def __init__(self, arguments: list[str],
                 gml_context: GloomhavenLineContext,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: GloomhavenParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         if len(arguments) != 0:
             raise MismatchNoArguments(f"The '\\dot' command takes no arguments but {len(arguments)} were given.")
@@ -78,7 +81,8 @@ class InsideCommand(AbstractItem):
     """
     def __init__(self, arguments: list[str|AbstractItem],
                 gml_context: GloomhavenLineContext,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: GloomhavenParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
 
         if len(arguments) == 2 and (
@@ -98,8 +102,8 @@ class InsideCommand(AbstractItem):
             # worse case scenario, you would have one big fat line as an argument of a command
             # To keep to this philosophy, we call gml_line_to_items with a width of -1, which fits everything on one line
             parser = GloomhavenParser(self.path_to_gml)
-            out_gml = parser.gml_line_to_items(arguments[0], gml_context, width = -1)
-            in_gml = parser.gml_line_to_items(arguments[1], gml_context, width = -1)
+            out_gml = parser.gml_line_to_items(arguments[0], gml_context, GloomhavenParserArguments(width = -1))
+            in_gml = parser.gml_line_to_items(arguments[1], gml_context, GloomhavenParserArguments(width = -1))
             if len(out_gml) == 0 or len(in_gml) == 0:
                 # outside or inside has only macros, so there is no element/item to collect
                 raise EmptyArgument("Arguments for the '\\inside' command must be valid gml commands and not only macros.")
@@ -131,7 +135,8 @@ class ExpCommand(AbstractItem):
     """
     def __init__(self, arguments: list[str|AbstractItem],
                 gml_context: GloomhavenLineContext,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: GloomhavenParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         if len(arguments) != 1:
             raise MismatchNoArguments(f"The '\\exp' command takes only 1 argument but {len(arguments)} were given.")
@@ -177,7 +182,8 @@ class OneChargeItem(AbstractItem):
     """
     def __init__(self, arguments: list[str|AbstractItem],
                 gml_context: GloomhavenLineContext,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: GloomhavenParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
 
         one_charge_size_factor = 2.6
@@ -189,7 +195,7 @@ class OneChargeItem(AbstractItem):
         self.charge_effect = None # By default, a charge is empty
         if len(arguments) > 0:
             parser = GloomhavenParser(self.path_to_gml)
-            charge_effect_lst = parser.gml_line_to_items(arguments[0], gml_context) # List of LineItems
+            charge_effect_lst = parser.gml_line_to_items(arguments[0], gml_context, GloomhavenParserArguments()) # List of LineItems
             # charge_effect_lst may be an empty list if the user only gave macros as arguments
             if len(charge_effect_lst) > 0:
                 charge_effect = charge_effect_lst[0]
@@ -246,7 +252,8 @@ class ChargesCommand(AbstractItem):
     def __init__(self, arguments: list[str|AbstractItem],
                 gml_context: GloomhavenLineContext,
                 has_loss: bool,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: GloomhavenParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
 
         if len(arguments) > 6 or len(arguments) == 0:
@@ -351,7 +358,8 @@ class ChargesLossCommand(ChargesCommand):
     '''
     def __init__(self, arguments: list[str],
                 gml_context: GloomhavenLineContext,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: GloomhavenParserArguments | None = None):
         super().__init__(arguments, gml_context, True, path_to_gml)
 
 class ChargesNonLossCommand(ChargesCommand):
@@ -360,7 +368,8 @@ class ChargesNonLossCommand(ChargesCommand):
     '''
     def __init__(self, arguments: list[str],
                 gml_context: GloomhavenLineContext,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: GloomhavenParserArguments | None = None):
         super().__init__(arguments, gml_context, False, path_to_gml)
 
 class SummonCommand(AbstractItem):
@@ -370,7 +379,8 @@ class SummonCommand(AbstractItem):
     """
     def __init__(self, arguments: list[str],
                 gml_context: GloomhavenLineContext,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: GloomhavenParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
 
         if len(arguments) != 6 and len(arguments) != 7:
@@ -404,7 +414,7 @@ class SummonCommand(AbstractItem):
                     self.parsed_arguments.append(TextItem(["-"], GloomhavenLineContext(font_size=small_font_size), path_to_gml=self.path_to_gml))
             else:
                 if i == 0:
-                    parsed_arg = parser.gml_line_to_items(arg, gml_context)
+                    parsed_arg = parser.gml_line_to_items(arg, gml_context, GloomhavenParserArguments())
                     if len(parsed_arg) > 0: # This can happen if the user only gave macros and not gml commands
                         self.parsed_arguments.append(parsed_arg[0])
                     else:
@@ -412,10 +422,10 @@ class SummonCommand(AbstractItem):
                 elif i == 5 or i == 6:
                     # Parse in small the summon's characteristics
                     all_lines = parser.gml_line_to_items(arg, GloomhavenLineContext(font_size=small_font_size),
-                                                        width = 0.35*self.image.get_width())
+                                                        GloomhavenParserArguments(width = 0.35*self.image.get_width()))
                     self.parsed_arguments.append(GloomhavenColumnItem(all_lines, None))
                 else:
-                    parsed_arg = parser.gml_line_to_items(arg, GloomhavenLineContext(font_size=small_font_size))
+                    parsed_arg = parser.gml_line_to_items(arg, GloomhavenLineContext(font_size=small_font_size), GloomhavenParserArguments())
                     if len(parsed_arg) > 0: # This can happen if the user only gave macros and not gml commands
                         self.parsed_arguments.append(parsed_arg[0])
                     else:
@@ -512,7 +522,8 @@ class DividerLine(AbstractItem):
     def __init__(self,
                 arguments: list[str],
                 gml_context: GloomhavenLineContext,
-                path_to_gml: Path | None = None):
+                path_to_gml: Path | None = None,
+                parser_arguments: GloomhavenParserArguments | None = None):
         super().__init__(arguments, gml_context, path_to_gml)
         if len(arguments) !=0:
             raise MismatchNoArguments(f"The '\\divider_line' takes no arguments but {len(arguments)} were given.")

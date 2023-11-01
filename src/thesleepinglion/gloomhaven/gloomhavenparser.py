@@ -1,7 +1,7 @@
 from pathlib import Path
 from copy import deepcopy
 
-from ..core.abstractparser import AbstractParser
+from ..core.abstractparser import AbstractParser, AbstractParserArguments
 from ..core.havenlexer import HavenLexer
 from ..core.items import AbstractItem, AoECommand, TextItem
 from ..core.macros import AbstractMacro, EndMacro, EndLastMacro, TopLeftMacro, BottomRightMacro, Column2Macro
@@ -11,6 +11,16 @@ from .gloomhaven_macros import TitleFontMacro, ColorMacro, SmallSizeMacro, BaseS
 from .gloomhavenlinecontext import GloomhavenLineContext
 from .gloomhaven_aliases import base_aliases
 from .gloomhaven_constants import card_width, small_font_size
+
+class GloomhavenParserArguments(AbstractParserArguments):
+     def __init__(self, ongoing_line : list[AbstractItem] = None,
+                 width : int = card_width*0.78,
+                 ongoing_x: int = 0,
+                 ongoing_blank: TextItem | None = None):
+        self.ongoing_line = ongoing_line
+        self.width = width
+        self.ongoing_x = ongoing_x
+        self.ongoing_blank = ongoing_blank
 
 class GloomhavenParser(AbstractParser):
     """
@@ -75,7 +85,7 @@ class GloomhavenParser(AbstractParser):
         for lexemes, had_tabulation in all_lines["center2"]:
             second_column_items += self.gml_line_to_items(lexemes,
                                                           GloomhavenLineContext.CreateFromIndentation(had_tabulation, class_color),
-                                                          width = 0.5*action_box_size)
+                                                          GloomhavenParserArguments(width = 0.5*action_box_size))
         # Promote the LineItem objects
         second_column_items = [GHTopmostLineItem.promoteLineItem(line) for line in second_column_items]
         second_column = GloomhavenColumnItem(second_column_items, self.path_to_gml)
@@ -83,7 +93,7 @@ class GloomhavenParser(AbstractParser):
         for lexemes, had_tabulation in all_lines["center"]:
             first_column_items += self.gml_line_to_items(lexemes,
                                                         GloomhavenLineContext.CreateFromIndentation(had_tabulation, class_color),
-                                                        width = action_box_size - second_column.get_width())
+                                                        GloomhavenParserArguments(width = action_box_size - second_column.get_width()))
         # Promote the LineItem objects
         first_column_items = [GHTopmostLineItem.promoteLineItem(line) for line in first_column_items]
         first_column = GloomhavenColumnItem(first_column_items, self.path_to_gml)
@@ -94,7 +104,7 @@ class GloomhavenParser(AbstractParser):
             for lexemes, had_tabulation in save_lines_second_column:
                 second_column_items += self.gml_line_to_items(lexemes,
                                                             GloomhavenLineContext.CreateFromIndentation(had_tabulation, class_color),
-                                                            width = action_box_size - first_column.get_width())
+                                                            GloomhavenParserArguments(width = action_box_size - first_column.get_width()))
             # Promote the LineItem objects
             second_column_items = [GHTopmostLineItem.promoteLineItem(line) for line in second_column_items]
             second_column = GloomhavenColumnItem(second_column_items, self.path_to_gml)
@@ -103,7 +113,7 @@ class GloomhavenParser(AbstractParser):
         for lexemes, had_tabulation in all_lines["topleft"]:
             items += self.gml_line_to_items(lexemes,
                                             GloomhavenLineContext.CreateFromIndentation(had_tabulation, class_color),
-                                            width = action_box_size)
+                                            GloomhavenParserArguments(width = action_box_size))
         items = [GHTopmostLineItem.promoteLineItem(line) for line in items]
         top_column = GloomhavenColumnItem(items, self.path_to_gml)
         # ... and the bottom column
@@ -111,7 +121,7 @@ class GloomhavenParser(AbstractParser):
         for lexemes, had_tabulation in all_lines["bottomright"]:
             items += self.gml_line_to_items(lexemes,
                                             GloomhavenLineContext.CreateFromIndentation(had_tabulation, class_color),
-                                            width = action_box_size)
+                                            GloomhavenParserArguments(width = action_box_size))
         items = [GHTopmostLineItem.promoteLineItem(line) for line in items]
         bot_column = GloomhavenColumnItem(items, self.path_to_gml)
 
@@ -128,13 +138,9 @@ class GloomhavenParser(AbstractParser):
         return {"topleft": top_column, "center": first_column, "center2": second_column, "bottomright": bot_column}, all_warnings
 
     def gml_line_to_items(self,
-                          gml_line : str | list[str],
+                          gml_line: str | list[str],
                           gml_context: GloomhavenLineContext,
-                          ongoing_line : list[AbstractItem] = None,
-                          width : int = card_width*0.78,
-                          ongoing_x: int = 0,
-                          ongoing_blank: TextItem | None = None,
-                          ):
+                          arguments: GloomhavenParserArguments):
         """
         Return a list of LineItems corresponding to the given GML line. The input may either be a string (for example,
         an entire line to parse), or a list of string (which have already been splitted by the lexer).
@@ -147,22 +153,22 @@ class GloomhavenParser(AbstractParser):
             splitted_gml = gml_line
         else:
             splitted_gml = self.lexer.input(gml_line)
-        x = ongoing_x # The space currently taken by the items which have already been parsed.
+        x = arguments.ongoing_x # The space currently taken by the items which have already been parsed.
         lines = []
         current_line = []
-        if ongoing_line is not None:
-            current_line = ongoing_line # Needed for recursion using macros.
+        if arguments.ongoing_line is not None:
+            current_line = arguments.ongoing_line # Needed for recursion using macros.
 
         ## This blank will be added inbetween every item in a line.
         ## It's size can be changed if a macro changes the size policy for this GML line
         blank = TextItem([" "], GloomhavenLineContext(font_size=gml_context.font_size))
-        if ongoing_blank is not None:
-            blank = ongoing_blank
+        if arguments.ongoing_blank is not None:
+            blank = arguments.ongoing_blank
 
         while len(splitted_gml) > 0:
             current_str = splitted_gml[0]
             if self.is_command(current_str):
-                item = self.create_command(current_str, gml_context)
+                item = self.create_command(current_str, gml_context, arguments)
             elif self.is_macro(current_str):
                 macro = self.create_macro(current_str)
                 if isinstance(macro, AbstractMacro):
@@ -175,18 +181,18 @@ class GloomhavenParser(AbstractParser):
                 result = []
                 for line in lines:
                     result.append(GloomhavenLineItem(list_join(line, blank), gml_context, self.path_to_gml))
-                return result + self.gml_line_to_items(splitted_gml,
-                                                      gml_context,
-                                                      ongoing_line = current_line,
-                                                      width = width,
-                                                      ongoing_x = x,
-                                                      ongoing_blank = blank)
+                # Update parser arguments
+                arguments.ongoing_line = current_line
+                arguments.ongoing_x = x
+                arguments.ongoing_blank = blank
+                return result + self.gml_line_to_items(splitted_gml, gml_context, arguments)
+
             else: # current_str is a text
                 # Compute the maximum space allowed for this text
-                if width == -1:
+                if arguments.width == -1:
                     allowed_width = -1
                 else:
-                    allowed_width = width - x
+                    allowed_width = arguments.width - x
 
                 minimum_one_word = (len(current_line)==0) # If at least one word should be placed in the line or if 0 words can be placed
                 item, remain_str = self.create_text(current_str, allowed_width, gml_context, minimum_one_word)
@@ -199,7 +205,7 @@ class GloomhavenParser(AbstractParser):
                     splitted_gml[0] = remain_str # Reminder: splitted_gml[0] is the current item being parsed
                     continue
 
-            if width == -1 or item.get_width() < width - x:
+            if arguments.width == -1 or item.get_width() < arguments.width - x:
                 current_line.append(item)
             else:
                 lines.append(current_line)
@@ -216,7 +222,6 @@ class GloomhavenParser(AbstractParser):
         for line in lines:
             result.append(GloomhavenLineItem(list_join(line, blank), gml_context, self.path_to_gml))
         return result
-
 
 from .gloomhaven_commands import EnhancementDotCommand, InsideCommand, ExpCommand, MultilineCommand, ChargesLossCommand, \
         ChargesNonLossCommand, SummonCommand, DividerLine
