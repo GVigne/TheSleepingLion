@@ -35,7 +35,8 @@ class FrosthavenParser(AbstractParser):
                         "\\conditional_consumption": ConditionalConsumeBox,
                         "\\exp": FHExpCommand,
                         "\\charges": FHChargesCommand,
-                        "\\charges_line": FHOneLineChargesCommand
+                        "\\charges_line": FHOneLineChargesCommand,
+                        "\\reduced_column": ReducedColumn
                     }
 
         self.macro_tokens = {"@end": EndMacro,
@@ -139,6 +140,7 @@ class FrosthavenParser(AbstractParser):
             primary_action = self.gml_line_to_items(lexemes,
                                                     FrosthavenLineContext(class_color=class_color),
                                                     FrosthavenParserArguments(width=primary_line_width))
+
         # Note that primary_action is a list of LineItem. The first ones will be placed on the card, and
         # the secondary actions will be aligned with the last one.
         secondary_lines_width = card_drawing_width - 2*SecondaryActionBox.BoxAdditionalWidth()
@@ -247,6 +249,7 @@ class FrosthavenParser(AbstractParser):
                     result.append(FrosthavenLineContext(list_join(line, blank), gml_context, self.path_to_gml))
                 # Update parser's arguments
                 arguments.ongoing_line = current_line
+                arguments.ongoing_x = x
                 arguments.ongoing_blank = blank
                 return result + self.gml_line_to_items(splitted_gml, gml_context, arguments)
             else: # current_str is a text
@@ -287,4 +290,4 @@ class FrosthavenParser(AbstractParser):
 
 from .frosthaven_commands import SecondaryActionBox, MandatoryBox, TopActionBRMandatoryBox, BotActionBRMandatoryBox, \
                                 AbilityLine, BaseConditionalBox, ConditionalConsumeBox, FHExpCommand, FHChargesCommand, \
-                                FHOneLineChargesCommand
+                                FHOneLineChargesCommand, ReducedColumn

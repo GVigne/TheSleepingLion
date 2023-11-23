@@ -30,6 +30,7 @@ fh_base_aliases = [
 "\\strengthen = \\image{strengthen.svg}",
 "\\bless{$x$} = @big \\image{bless.svg} @endlast",
 "\\bless = \\image{bless.svg}",
+"\\jump = \\image{jump.svg}",
 
 "\\muddle{$x$} = @big \\image{muddle.svg} @endlast",
 "\\muddle = \\image{muddle.svg}",

@@ -4,7 +4,7 @@ from math import pi, sqrt
 
 from ..core.abstractGMLlinecontext import AbstractGMLLineContext
 from ..core.items import AbstractItem, TextItem, LineItem
-from ..core.errors import MismatchNoArguments
+from ..core.errors import MismatchNoArguments, InvalidArgumentType
 from ..core.utils import list_join
 
 from .frosthaven_items import ColumnItem, FrosthavenImage
@@ -655,7 +655,6 @@ class FHChargesCommand(AbstractItem):
         cr.restore()
         cr.restore()
 
-
 class FHOneLineChargesCommand(FHChargesCommand):
     def __init__(self, arguments: list[str],
                  gml_context: FrosthavenLineContext,
@@ -665,5 +664,36 @@ class FHOneLineChargesCommand(FHChargesCommand):
             raise MismatchNoArguments(f"The '\\charges_line' commands takes up to 4 arguments but f{len(arguments)} were given")
         super().__init__(arguments, gml_context, True, path_to_gml)
 
+class ReducedColumn(AbstractItem):
+    """
+    A class to grant the user access to a ColumnItem, enabling it to place items at different
+    heights from one another, for example when writing an element consumption with a text on two
+    lines, centered vertically with the imaeg of the consumed element.
+    """
+    def __init__(self, arguments: list[str],
+                 gml_context: AbstractGMLLineContext,
+                 path_to_gml: Path | None = None,
+                 parser_arguments: FrosthavenParserArguments | None = None):
+        super().__init__(arguments, gml_context, path_to_gml, parser_arguments)
+        if len(arguments) != 1 and len(arguments) != 2:
+            raise MismatchNoArguments(f"The '\\reduced_column' command takes 1 mandatory argument and 1 optional argument but {len(arguments)} were given.")
+        reduced_width = parser_arguments.width - parser_arguments.ongoing_x
+        if len(arguments) == 2:
+            try:
+                reduced_width = float(arguments[1])*parser_arguments.width
+            except:
+                raise InvalidArgumentType("The optional argument for the '\\reduced_column' command must be a number between 0 and 1.")
+
+        reduced_args = FrosthavenParserArguments(None, reduced_width, 0, None)
+        self.parsed_action = ColumnItem(FrosthavenParser(path_to_gml).gml_line_to_items(arguments[0],gml_context,reduced_args))
+
+    def get_width(self):
+        return self.parsed_action.get_width()
+
+    def get_height(self):
+        return self.parsed_action.get_height()
+
+    def draw(self, cr):
+        self.parsed_action.draw(cr)
 
 from .frosthavenparser import FrosthavenParser
