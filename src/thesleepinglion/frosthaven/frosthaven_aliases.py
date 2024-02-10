@@ -30,6 +30,8 @@ fh_base_aliases = [
 "\\strengthen = \\image{strengthen.svg}",
 "\\bless{$x$} = @big \\image{bless.svg} @endlast",
 "\\bless = \\image{bless.svg}",
+"\\invisible{$x$} = @big \\image{invisible.svg} @endlast",
+"\\invisible = \\image{invisible.svg}",
 "\\jump = \\image{jump.svg}",
 
 "\\muddle{$x$} = @big \\image{muddle.svg} @endlast",
@@ -52,6 +54,7 @@ fh_base_aliases = [
 "\\bane = \\image{bane.svg}",
 
 "\\consume{$x$} = @conditional_consumption @big \\image{$x$_consume.svg} @endlast :",
+"\\additional_consume{$x$} = @conditional @big \\image{$x$_consume.svg} @endlast :",
 "\\generate{$x$}{$y$}{$z$} = @mandatory @big \\image{$x$.svg} \\image{$y$.svg} \\image{$z$.svg} @endlast",
 "\\generate{$x$}{$y$} = @mandatory @big \\image{$x$.svg} \\image{$y$.svg} @endlast",
 "\\generate{$x$} = @mandatory @big \\image{$x$.svg} @endlast",

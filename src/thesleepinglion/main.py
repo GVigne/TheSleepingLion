@@ -47,8 +47,8 @@ def thesleepinglion_main():
                 print(show_warning_errors(parsing_warnings))
             width, height = card_width, card_height
             if isinstance(haven_class, FrosthavenClass):
-                width, heigh = fh_card_width, fh_card_height
-            surface = cairo.PDFSurface(path_to_pdf, width, heigh)
+                width, height = fh_card_width, fh_card_height
+            surface = cairo.PDFSurface(path_to_pdf, width, height)
             cr = cairo.Context(surface)
             for card in haven_class.cards:
                 cr.save()
