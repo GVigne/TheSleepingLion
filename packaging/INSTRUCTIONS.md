@@ -24,10 +24,10 @@ Create a Python venv using system-wide packages, then activate it:
 
 ## Step 4: package The Sleeping Lion using Nsis
 Nsis is a tool which helps distribute apps through Windows. We will also be using ResourceHacker to set an icon on the resulting executable (this icon will be shown in the task bar to the user).
-- Download an install ResourceHacker from http://www.angusj.com/resourcehacker/. Then, move the `ResourceHacker.exe` file to the `packaging` folder.
+- Download an install ResourceHacker from http://www.angusj.com/resourcehacker/. or [Resource Cracker](https://www.pelock.com/products/resource-cracker) Then, move the `ResourceHacker.exe` file to the `packaging` folder.
 - Navigate to the `packaging` folder, and run `./build.sh`. This will launch the `build.sh` script which will take care of the creation of the executable.
 
-The `build.sh` script starts by using PyInstaller to create an executable, then calls Nsis and Resource hacker to have a nice Setup Wizard and making sure The Sleeping Lion can be uninstalled in a "clean Windows way" (via "Add or Remove programs").
+The `build.sh` script starts by using PyInstaller to create an executable, then calls Nsis and Resource hacker or [Resource Cracker](https://www.pelock.com/products/resource-cracker) to have a nice Setup Wizard and making sure The Sleeping Lion can be uninstalled in a "clean Windows way" (via "Add or Remove programs").
 
  Note that the icon located in `packaging` and named `the_sleeping_lion_square.ico` is different from the ones in `gui_images`: Windows can't deal with rectangular icons, so we have to use a dedicated square icon.
 
